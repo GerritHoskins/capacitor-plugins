@@ -1,0 +1,24 @@
+{
+  "packages": [
+    "clevertap",
+    "in-app-browser",
+    "login-provider",
+    "mparticle"
+  ],
+  "command": {
+    "bootstrap": {
+      "ci": false,
+      "npmClientArgs": [
+        "--no-package-lock"
+      ]
+    },
+    "version": {
+      "allowBranch": "master",
+      "conventionalCommits": true,
+      "createRelease": "github",
+      "message": "chore(release): publish [skip ci]",
+      "tagVersionPrefix": ""
+    }
+  },
+  "version": "independent"
+}

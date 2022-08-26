@@ -1,0 +1,37 @@
+{
+  "name": "@gerrithoskins/capacitor-plugins",
+  "private": true,
+  "scripts": {
+    "build": "lerna run build",
+    "watch": "lerna run --parallel --stream watch",
+    "lint": "npm run scripts:prettier -- --check && lerna run lint",
+    "fmt": "npm run scripts:prettier -- --write && lerna run fmt",
+    "scripts:prettier": "npx prettier \"scripts/**/*.mjs\"",
+    "apply-patches": "node ./scripts/apply-patches.mjs",
+    "toggle-local": "node ./scripts/toggle-local.mjs",
+    "update-all": "node ./scripts/update-all.mjs",
+    "set-capacitor-version": "node ./scripts/set-capacitor-version.mjs",
+    "postinstall": "lerna bootstrap",
+    "publish:cocoapod": "lerna run publish:cocoapod --concurrency 1",
+    "ci:publish:nightly": "lerna publish prerelease --conventional-commits --conventional-prerelease --preid nightly-$(git rev-parse --short HEAD) --dist-tag nightly --force-publish --no-verify-access --no-changelog --no-git-tag-version --no-push --yes",
+    "ci:publish:alpha": "lerna publish prerelease --conventional-commits --conventional-prerelease --preid alpha --dist-tag next --force-publish --no-verify-access --yes",
+    "ci:publish:beta": "lerna publish prerelease --conventional-commits --conventional-prerelease --preid beta --dist-tag next --force-publish --no-verify-access --yes",
+    "ci:publish:rc": "lerna publish prerelease --conventional-commits --conventional-prerelease --preid rc --dist-tag next --force-publish --no-verify-access --yes",
+    "ci:publish:latest": "lerna publish --conventional-graduate --conventional-commits --dist-tag latest --force-publish --no-verify-access --yes",
+    "ci:publish:dev": "lerna publish prerelease --conventional-commits --conventional-prerelease --preid dev-$(git rev-parse --short HEAD) --dist-tag dev --force-publish --no-verify-access --no-changelog --no-git-tag-version --no-push --yes"
+  },
+  "devDependencies": {
+    "@actions/core": "^1.9.1",
+    "@ionic/prettier-config": "^1.0.1",
+    "@types/prompts": "^2.0.8",
+    "esm": "^3.2.25",
+    "lerna": "^5.4.3",
+    "prettier": "~2.3.0",
+    "prompts": "^2.3.2"
+  },
+  "prettier": "@ionic/prettier-config",
+  "volta": {
+    "node": "14.18.2",
+    "npm": "6.14.15"
+  }
+}
