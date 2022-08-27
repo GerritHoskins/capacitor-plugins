@@ -1,0 +1,4 @@
+11 error Error: A GH_TOKEN environment variable is required.
+11 error     at createGitHubClient (/home/ubuntu/WebstormProjects/cap-plugins/node_modules/@lerna/github-client/lib/github-client.js:17:11)
+11 error     at createReleaseClient (/home/ubuntu/WebstormProjects/cap-plugins/node_modules/@lerna/version/lib/create-release.js:20:14)
+11 error     at VersionCommand.configureProperties (/home/ubuntu/WebstormProjects/cap-plugins/node_modules/@lerna/version/index.js:83:58)
