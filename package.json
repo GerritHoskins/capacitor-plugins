@@ -1,5 +1,5 @@
 {
-  "name": "@gerrithoskins/capacitor-plugins",
+  "name": "capacitor-plugins",
   "private": true,
   "scripts": {
     "build": "lerna run build",
