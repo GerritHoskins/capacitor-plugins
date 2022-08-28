@@ -1,5 +1,5 @@
 {
-  "name": "@bitburst-gmbh/clevertap",
+  "name": "@gerrithoskins/clevertap",
   "version": "0.0.1",
   "description": "capacitor plugin for clevertap",
   "main": "dist/plugin.cjs.js",
@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BitBurst-GmbH/capacitor-plugins.git"
+    "url": "git+https://github.com/GerritHoskins/capacitor-plugins.git"
   },
   "bugs": {
     "url": "https://github.com/BitBurst-GmbH/capacitor-plugins.git/issues"
