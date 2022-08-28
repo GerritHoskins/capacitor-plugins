@@ -52,6 +52,7 @@
     "@ionic/eslint-config": "^0.3.0",
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
+    "@types/clevertap-web-sdk": "^1.1.0",
     "eslint": "^7.11.0",
     "prettier": "~2.3.0",
     "prettier-plugin-java": "~1.0.2",
@@ -63,6 +64,9 @@
   "peerDependencies": {
     "@capacitor/core": "^4.0.0",
     "@capacitor/cli": "^4.0.0"
+  },
+  "dependencies": {
+    "clevertap-web-sdk": "^1.2.0"
   },
   "prettier": "@ionic/prettier-config",
   "swiftlint": "@ionic/swiftlint-config",

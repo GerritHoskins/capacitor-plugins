@@ -1,4 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
+import clevertap from 'clevertap-web-sdk';
 
 import type {
   ClevertapInstance,
@@ -15,6 +16,7 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
   }
 
   getClevertapId(): Promise<ClevertapInstance> {
+    clevertap.getCleverTapID();
     throw this.unimplemented('Not implemented on web.');
   }
 
