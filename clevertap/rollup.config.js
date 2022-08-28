@@ -20,4 +20,3 @@ export default {
   ],
   external: ['@capacitor/core', '@capacitor/cli'],
 };
-

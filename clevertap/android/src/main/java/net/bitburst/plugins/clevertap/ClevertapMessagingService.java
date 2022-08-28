@@ -1,13 +1,12 @@
 package net.bitburst.plugins.clevertap;
 
 import android.util.Log;
-
 import androidx.annotation.NonNull;
-
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 public class ClevertapMessagingService extends FirebaseMessagingService {
+
     public static final String LOG_TAG = "bitburst.clevertap ";
 
     @Override
@@ -25,8 +24,8 @@ public class ClevertapMessagingService extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String token) {
         Log.d(LOG_TAG, "Refreshed token: " + token);
-       //send the FCM registration token
-       //sendRegistrationToServer(token);
+        //send the FCM registration token
+        //sendRegistrationToServer(token);
     }
 
     private void sendRegistrationToServer(String token) {

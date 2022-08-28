@@ -32,6 +32,17 @@ export interface LoginProviderPlugin {
   removeAllListeners(): Promise<void>;
 }
 
+export type LoginProviderPayload = {
+  provider: Provider;
+  token: string;
+  secret: string;
+  email: string;
+  avatarUrl: string;
+  inviteCode: string;
+};
+
+export type LoginProviderOptions = Record<string, unknown>;
+
 export type Options = GoogleOptions | UniversalOptions;
 export interface UniversalOptions {
   customParameters?: CustomParameter[];
@@ -175,7 +186,7 @@ export interface AppleInterface {
   appleScriptUrl: string;
   appleScriptLoaded: boolean | unknown;
   login(): Promise<AppleLoginResponse>;
-  initialize(options: AppleInitOptions): Promise<void>
+  initialize(options: AppleInitOptions): Promise<void>;
 }
 export interface AppleInitOptions {
   clientId: string;

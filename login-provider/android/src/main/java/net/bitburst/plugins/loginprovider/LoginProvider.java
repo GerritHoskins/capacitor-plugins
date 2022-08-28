@@ -1,10 +1,10 @@
 package net.bitburst.plugins.loginprovider;
 
+import android.util.Log;
 import net.bitburst.plugins.loginprovider.handlers.AppleAuthProviderHandler;
 import net.bitburst.plugins.loginprovider.handlers.FacebookAuthProviderHandler;
 import net.bitburst.plugins.loginprovider.handlers.GoogleAuthProviderHandler;
 import net.bitburst.plugins.loginprovider.handlers.OAuthProviderHandler;
-import android.util.Log;
 
 public class LoginProvider {
 
@@ -29,10 +29,11 @@ public class LoginProvider {
         this.statusChangeListener =
             execute(
                 () -> {
-                if (statusChangeListener != null) {
-                    statusChangeListener.onAppStatusChanged();
+                    if (statusChangeListener != null) {
+                        statusChangeListener.onAppStatusChanged();
+                    }
                 }
-            });
+            );
     }
 
     public void setAppStatusChangeListener(@Nullable AppStatusChangeListener listener) {
@@ -70,7 +71,7 @@ public class LoginProvider {
         call.resolve();
     }
 
-     public void startActivityForResult(final PluginCall call, Intent intent, String callbackName) {
+    public void startActivityForResult(final PluginCall call, Intent intent, String callbackName) {
         plugin.startActivityForResult(call, intent, callbackName);
     }
 

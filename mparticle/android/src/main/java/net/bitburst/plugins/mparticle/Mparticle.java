@@ -1,19 +1,16 @@
 package net.bitburst.plugins.mparticle;
 
-import java.util.Dictionary;
-
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
-
 import com.mparticle.MParticle;
-import com.mparticle.MParticleOptions;
 import com.mparticle.MParticle.EventType;
-import com.mparticle.identity.MParticleUser;
-import com.mparticle.identity.IdentityApiRequest;
+import com.mparticle.MParticleOptions;
 import com.mparticle.commerce.Product;
 import com.mparticle.commerce.Product.Builder;
-
+import com.mparticle.identity.IdentityApiRequest;
+import com.mparticle.identity.MParticleUser;
 import java.util.*;
+import java.util.Dictionary;
 import org.json.JSONException;
 
 public class Mparticle {
@@ -46,10 +43,7 @@ public class Mparticle {
     }
 
     public IdentityApiRequest identityRequest(String email, String customerId) {
-        IdentityApiRequest identityRequest = IdentityApiRequest.withEmptyUser()
-        .email(email)
-        .customerId(customerId)
-        .build();
+        IdentityApiRequest identityRequest = IdentityApiRequest.withEmptyUser().email(email).customerId(customerId).build();
         return identityRequest;
     }
 
@@ -63,7 +57,7 @@ public class Mparticle {
                 try {
                     Object value = temp.get(key);
                     customAttributes.put(key, value.toString());
-                    } catch (JSONException e) {
+                } catch (JSONException e) {
                     // Something went wrong!
                 }
             }
@@ -71,9 +65,10 @@ public class Mparticle {
         return new Product.Builder(
             (String) productData.getString("name"),
             (String) productData.getString("sku"),
-            (double) productData.getInteger("cost"))
+            (double) productData.getInteger("cost")
+        )
             .quantity((double) productData.getInteger("quantity"))
-            .customAttributes((Map<String,String>) customAttributes)
+            .customAttributes((Map<String, String>) customAttributes)
             .build();
     }
 }

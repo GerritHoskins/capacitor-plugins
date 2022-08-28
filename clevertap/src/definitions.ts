@@ -23,7 +23,7 @@ export interface ClevertapPlugin {
   registerFBM(): Promise<void>;
   getDeliveredNotifications(): Promise<DeliveredNotifications>;
   removeDeliveredNotifications(
-      delivered: DeliveredNotifications,
+    delivered: DeliveredNotifications,
   ): Promise<void>;
   createChannel(channel: Channel): Promise<void>;
   onUserLogin(profile: UserProfile): Promise<void>;

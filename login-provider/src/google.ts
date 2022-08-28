@@ -128,15 +128,16 @@ export class GooglePlugin extends WebPlugin implements GoogleInterface {
   }
 
   async login(): Promise<GoogleLoginResponse> {
-    return new Promise<GoogleLoginResponse>( async (resolve, reject) => {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise<GoogleLoginResponse>(async (resolve, reject) => {
       try {
         let serverAuthCode: string | undefined = undefined;
         const needsOfflineAccess = this.options?.grantOfflineAccess ?? false;
 
         if (needsOfflineAccess) {
           const offlineAccessResponse = await gapi.auth2
-              .getAuthInstance()
-              .grantOfflineAccess();
+            .getAuthInstance()
+            .grantOfflineAccess();
           serverAuthCode = offlineAccessResponse.code;
         } else {
           await gapi.auth2.getAuthInstance().signIn();
@@ -150,7 +151,7 @@ export class GooglePlugin extends WebPlugin implements GoogleInterface {
         }
 
         const user: GoogleLoginResponse = (await this.getUserFrom(
-            googleUser,
+          googleUser,
         )) as GoogleLoginResponse;
 
         if (serverAuthCode) {

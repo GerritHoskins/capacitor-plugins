@@ -6,19 +6,18 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
-
+import com.mparticle.*;
 import com.mparticle.MParticle;
-import com.mparticle.MParticleOptions;
 import com.mparticle.MParticle.EventType;
 import com.mparticle.MParticle.ServiceProviders;
-import com.mparticle.identity.IdentityApiRequest;
-import com.mparticle.commerce.Product;
+import com.mparticle.MParticleOptions;
 import com.mparticle.commerce.CommerceEvent;
 import com.mparticle.commerce.CommerceEvent.Builder;
+import com.mparticle.commerce.Product;
 import com.mparticle.commerce.TransactionAttributes;
+import com.mparticle.identity.IdentityApiRequest;
 import com.mparticle.identity.IdentityApiResult;
 import com.mparticle.identity.TaskSuccessListener;
-import com.mparticle.*;
 import java.util.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,7 +63,7 @@ public class MparticlePlugin extends Plugin {
                 try {
                     Object value = temp.get(key);
                     customAttributes.put(key, value.toString());
-                    } catch (JSONException e) {
+                } catch (JSONException e) {
                     // Something went wrong!
                 }
             }
@@ -72,9 +71,7 @@ public class MparticlePlugin extends Plugin {
         String name = call.getString("eventName");
         int type = call.getInt("eventType");
 
-        MPEvent event = new MPEvent.Builder(name, implementation.getEventType(type))
-            .customAttributes(customAttributes)
-            .build();
+        MPEvent event = new MPEvent.Builder(name, implementation.getEventType(type)).customAttributes(customAttributes).build();
 
         Mparticle.getInstance().logEvent(event);
         call.resolve(new JSObject());
@@ -86,7 +83,7 @@ public class MparticlePlugin extends Plugin {
         String link = call.getString("pageLink");
         Map<String, String> screenInfo = new HashMap<String, String>();
         screenInfo.put("page", link);
-        Mparticle.getInstance().logScreen(name, screenInfo );
+        Mparticle.getInstance().logScreen(name, screenInfo);
         call.resolve(new JSObject());
     }
 
@@ -95,7 +92,7 @@ public class MparticlePlugin extends Plugin {
         String name = call.getString("attributeName");
         String value = call.getString("attributeValue");
         if (implementation.currentUser() != null) {
-            implementation.currentUser().setUserAttribute(name,value);
+            implementation.currentUser().setUserAttribute(name, value);
         }
         call.resolve(new JSObject());
     }
@@ -109,7 +106,7 @@ public class MparticlePlugin extends Plugin {
             attributeList = list_tmp.toList();
         } catch (JSONException e) {}
         if (implementation.currentUser() != null) {
-            implementation.currentUser().setUserAttributeList(name,attributeList);
+            implementation.currentUser().setUserAttributeList(name, attributeList);
         }
         call.resolve(new JSObject());
     }
@@ -118,7 +115,7 @@ public class MparticlePlugin extends Plugin {
     public void loginMparticleUser(PluginCall call) {
         String email = call.getString("email");
         String customerId = call.getString("customerId");
-        Mparticle.getInstance().Identity().login(implementation.identityRequest(email,customerId));
+        Mparticle.getInstance().Identity().login(implementation.identityRequest(email, customerId));
         call.resolve(new JSObject());
     }
 
@@ -132,25 +129,30 @@ public class MparticlePlugin extends Plugin {
     public void registerMparticleUser(PluginCall call) {
         String email = call.getString("email");
         String customerId = call.getString("customerId");
-        Mparticle.getInstance().Identity().login(implementation.identityRequest(email,customerId))
-        .addSuccessListener(new TaskSuccessListener() {
-            public void onSuccess(IdentityApiResult result) {
-                //proceed with login
-                JSObject temp = call.getObject("userAttributes");
-                if (temp != null) {
-                    Iterator<String> iter = temp.keys();
-                    while (iter.hasNext()) {
-                        String key = iter.next();
-                        try {
-                            Object value = temp.get(key);
-                            result.getUser().setUserAttribute(key,value);
-                            } catch (JSONException e) {
-                            // Something went wrong!
+        Mparticle
+            .getInstance()
+            .Identity()
+            .login(implementation.identityRequest(email, customerId))
+            .addSuccessListener(
+                new TaskSuccessListener() {
+                    public void onSuccess(IdentityApiResult result) {
+                        //proceed with login
+                        JSObject temp = call.getObject("userAttributes");
+                        if (temp != null) {
+                            Iterator<String> iter = temp.keys();
+                            while (iter.hasNext()) {
+                                String key = iter.next();
+                                try {
+                                    Object value = temp.get(key);
+                                    result.getUser().setUserAttribute(key, value);
+                                } catch (JSONException e) {
+                                    // Something went wrong!
+                                }
+                            }
                         }
                     }
                 }
-            }
-        });;
+            );
         call.resolve(new JSObject());
     }
 }

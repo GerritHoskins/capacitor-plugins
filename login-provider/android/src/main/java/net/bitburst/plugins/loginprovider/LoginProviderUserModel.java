@@ -12,9 +12,14 @@ public class LoginProviderUserModel {
     private String secret;
 
     public LoginProviderUserModel(
-        String provider, String displayName, String email,
-        Uri photoUrl, String providerId, String tenantId,
-        String uid, String secret
+        String provider,
+        String displayName,
+        String email,
+        Uri photoUrl,
+        String providerId,
+        String tenantId,
+        String uid,
+        String secret
     ) {
         this.provider = provider;
         this.displayName = displayName;
@@ -89,5 +94,4 @@ public class LoginProviderUserModel {
     public void setSecret(String secret) {
         this.secret = secret;
     }
-
 }

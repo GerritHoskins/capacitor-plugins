@@ -9,8 +9,6 @@ import com.google.firebase.auth.AdditionalUserInfo;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.OAuthProvider;
-import net.bitburst.plugins.loginprovider.LoginProvider;
-import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharsetDecoder;
@@ -20,6 +18,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.List;
+import net.bitburst.plugins.loginprovider.LoginProvider;
+import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -80,11 +80,9 @@ public class AppleAuthProviderHandler {
         }
     }
 
-    private void startActivityForSignIn(final PluginCall call, OAuthProvider.Builder provider) {
-    }
+    private void startActivityForSignIn(final PluginCall call, OAuthProvider.Builder provider) {}
 
-    private void finishActivityForSignIn(final PluginCall call, Task<AuthResult> pendingResultTask) {
-    }
+    private void finishActivityForSignIn(final PluginCall call, Task<AuthResult> pendingResultTask) {}
 
     private void applySignInOptions(PluginCall call, OAuthProvider.Builder provider) {
         JSArray customParameters = call.getArray("customParameters");

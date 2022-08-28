@@ -4,7 +4,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
-
 import com.clevertap.android.sdk.CleverTapAPI;
 import com.getcapacitor.*;
 
@@ -29,7 +28,14 @@ public class ClevertapChannelManager {
 
     public void createChannel(PluginCall call) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            CleverTapAPI.createNotificationChannel(context.getApplicationContext(), CHANNEL_ID, CHANNEL_NAME, CHANNEL_DESCRIPTION,  NotificationManager.IMPORTANCE_HIGH, false);
+            CleverTapAPI.createNotificationChannel(
+                context.getApplicationContext(),
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                CHANNEL_DESCRIPTION,
+                NotificationManager.IMPORTANCE_HIGH,
+                false
+            );
         }
         call.resolve();
     }

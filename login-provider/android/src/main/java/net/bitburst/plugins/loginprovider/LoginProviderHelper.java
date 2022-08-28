@@ -1,21 +1,21 @@
 package net.bitburst.plugins.loginprovider;
 
-import net.bitburst.plugins.loginprovider.LoginProviderUserModel;
 import androidx.annotation.Nullable;
 import com.getcapacitor.JSObject;
 import java.util.Map;
+import net.bitburst.plugins.loginprovider.LoginProviderUserModel;
 
 public class LoginProviderHelper {
 
     public interface LoginProviderUser {
-        String provider default "";
-        String displayName default "";
-        String email default "";
-        URI photoUrl default "";
-        String providerId default "";
-        String tenantId default "";
-        String uid default "";
-        String secret default "";
+        String provider;
+        String displayName;
+        String email;
+        URI photoUrl;
+        String providerId;
+        String tenantId;
+        String uid;
+        String secret;
     }
 
     public static JSObject createSignInResult(
@@ -26,7 +26,6 @@ public class LoginProviderHelper {
         @Nullable String accessToken,
         @Nullable AdditionalUserInfo additionalUserInfo
     ) {
-
         LoginProviderUserModel usr = new LoginProviderUserModel();
 
         JSObject userResult = LoginProviderHelper.createUserResult(user);

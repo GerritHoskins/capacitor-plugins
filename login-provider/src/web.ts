@@ -6,13 +6,11 @@ import type {
   LoginProviderPlugin,
   Provider,
   ProviderResponse,
-
   FacebookInitOptions,
   FacebookLoginOptions,
-  GoogleInitOptions} from './definitions';
-import {
-  ProviderName,
+  GoogleInitOptions,
 } from './definitions';
+import { ProviderName } from './definitions';
 import { FacebookPlugin } from './facebook';
 import { GooglePlugin } from './google';
 import { TwitterPlugin } from './twitter';
@@ -29,7 +27,9 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
   }
 
   signOutFromProvider(provider: ProviderName): Promise<any> {
-    return Promise.reject('logout method not implemented yet.' + provider.toString());
+    return Promise.reject(
+      'logout method not implemented yet.' + provider.toString(),
+    );
   }
 
   public async initializeProvider(

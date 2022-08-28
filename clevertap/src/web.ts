@@ -1,8 +1,12 @@
 import { WebPlugin } from '@capacitor/core';
 
 import type {
-  ClevertapInstance, ClevertapPlugin, DeliveredNotifications, UserProfile,
-  Channel, PushEvent,
+  ClevertapInstance,
+  ClevertapPlugin,
+  DeliveredNotifications,
+  UserProfile,
+  Channel,
+  PushEvent,
 } from './definitions';
 
 export declare class Clevertap extends WebPlugin implements ClevertapPlugin {
@@ -25,7 +29,9 @@ export declare class Clevertap extends WebPlugin implements ClevertapPlugin {
   /**
    * Remove the specified notifications from the notifications screen.
    */
-  removeDeliveredNotifications(delivered: DeliveredNotifications): Promise<void>;
+  removeDeliveredNotifications(
+    delivered: DeliveredNotifications,
+  ): Promise<void>;
   /**
    * Create a notification channel.
    */
@@ -37,5 +43,5 @@ export declare class Clevertap extends WebPlugin implements ClevertapPlugin {
   /**
    * Push user profile on logon
    */
-  pushEvent(event: PushEvent): Promise<void>
+  pushEvent(event: PushEvent): Promise<void>;
 }

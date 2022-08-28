@@ -15,9 +15,9 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
+import java.util.List;
 import net.bitburst.plugins.loginprovider.LoginProvider;
 import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
-import java.util.List;
 import org.json.JSONException;
 
 public class FacebookAuthProviderHandler {

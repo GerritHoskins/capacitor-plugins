@@ -31,12 +31,18 @@ declare interface Facebook {
 
   api<TResponse>(path: string, callback: (response: TResponse) => void): void;
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-types
   api<TParams extends object, TResponse>(
     path: string,
     params: TParams,
     callback: (response: TResponse) => void,
   ): void;
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-types
   api<TParams extends object, TResponse>(
     path: string,
     method: 'get' | 'post' | 'delete',
@@ -49,16 +55,16 @@ declare let FB: Facebook;
 
 declare global {
   interface Window {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-types
     fbAsyncInit: Function;
   }
 }
 
 export class FacebookPlugin extends WebPlugin implements FacebookInterface {
   constructor() {
-    super({
-      name: 'FacebookLogin',
-      platforms: ['web'],
-    });
+    super();
   }
 
   initialize(options: Partial<FacebookInitOptions>): Promise<void> {
@@ -170,6 +176,9 @@ export class FacebookPlugin extends WebPlugin implements FacebookInterface {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-types
   async getProfile<T extends object>(options: {
     fields: readonly string[];
   }): Promise<T> {
@@ -186,6 +195,9 @@ export class FacebookPlugin extends WebPlugin implements FacebookInterface {
             return;
           }
 
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
           resolve(<T>response);
         },
       );
