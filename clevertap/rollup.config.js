@@ -18,5 +18,5 @@ export default {
       inlineDynamicImports: true,
     },
   ],
-  external: ['@capacitor/core', '@capacitor/cli'],
+  external: ['@capacitor/core'],
 };

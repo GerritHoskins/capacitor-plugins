@@ -9,39 +9,46 @@ import type {
   PushEvent,
 } from './definitions';
 
-export declare class Clevertap extends WebPlugin implements ClevertapPlugin {
-  /**
-   * Get activity state of plugin and Clevertap SDK
-   */
-  isReady(): Promise<ClevertapInstance>;
-  /**
-   * Get Clevertap generated user id
-   */
-  getClevertapId(): Promise<ClevertapInstance>;
-  /**
-   * Register the app to receive push notifications.
-   */
-  registerFBM(): Promise<void>;
-  /**
-   * Get a list of notifications that are visible on the notifications screen.
-   */
-  getDeliveredNotifications(): Promise<DeliveredNotifications>;
-  /**
-   * Remove the specified notifications from the notifications screen.
-   */
+export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
+  isReady(): Promise<ClevertapInstance> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  getClevertapId(): Promise<ClevertapInstance> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  registerFBM(): Promise<void> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  getDeliveredNotifications(): Promise<DeliveredNotifications> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
   removeDeliveredNotifications(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
+    // @ts-ignore
     delivered: DeliveredNotifications,
-  ): Promise<void>;
-  /**
-   * Create a notification channel.
-   */
-  createChannel(channel: Channel): Promise<void>;
-  /**
-   * Push user profile on logon
-   */
-  onUserLogin(profile: UserProfile): Promise<void>;
-  /**
-   * Push user profile on logon
-   */
-  pushEvent(event: PushEvent): Promise<void>;
+  ): Promise<void> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  createChannel(channel: Channel): Promise<void> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  onUserLogin(profile: UserProfile): Promise<void> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  pushEvent(event: PushEvent): Promise<void> {
+    throw this.unimplemented('Not implemented on web.');
+  }
 }

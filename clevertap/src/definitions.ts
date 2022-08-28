@@ -1,22 +1,3 @@
-/// <reference types="@capacitor/cli" />
-
-export type PresentationOption = 'badge' | 'sound' | 'alert';
-
-declare module '@capacitor/cli' {
-  export interface PluginsConfig {
-    PushNotifications?: {
-      /**
-       *   - `badge`: badge count on the app icon is updated (default value)
-       *   - `sound`: the device will ring/vibrate when the push notification is received
-       *   - `alert`: the push notification is displayed in a native dialog
-       *
-       * badge is only available for iOS.
-       */
-      presentationOptions: PresentationOption[];
-    };
-  }
-}
-
 export interface ClevertapPlugin {
   getClevertapId(): Promise<ClevertapInstance>;
   isReady(): Promise<ClevertapInstance>;
