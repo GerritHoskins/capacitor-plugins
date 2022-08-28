@@ -4,9 +4,10 @@ export default {
     {
       file: 'dist/plugin.js',
       format: 'iife',
-      name: 'capacitorMparticle',
+      name: 'capacitorPlugin',
       globals: {
         '@capacitor/core': 'capacitorExports',
+        '@capacitor/cli': 'capacitorExports',
       },
       sourcemap: true,
       inlineDynamicImports: true,
@@ -18,5 +19,5 @@ export default {
       inlineDynamicImports: true,
     },
   ],
-  external: ['@capacitor/core'],
+  external: ['@capacitor/core', '@capacitor/cli'],
 };
