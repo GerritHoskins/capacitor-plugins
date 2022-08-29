@@ -13,9 +13,12 @@ npx cap sync
 
 <docgen-index>
 
-* [`initializeProvider(...)`](#initializeprovider)
-* [`signInWithProvider(...)`](#signinwithprovider)
-* [`signOutFromProvider(...)`](#signoutfromprovider)
+* [`loginWithProvider(...)`](#loginwithprovider)
+* [`loginWithApple(...)`](#loginwithapple)
+* [`loginWithFacebook(...)`](#loginwithfacebook)
+* [`loginWithGoogle(...)`](#loginwithgoogle)
+* [`loginWithTwitter()`](#loginwithtwitter)
+* [`logoutFromProvider(...)`](#logoutfromprovider)
 * [`addListener('appStateChange', ...)`](#addlistenerappstatechange)
 * [`removeAllListeners()`](#removealllisteners)
 * [Interfaces](#interfaces)
@@ -27,41 +30,86 @@ npx cap sync
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### initializeProvider(...)
+### loginWithProvider(...)
 
 ```typescript
-initializeProvider(provider: ProviderName, options: GoogleInitOptions | FacebookInitOptions | AppleInitOptions) => Promise<void>
-```
-
-| Param          | Type                                                                                                                                                                          |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`provider`** | <code><a href="#providername">ProviderName</a></code>                                                                                                                         |
-| **`options`**  | <code><a href="#googleinitoptions">GoogleInitOptions</a> \| <a href="#facebookinitoptions">FacebookInitOptions</a> \| <a href="#appleinitoptions">AppleInitOptions</a></code> |
-
---------------------
-
-
-### signInWithProvider(...)
-
-```typescript
-signInWithProvider(provider: ProviderName, options?: FacebookLoginOptions | undefined, inviteCode?: string | undefined) => Promise<ProviderResponse>
+loginWithProvider(provider: ProviderName, options?: LoginProviderOptions | undefined, inviteCode?: string | undefined) => Promise<LoginProviderPayload>
 ```
 
 | Param            | Type                                                                  |
 | ---------------- | --------------------------------------------------------------------- |
 | **`provider`**   | <code><a href="#providername">ProviderName</a></code>                 |
-| **`options`**    | <code><a href="#facebookloginoptions">FacebookLoginOptions</a></code> |
+| **`options`**    | <code><a href="#loginprovideroptions">LoginProviderOptions</a></code> |
 | **`inviteCode`** | <code>string</code>                                                   |
 
-**Returns:** <code>Promise&lt;<a href="#providerresponse">ProviderResponse</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#loginproviderpayload">LoginProviderPayload</a>&gt;</code>
 
 --------------------
 
 
-### signOutFromProvider(...)
+### loginWithApple(...)
 
 ```typescript
-signOutFromProvider(provider: ProviderName) => Promise<void | any>
+loginWithApple(options: LoginProviderOptions, inviteCode?: string | undefined) => Promise<LoginProviderPayload>
+```
+
+| Param            | Type                                                                  |
+| ---------------- | --------------------------------------------------------------------- |
+| **`options`**    | <code><a href="#loginprovideroptions">LoginProviderOptions</a></code> |
+| **`inviteCode`** | <code>string</code>                                                   |
+
+**Returns:** <code>Promise&lt;<a href="#loginproviderpayload">LoginProviderPayload</a>&gt;</code>
+
+--------------------
+
+
+### loginWithFacebook(...)
+
+```typescript
+loginWithFacebook(options: LoginProviderOptions, inviteCode?: string | undefined) => Promise<LoginProviderPayload>
+```
+
+| Param            | Type                                                                  |
+| ---------------- | --------------------------------------------------------------------- |
+| **`options`**    | <code><a href="#loginprovideroptions">LoginProviderOptions</a></code> |
+| **`inviteCode`** | <code>string</code>                                                   |
+
+**Returns:** <code>Promise&lt;<a href="#loginproviderpayload">LoginProviderPayload</a>&gt;</code>
+
+--------------------
+
+
+### loginWithGoogle(...)
+
+```typescript
+loginWithGoogle(options: LoginProviderOptions, inviteCode?: string | undefined) => Promise<LoginProviderPayload>
+```
+
+| Param            | Type                                                                  |
+| ---------------- | --------------------------------------------------------------------- |
+| **`options`**    | <code><a href="#loginprovideroptions">LoginProviderOptions</a></code> |
+| **`inviteCode`** | <code>string</code>                                                   |
+
+**Returns:** <code>Promise&lt;<a href="#loginproviderpayload">LoginProviderPayload</a>&gt;</code>
+
+--------------------
+
+
+### loginWithTwitter()
+
+```typescript
+loginWithTwitter() => Promise<LoginProviderPayload>
+```
+
+**Returns:** <code>Promise&lt;<a href="#loginproviderpayload">LoginProviderPayload</a>&gt;</code>
+
+--------------------
+
+
+### logoutFromProvider(...)
+
+```typescript
+logoutFromProvider(provider: ProviderName) => Promise<void | any>
 ```
 
 | Param          | Type                                                  |
@@ -101,22 +149,12 @@ removeAllListeners() => Promise<void>
 ### Interfaces
 
 
-#### GoogleInitOptions
+#### LoginProviderOptions
 
-| Prop                     | Type                 |
-| ------------------------ | -------------------- |
-| **`grantOfflineAccess`** | <code>boolean</code> |
-
-
-#### FacebookInitOptions
-
-| Prop                   | Type                 |
-| ---------------------- | -------------------- |
-| **`appId`**            | <code>string</code>  |
-| **`autoLogAppEvents`** | <code>boolean</code> |
-| **`xfbml`**            | <code>boolean</code> |
-| **`version`**          | <code>string</code>  |
-| **`locale`**           | <code>string</code>  |
+| Prop        | Type                                                                                                                                                                                                                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`init`**  | <code>{ apple?: <a href="#appleinitoptions">AppleInitOptions</a>; facebook?: <a href="#facebookinitoptions">FacebookInitOptions</a>; google?: <a href="#googleinitoptions">GoogleInitOptions</a>; custom?: <a href="#record">Record</a>&lt;string, unknown&gt;; }</code> |
+| **`login`** | <code>{ facebook?: <a href="#facebookloginoptions">FacebookLoginOptions</a>; custom?: <a href="#record">Record</a>&lt;string, unknown&gt;; }</code>                                                                                                                      |
 
 
 #### AppleInitOptions
@@ -130,27 +168,43 @@ removeAllListeners() => Promise<void>
 | **`usePopup`**    | <code>boolean</code> |
 
 
-#### FacebookLoginResponse
+#### FacebookInitOptions
 
-| Prop                             | Type                                                          |
-| -------------------------------- | ------------------------------------------------------------- |
-| **`accessToken`**                | <code><a href="#facebookauth">FacebookAuth</a> \| null</code> |
-| **`recentlyGrantedPermissions`** | <code>string[]</code>                                         |
-| **`recentlyDeniedPermissions`**  | <code>string[]</code>                                         |
+| Prop                   | Type                 |
+| ---------------------- | -------------------- |
+| **`appId`**            | <code>string</code>  |
+| **`autoLogAppEvents`** | <code>boolean</code> |
+| **`xfbml`**            | <code>boolean</code> |
+| **`version`**          | <code>string</code>  |
+| **`locale`**           | <code>string</code>  |
 
 
-#### FacebookAuth
+#### GoogleInitOptions
 
-| Prop                      | Type                  |
-| ------------------------- | --------------------- |
-| **`applicationId`**       | <code>string</code>   |
-| **`declinedPermissions`** | <code>string[]</code> |
-| **`expires`**             | <code>string</code>   |
-| **`isExpired`**           | <code>boolean</code>  |
-| **`lastRefresh`**         | <code>string</code>   |
-| **`permissions`**         | <code>string[]</code> |
-| **`token`**               | <code>string</code>   |
-| **`userId`**              | <code>string</code>   |
+| Prop                     | Type                 |
+| ------------------------ | -------------------- |
+| **`grantOfflineAccess`** | <code>boolean</code> |
+
+
+#### FacebookLoginOptions
+
+| Prop              | Type                  |
+| ----------------- | --------------------- |
+| **`permissions`** | <code>string[]</code> |
+
+
+#### PluginListenerHandle
+
+| Prop         | Type                                      |
+| ------------ | ----------------------------------------- |
+| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
+
+
+#### AppStateChange
+
+| Prop       | Type                                                                                                                                                                                                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`user`** | <code><a href="#googleloginresponse">GoogleLoginResponse</a> \| <a href="#facebookloginresponse">FacebookLoginResponse</a> \| <a href="#appleloginresponse">AppleLoginResponse</a> \| <a href="#twitterloginresponse">TwitterLoginResponse</a> \| null</code> |
 
 
 #### GoogleLoginResponse
@@ -176,6 +230,29 @@ removeAllListeners() => Promise<void>
 | **`refreshToken`** | <code>string</code> |
 
 
+#### FacebookLoginResponse
+
+| Prop                             | Type                                                          |
+| -------------------------------- | ------------------------------------------------------------- |
+| **`accessToken`**                | <code><a href="#facebookauth">FacebookAuth</a> \| null</code> |
+| **`recentlyGrantedPermissions`** | <code>string[]</code>                                         |
+| **`recentlyDeniedPermissions`**  | <code>string[]</code>                                         |
+
+
+#### FacebookAuth
+
+| Prop                      | Type                  |
+| ------------------------- | --------------------- |
+| **`applicationId`**       | <code>string</code>   |
+| **`declinedPermissions`** | <code>string[]</code> |
+| **`expires`**             | <code>string</code>   |
+| **`isExpired`**           | <code>boolean</code>  |
+| **`lastRefresh`**         | <code>string</code>   |
+| **`permissions`**         | <code>string[]</code> |
+| **`token`**               | <code>string</code>   |
+| **`userId`**              | <code>string</code>   |
+
+
 #### AppleLoginResponse
 
 | Prop        | Type                        |
@@ -197,109 +274,12 @@ removeAllListeners() => Promise<void>
 | **`userID`**          | <code>string</code> |
 
 
-#### FacebookLoginOptions
-
-| Prop              | Type                  |
-| ----------------- | --------------------- |
-| **`permissions`** | <code>string[]</code> |
-
-
-#### PluginListenerHandle
-
-| Prop         | Type                                      |
-| ------------ | ----------------------------------------- |
-| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
-
-
-#### AppStateChange
-
-| Prop       | Type                                                                                                                                                                                                                                                          |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`user`** | <code><a href="#facebookloginresponse">FacebookLoginResponse</a> \| <a href="#googleloginresponse">GoogleLoginResponse</a> \| <a href="#appleloginresponse">AppleLoginResponse</a> \| <a href="#twitterloginresponse">TwitterLoginResponse</a> \| null</code> |
-
-
-#### FacebookInterface
-
-| Method                    | Signature                                                                                                                                           |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **initialize**            | (options: <a href="#partial">Partial</a>&lt;<a href="#facebookinitoptions">FacebookInitOptions</a>&gt;) =&gt; Promise&lt;void&gt;                   |
-| **login**                 | (options: <a href="#facebookloginoptions">FacebookLoginOptions</a>) =&gt; Promise&lt;<a href="#facebookloginresponse">FacebookLoginResponse</a>&gt; |
-| **logout**                | () =&gt; Promise&lt;void&gt;                                                                                                                        |
-| **reauthorize**           | () =&gt; Promise&lt;<a href="#facebookloginresponse">FacebookLoginResponse</a>&gt;                                                                  |
-| **getCurrentAccessToken** | () =&gt; Promise&lt;<a href="#facebookcurrentaccesstokenresponse">FacebookCurrentAccessTokenResponse</a>&gt;                                        |
-| **getProfile**            | &lt;T extends <a href="#record">Record</a>&lt;string, unknown&gt;&gt;(options: { fields: readonly string[]; }) =&gt; Promise&lt;T&gt;               |
-
-
-#### FacebookCurrentAccessTokenResponse
-
-| Prop              | Type                                                          |
-| ----------------- | ------------------------------------------------------------- |
-| **`accessToken`** | <code><a href="#facebookauth">FacebookAuth</a> \| null</code> |
-
-
-#### GoogleInterface
-
-| Method         | Signature                                                                                                                     |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| **initialize** | (options: <a href="#partial">Partial</a>&lt;<a href="#googleinitoptions">GoogleInitOptions</a>&gt;) =&gt; Promise&lt;void&gt; |
-| **login**      | () =&gt; Promise&lt;<a href="#googleloginresponse">GoogleLoginResponse</a>&gt;                                                |
-| **refresh**    | () =&gt; Promise&lt;<a href="#googleauth">GoogleAuth</a>&gt;                                                                  |
-| **logout**     | () =&gt; Promise&lt;any&gt;                                                                                                   |
-
-
-#### AppleInterface
-
-| Prop                    | Type                 |
-| ----------------------- | -------------------- |
-| **`appleScriptUrl`**    | <code>string</code>  |
-| **`appleScriptLoaded`** | <code>unknown</code> |
-
-| Method         | Signature                                                                             |
-| -------------- | ------------------------------------------------------------------------------------- |
-| **login**      | () =&gt; Promise&lt;<a href="#appleloginresponse">AppleLoginResponse</a>&gt;          |
-| **initialize** | (options: <a href="#appleinitoptions">AppleInitOptions</a>) =&gt; Promise&lt;void&gt; |
-
-
-#### TwitterInterface
-
-| Method       | Signature                                                                                  |
-| ------------ | ------------------------------------------------------------------------------------------ |
-| **isLogged** | () =&gt; Promise&lt;<a href="#twitteruserstatusresponse">TwitterUserStatusResponse</a>&gt; |
-| **login**    | () =&gt; Promise&lt;<a href="#twitterloginresponse">TwitterLoginResponse</a>&gt;           |
-| **logout**   | () =&gt; Promise&lt;void&gt;                                                               |
-
-
-#### TwitterUserStatusResponse
-
-| Prop      | Type                 |
-| --------- | -------------------- |
-| **`in`**  | <code>boolean</code> |
-| **`out`** | <code>boolean</code> |
-
-
 ### Type Aliases
 
 
-#### ProviderResponse
+#### LoginProviderPayload
 
-<code><a href="#facebookloginresponse">FacebookLoginResponse</a> | <a href="#googleloginresponse">GoogleLoginResponse</a> | <a href="#appleloginresponse">AppleLoginResponse</a> | <a href="#twitterloginresponse">TwitterLoginResponse</a></code>
-
-
-#### AppStateChangeListener
-
-<code>(change: <a href="#appstatechange">AppStateChange</a>): void</code>
-
-
-#### Provider
-
-<code><a href="#facebookinterface">FacebookInterface</a> | <a href="#googleinterface">GoogleInterface</a> | <a href="#appleinterface">AppleInterface</a> | <a href="#twitterinterface">TwitterInterface</a></code>
-
-
-#### Partial
-
-Make all properties in T optional
-
-<code>{ [P in keyof T]?: T[P]; }</code>
+<code>{ provider: <a href="#providername">ProviderName</a>; token: string; secret: string; email: string; avatarUrl: string; inviteCode?: string; }</code>
 
 
 #### Record
@@ -307,6 +287,11 @@ Make all properties in T optional
 Construct a type with a set of properties K of type T
 
 <code>{ [P in K]: T; }</code>
+
+
+#### AppStateChangeListener
+
+<code>(change: <a href="#appstatechange">AppStateChange</a>): void</code>
 
 
 ### Enums
