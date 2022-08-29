@@ -14,17 +14,26 @@ declare module '@capacitor/cli' {
 
 /***/
 export interface LoginProviderPlugin {
-  provider: Provider | undefined;
-  initializeProvider(
+  loginWithProvider(
     provider: ProviderName,
-    options: GoogleInitOptions | FacebookInitOptions | AppleInitOptions,
-  ): Promise<void>;
-  signInWithProvider(
-    provider: ProviderName,
-    options?: FacebookLoginOptions,
+    options?: LoginProviderOptions,
     inviteCode?: string,
-  ): Promise<ProviderResponse>;
-  signOutFromProvider(provider: ProviderName): Promise<void | any>;
+  ): Promise<LoginProviderPayload>;
+  loginWithApple(
+    options: LoginProviderOptions,
+    inviteCode?: string,
+  ): Promise<LoginProviderPayload>;
+  loginWithFacebook(
+    options: LoginProviderOptions,
+    inviteCode?: string,
+  ): Promise<LoginProviderPayload>;
+  loginWithGoogle(
+    options: LoginProviderOptions,
+    inviteCode?: string,
+  ): Promise<LoginProviderPayload>;
+  loginWithTwitter(): Promise<LoginProviderPayload>;
+
+  logoutFromProvider(provider: ProviderName): Promise<void | any>;
   addListener(
     eventName: 'appStateChange',
     listenerFunc: AppStateChangeListener,
@@ -33,15 +42,26 @@ export interface LoginProviderPlugin {
 }
 
 export type LoginProviderPayload = {
-  provider: Provider;
+  provider: ProviderName;
   token: string;
   secret: string;
   email: string;
   avatarUrl: string;
-  inviteCode: string;
+  inviteCode?: string;
 };
 
-export type LoginProviderOptions = Record<string, unknown>;
+export interface LoginProviderOptions {
+  init: {
+    apple?: AppleInitOptions;
+    facebook?: FacebookInitOptions;
+    google?: GoogleInitOptions;
+    custom?: Record<string, unknown>;
+  };
+  login: {
+    facebook?: FacebookLoginOptions;
+    custom?: Record<string, unknown>;
+  };
+}
 
 export type Options = GoogleOptions | UniversalOptions;
 export interface UniversalOptions {
