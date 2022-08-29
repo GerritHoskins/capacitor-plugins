@@ -12,16 +12,10 @@ def capacitor_pods
   pod 'FBSDKCoreKit', '14.1.0'
 end
 
-target 'PluginTests' do
-  use_frameworks!
-
-  pod 'GoogleSignIn', '~> 6.0.1'
-  pod 'TwitterKit'
-  pod 'FBSDKLoginKit', '14.1.0'
-  pod 'FBSDKCoreKit', '14.1.0'
-  pod 'Capacitor', :path => '../node_modules/@capacitor/ios'
+target 'Plugin' do
+  capacitor_pods
 end
 
-post_install do |installer|
-  assertDeploymentTarget(installer)
+target 'PluginTests' do
+  capacitor_pods
 end

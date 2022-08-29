@@ -3,7 +3,8 @@
     "clevertap",
     "in-app-browser",
     "login-provider",
-    "mparticle"
+    "mparticle",
+    "native-market"
   ],
   "command": {
     "bootstrap": {
