@@ -15,9 +15,8 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
     throw this.unimplemented('Not implemented on web.');
   }
 
-  getClevertapId(): Promise<ClevertapInstance> {
-    clevertap.getCleverTapID();
-    throw this.unimplemented('Not implemented on web.');
+  async getClevertapId(): Promise<ClevertapInstance> {
+    return { clevertapId: clevertap.getCleverTapID() || '' };
   }
 
   registerFBM(): Promise<void> {
