@@ -1,5 +1,6 @@
 {
   "packages": [
+    "appsflyer-uid",
     "clevertap",
     "in-app-browser",
     "login-provider",
