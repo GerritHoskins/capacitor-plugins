@@ -13,10 +13,8 @@ public class AppsflyerUidPlugin extends Plugin {
 
     @PluginMethod
     public void getUID(PluginCall call) {
-        String uid = call.getString("uid");
-
         JSObject ret = new JSObject();
-        ret.put("uid", implementation.getUID(uid));
+        ret.put("uid", implementation.getUID(getContext()));
         call.resolve(ret);
     }
 }
