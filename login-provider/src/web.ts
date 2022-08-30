@@ -2,11 +2,7 @@ import { WebPlugin } from '@capacitor/core';
 
 import { ApplePlugin } from './apple';
 import type {
-  AppleInitOptions,
   LoginProviderPlugin,
-  FacebookInitOptions,
-  FacebookLoginOptions,
-  GoogleInitOptions,
   LoginProviderOptions,
   LoginProviderPayload,
 } from './definitions';
@@ -35,13 +31,13 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
         providerName + ' initialization settings required.',
       );
 
-    if (providerName === ProviderName.Apple) {
+    if (providerName === ProviderName.APPLE) {
       return await this.loginWithApple(options, inviteCode);
-    } else if (providerName === ProviderName.Facebook) {
+    } else if (providerName === ProviderName.FACEBOOK) {
       return await this.loginWithFacebook(options, inviteCode);
-    } else if (providerName === ProviderName.Google) {
+    } else if (providerName === ProviderName.GOOGLE) {
       return await this.loginWithGoogle(options, inviteCode);
-    } else if (providerName === ProviderName.Twitter) {
+    } else if (providerName === ProviderName.TWITTER) {
       return await this.loginWithTwitter();
     }
 
@@ -55,9 +51,7 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
     inviteCode?: '',
   ): Promise<LoginProviderPayload> {
     const apple: ApplePlugin = new ApplePlugin();
-    const response = await apple
-      .initialize(options.init as AppleInitOptions)
-      .then(() => apple.login());
+    const response = await apple.initialize(options).then(() => apple.login());
 
     if (!response)
       return Promise.reject(
@@ -65,7 +59,7 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
       );
 
     return {
-      provider: ProviderName.Apple,
+      provider: ProviderName.APPLE.toString(),
       token: response.token,
       secret: response.code,
       email: response.email,
@@ -80,8 +74,8 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
   ): Promise<LoginProviderPayload> {
     const facebook: FacebookPlugin = new FacebookPlugin();
     const response = await facebook
-      .initialize(options.init as FacebookInitOptions)
-      .then(() => facebook.login(options.login as FacebookLoginOptions))
+      .initialize(options)
+      .then(() => facebook.login(options))
       .then(() => facebook.getCurrentAccessToken());
 
     if (!response)
@@ -100,7 +94,7 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
     });
 
     return {
-      provider: ProviderName.Facebook,
+      provider: ProviderName.FACEBOOK.toString(),
       token,
       secret: '',
       email: profile.email,
@@ -114,24 +108,24 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
     inviteCode?: '',
   ): Promise<LoginProviderPayload> {
     const google: GooglePlugin = new GooglePlugin();
-    const response = await google
-      .initialize(options.init as GoogleInitOptions)
-      .then(() => google.login());
-
-    if (!response || !response.authentication)
-      return Promise.reject(
-        new Error('google login failed to retrieve valid auth response'),
-      );
-
-    return {
-      provider: ProviderName.Google,
-      email: response.email,
-      token:
-        (await google.refresh()).idToken || response.authentication.idToken,
-      secret: '',
-      avatarUrl: response.imageUrl,
-      inviteCode,
-    } as LoginProviderPayload;
+    return google
+      .initialize(options)
+      .then(() => google.login())
+      .then(response => {
+        if (!response || !response.authentication)
+          return Promise.reject(
+            new Error('google login failed to retrieve valid auth response'),
+          );
+        return {
+          provider: ProviderName.GOOGLE.toString(),
+          email: response.email,
+          token: response.authentication.idToken,
+          secret: '',
+          avatarUrl: response.imageUrl,
+          inviteCode,
+        } as LoginProviderPayload;
+      })
+      .then(() => google.refresh());
   }
 
   loginWithTwitter(): Promise<LoginProviderPayload> {

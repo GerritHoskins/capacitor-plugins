@@ -5,9 +5,28 @@ import type { PluginListenerHandle } from '@capacitor/core';
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
     LoginProvider?: {
-      skipNativeAuth?: boolean;
-      providers?: string[];
-      GoogleAuth: Options;
+      apple?: {
+        clientId: string;
+        redirectURI: string;
+        scope: string;
+      };
+      facebook?: {
+        appId: string;
+        autoLogAppEvents: boolean;
+        xfbml: boolean;
+        version: string;
+        locale: string;
+        permissions: string[];
+      };
+      google?: {
+        scopes: string[];
+        serverClientId: string;
+        forceCodeForRefreshToken: boolean;
+      };
+      twitter?: {
+        consumerKey: string;
+        consumerSecret: string;
+      };
     };
   }
 }
@@ -42,7 +61,7 @@ export interface LoginProviderPlugin {
 }
 
 export type LoginProviderPayload = {
-  provider: ProviderName;
+  provider: string;
   token: string;
   secret: string;
   email: string;
@@ -50,27 +69,17 @@ export type LoginProviderPayload = {
   inviteCode?: string;
 };
 
-export interface LoginProviderOptions {
-  init: {
-    apple?: AppleInitOptions;
-    facebook?: FacebookInitOptions;
-    google?: GoogleInitOptions;
-    custom?: Record<string, unknown>;
-  };
-  login: {
-    facebook?: FacebookLoginOptions;
-    custom?: Record<string, unknown>;
-  };
-}
-
-export type Options = GoogleOptions | UniversalOptions;
-export interface UniversalOptions {
-  customParameters?: CustomParameter[];
-  scopes?: string[];
-}
-export interface CustomParameter {
-  key: string;
-  value: string;
+export interface LoginProviderOptions
+  extends AppleInitOptions,
+    FacebookInitOptions,
+    GoogleInitOptions,
+    FacebookLoginOptions,
+    Pick<
+      GoogleInitOptions,
+      'scopes' | 'clientId' | 'forceCodeForRefreshToken'
+    > {
+  grantOfflineAccess?: boolean;
+  custom?: Record<string, unknown>;
 }
 export type AppStateChangeListener = (change: AppStateChange) => void;
 export interface AppStateChange {
@@ -83,28 +92,10 @@ export interface AppStateChange {
 }
 
 export enum ProviderName {
-  Facebook,
-  Google,
-  Apple,
-  Twitter,
-}
-
-export type Provider =
-  | FacebookInterface
-  | GoogleInterface
-  | AppleInterface
-  | TwitterInterface;
-
-export type ProviderResponse =
-  | FacebookLoginResponse
-  | GoogleLoginResponse
-  | AppleLoginResponse
-  | TwitterLoginResponse;
-
-export interface ProviderS {
-  provider: ProviderName | null;
-  scopes?: string[];
-  customParams?: Record<string, unknown>;
+  FACEBOOK,
+  GOOGLE,
+  APPLE,
+  TWITTER,
 }
 /***/
 
@@ -130,17 +121,13 @@ export interface GoogleAuth {
   idToken: string;
   refreshToken?: string;
 }
-export interface GoogleOptions {
+export interface GoogleInitOptions {
   clientId?: string;
   iosClientId?: string;
   androidClientId?: string;
   scopes?: string[];
   serverClientId?: string;
   forceCodeForRefreshToken?: boolean;
-}
-export interface GoogleInitOptions
-  extends Pick<GoogleOptions, 'scopes' | 'clientId'> {
-  grantOfflineAccess: boolean;
 }
 
 // FACEBOOK
@@ -191,14 +178,14 @@ export interface FacebookGetProfileResponse {
   error: FacebookError | null;
 }
 export interface FacebookLoginOptions {
-  permissions: string[];
+  permissions?: string[];
 }
 export interface FacebookInitOptions {
-  appId: string;
-  autoLogAppEvents: boolean;
-  xfbml: boolean;
-  version: string;
-  locale: string;
+  appId?: string;
+  autoLogAppEvents?: boolean;
+  xfbml?: boolean;
+  version?: string;
+  locale?: string;
 }
 
 //APPLE
@@ -209,8 +196,8 @@ export interface AppleInterface {
   initialize(options: AppleInitOptions): Promise<void>;
 }
 export interface AppleInitOptions {
-  clientId: string;
-  redirectURI: string;
+  clientId?: string;
+  redirectURI?: string;
   state?: string;
   scope?: string;
   usePopup?: boolean;

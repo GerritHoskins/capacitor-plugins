@@ -7,17 +7,11 @@ import type {
   FacebookGetProfileResponse,
   FacebookLoginResponse,
   FacebookInterface,
+  LoginProviderOptions,
 } from './definitions';
 
 declare interface Facebook {
-  init(
-    options: Partial<{
-      appId: string;
-      autoLogAppEvents: boolean;
-      xfbml: boolean;
-      version: string;
-    }>,
-  ): void;
+  init(options: Partial<LoginProviderOptions>): void;
 
   login(handle: (response: any) => void, options?: { scope: string }): void;
 
@@ -105,9 +99,7 @@ export class FacebookPlugin extends WebPlugin implements FacebookInterface {
     });
   }
 
-  async login(options: {
-    permissions: string[];
-  }): Promise<FacebookLoginResponse> {
+  async login(options: LoginProviderOptions): Promise<FacebookLoginResponse> {
     console.log('FacebookLoginWeb.login', options);
 
     return new Promise<FacebookLoginResponse>((resolve, reject) => {
@@ -129,7 +121,7 @@ export class FacebookPlugin extends WebPlugin implements FacebookInterface {
             });
           }
         },
-        { scope: options.permissions.join(',') },
+        { scope: options?.permissions?.map((s: string) => s).join(',') || '' },
       );
     });
   }

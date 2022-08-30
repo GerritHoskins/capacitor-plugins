@@ -2,13 +2,13 @@ import { WebPlugin } from '@capacitor/core';
 
 import type {
   GoogleLoginResponse,
-  GoogleInitOptions,
   GoogleInterface,
+  LoginProviderOptions,
 } from './definitions';
 
 export class GooglePlugin extends WebPlugin implements GoogleInterface {
   gapiLoaded: Promise<void> | undefined;
-  options: Partial<GoogleInitOptions> | undefined;
+  options: LoginProviderOptions | undefined;
 
   constructor() {
     super();
@@ -38,10 +38,8 @@ export class GooglePlugin extends WebPlugin implements GoogleInterface {
     head.appendChild(script);
   }
 
-  async initialize(_options: Partial<GoogleInitOptions>): Promise<void> {
-    if (typeof window === 'undefined') {
-      return;
-    }
+  async initialize(_options: LoginProviderOptions): Promise<void> {
+    if (typeof window === 'undefined') return;
 
     const metaClientId = (
       document.getElementsByName('google-signin-client_id')[0] as any
