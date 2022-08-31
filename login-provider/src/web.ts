@@ -5,8 +5,8 @@ import type {
   LoginProviderPlugin,
   LoginProviderOptions,
   LoginProviderPayload,
+  ProviderName,
 } from './definitions';
-import { ProviderName } from './definitions';
 import { FacebookPlugin } from './facebook';
 import { GooglePlugin } from './google';
 
@@ -31,13 +31,13 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
         providerName + ' initialization settings required.',
       );
 
-    if (providerName === ProviderName.APPLE) {
+    if (providerName === 'APPLE') {
       return await this.loginWithApple(options, inviteCode);
-    } else if (providerName === ProviderName.FACEBOOK) {
+    } else if (providerName === 'FACEBOOK') {
       return await this.loginWithFacebook(options, inviteCode);
-    } else if (providerName === ProviderName.GOOGLE) {
+    } else if (providerName === 'GOOGLE') {
       return await this.loginWithGoogle(options, inviteCode);
-    } else if (providerName === ProviderName.TWITTER) {
+    } else if (providerName === 'TWITTER') {
       return await this.loginWithTwitter();
     }
 
@@ -59,9 +59,9 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
       );
 
     return {
-      provider: ProviderName.APPLE.toString(),
-      token: response.token,
-      secret: response.code,
+      provider: 'APPLE',
+      token: response.identityToken,
+      secret: response.authorizationCode,
       email: response.email,
       avatarUrl: '',
       inviteCode,
@@ -94,7 +94,7 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
     });
 
     return {
-      provider: ProviderName.FACEBOOK.toString(),
+      provider: 'FACEBOOK',
       token,
       secret: '',
       email: profile.email,
@@ -109,23 +109,33 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
   ): Promise<LoginProviderPayload> {
     const google: GooglePlugin = new GooglePlugin();
     return google
-      .initialize(options)
-      .then(() => google.login())
+      .load(options)
+      .then(() => {
+        if (google.isSignedIn()) {
+          return google.currentUser();
+        }
+
+        return google.login();
+      })
       .then(response => {
-        if (!response || !response.authentication)
+        if (!response) {
           return Promise.reject(
             new Error('google login failed to retrieve valid auth response'),
           );
+        }
+
         return {
-          provider: ProviderName.GOOGLE.toString(),
-          email: response.email,
-          token: response.authentication.idToken,
+          provider: 'GOOGLE',
+          email: response.getBasicProfile().getEmail(),
+          token: response.getAuthResponse().id_token,
           secret: '',
-          avatarUrl: response.imageUrl,
+          avatarUrl: response.getBasicProfile().getImageUrl(),
           inviteCode,
         } as LoginProviderPayload;
       })
-      .then(() => google.refresh());
+      .catch(err => {
+        return Promise.reject(err);
+      });
   }
 
   loginWithTwitter(): Promise<LoginProviderPayload> {

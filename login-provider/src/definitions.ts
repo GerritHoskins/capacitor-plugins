@@ -2,6 +2,8 @@
 
 import type { PluginListenerHandle } from '@capacitor/core';
 
+import GoogleUser = gapi.auth2.GoogleUser;
+
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
     LoginProvider?: {
@@ -61,7 +63,7 @@ export interface LoginProviderPlugin {
 }
 
 export type LoginProviderPayload = {
-  provider: string;
+  provider: ProviderName;
   token: string;
   secret: string;
   email: string;
@@ -74,10 +76,7 @@ export interface LoginProviderOptions
     FacebookInitOptions,
     GoogleInitOptions,
     FacebookLoginOptions,
-    Pick<
-      GoogleInitOptions,
-      'scopes' | 'clientId' | 'forceCodeForRefreshToken'
-    > {
+    Pick<GoogleInitOptions, 'scope' | 'clientId' | 'forceCodeForRefreshToken'> {
   grantOfflineAccess?: boolean;
   custom?: Record<string, unknown>;
 }
@@ -91,20 +90,33 @@ export interface AppStateChange {
     | null;
 }
 
+export type ProviderName =
+  | 'GOOGLE'
+  | 'APPLE'
+  | 'FACEBOOK'
+  | 'TWITTER'
+  | 'EMAIL';
+/*
 export enum ProviderName {
   FACEBOOK,
   GOOGLE,
   APPLE,
   TWITTER,
-}
+}*/
 /***/
 
 // GOOGLE
 export interface GoogleInterface {
-  initialize(options: Partial<GoogleInitOptions>): Promise<void>;
-  login(): Promise<GoogleLoginResponse>;
-  refresh(): Promise<GoogleAuth>;
-  logout(): Promise<any>;
+  loadScript(): Promise<void>;
+  onGapiLoadPromise(options: GoogleInitOptions): Promise<unknown>;
+  loadingAuth2(params: any): Promise<unknown>;
+  load(params: any): Promise<unknown>;
+  wrapper(f: any, method: string): any;
+  login(): Promise<GoogleUser>;
+  logout(): any;
+  isSignedIn(): boolean;
+  currentUser(): GoogleUser;
+  grantOfflineAccess(): any;
 }
 export interface GoogleLoginResponse {
   id: string;
@@ -125,9 +137,10 @@ export interface GoogleInitOptions {
   clientId?: string;
   iosClientId?: string;
   androidClientId?: string;
-  scopes?: string[];
+  scope?: string;
   serverClientId?: string;
   forceCodeForRefreshToken?: boolean;
+  redirectURI?: string;
 }
 
 // FACEBOOK
@@ -190,8 +203,6 @@ export interface FacebookInitOptions {
 
 //APPLE
 export interface AppleInterface {
-  appleScriptUrl: string;
-  appleScriptLoaded: boolean | unknown;
   login(): Promise<AppleLoginResponse>;
   initialize(options: AppleInitOptions): Promise<void>;
 }
@@ -203,11 +214,9 @@ export interface AppleInitOptions {
   usePopup?: boolean;
 }
 export interface AppleLoginResponse {
-  user: string | null;
   email: string | null;
-  name: string | null;
-  token: string;
-  code: string;
+  identityToken: string;
+  authorizationCode: string;
 }
 
 //TWITTER

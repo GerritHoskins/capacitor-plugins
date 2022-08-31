@@ -1,5 +1,4 @@
 import { WebPlugin } from '@capacitor/core';
-import * as $script from 'scriptjs';
 
 import type {
   AppleInitOptions,
@@ -7,40 +6,19 @@ import type {
   AppleLoginResponse,
 } from './definitions';
 
-declare global {
-  interface Window {
-    AppleID: {
-      auth: {
-        init: (options: AppleInitOptions) => Promise<void>;
-        signIn: () => Promise<{
-          user: null;
-          email: string | null;
-          givenName: string | null;
-          familyName: string | null;
-          identityToken: string;
-          authorizationCode: string;
-        }>;
-      };
-    };
-  }
-}
-
-const AppleID = window.AppleID;
+declare let AppleID: any;
 
 export class ApplePlugin extends WebPlugin implements AppleInterface {
-  appleScriptUrl =
+  private appleScriptUrl =
     'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js';
-  appleScriptLoaded: false | unknown;
+  private appleScriptLoaded = false;
 
   constructor() {
-    super({
-      name: 'SignInWithApple',
-      platforms: ['web'],
-    });
+    super();
   }
 
   async initialize(options: AppleInitOptions): Promise<void> {
-    this.appleScriptLoaded = await this.loadSignInWithAppleJS();
+    this.appleScriptLoaded = await this.loadAppleAuthScript();
     if (this.appleScriptLoaded) {
       return await AppleID.auth.init(options);
     } else {
@@ -54,29 +32,27 @@ export class ApplePlugin extends WebPlugin implements AppleInterface {
     const response = await AppleID.auth.signIn();
     if (!response) return Promise.reject('Unable to Sign in with Apple.');
 
-    const {
-      user,
-      email,
-      givenName,
-      familyName,
-      identityToken,
-      authorizationCode,
-    } = response;
+    const { email, identityToken, authorizationCode } = response;
 
     return {
-      user: user,
       email: email,
-      name: givenName + ' ' + familyName,
-      token: identityToken,
-      code: authorizationCode,
+      identityToken: identityToken,
+      authorizationCode: authorizationCode,
     } as AppleLoginResponse;
   }
 
-  async loadSignInWithAppleJS(): Promise<boolean> {
+  private async loadAppleAuthScript(): Promise<boolean> {
     return new Promise(resolve => {
       if (!this.appleScriptLoaded) {
         if (typeof window !== undefined) {
-          $script.get(this.appleScriptUrl, () => resolve(true));
+          const script = document.createElement('script');
+          script.src = this.appleScriptUrl;
+          script.type = 'text/javascript';
+          script.defer = true;
+          script.async = true;
+          script.id = 'apple_auth';
+          script.onload = () => resolve(true);
+          document.head.appendChild(script);
         } else {
           resolve(false);
         }

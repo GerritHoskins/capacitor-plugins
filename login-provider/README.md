@@ -9,6 +9,56 @@ npm install @bitburst-gmbh/login-provider
 npx cap sync
 ```
 
+## Example implementation
+
+```typescript
+onLoginWith(provider: ProviderName, inviteCode: string): Promise<void> {
+      let options: LoginProviderOptions | undefined;
+      
+      // ideally retrieve these settings from the capacitor.config.ts (or .json)
+      switch (provider) {
+        case 'APPLE':
+          options = {
+            clientId: process.env.VUE_APP_APPLE_CLIENT_ID,
+            redirectURI: `${window.location.origin}/surveys`,
+            scope: 'email name',
+          };
+          break;
+        case 'FACEBOOK':
+          options = {
+            appId: process.env.VUE_APP_FACEBOOK_APP_ID,
+            xfbml: true,
+            version: 'v5.0',
+            permissions: ['email'],
+          };
+          break;
+        case 'GOOGLE':
+          options = {
+            scope: 'profile email',
+            clientId: process.env.VUE_APP_GOOGLE_CLIENT_ID,
+            forceCodeForRefreshToken: true,
+          };
+          break;
+        case 'TWITTER':
+          options = {
+            consumerKey: process.env.VUE_APP_TWITTER_KEY,
+            consumerSecret: process.env.VUE_APP_TWITTER_CONSUMER_SECRET,
+          };
+          break;
+        default:
+          break;
+      }
+
+      if (!options) return Promise.reject();
+
+      return LoginProvider.loginWithProvider(
+        provider as ProviderName,
+        options as LoginProviderOptions,
+        inviteCode
+      ).then(response => this.login(response));
+    }
+```
+
 ## API
 
 <docgen-index>
@@ -23,7 +73,6 @@ npx cap sync
 * [`removeAllListeners()`](#removealllisteners)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
-* [Enums](#enums)
 
 </docgen-index>
 
@@ -219,13 +268,11 @@ removeAllListeners() => Promise<void>
 
 #### AppleLoginResponse
 
-| Prop        | Type                        |
-| ----------- | --------------------------- |
-| **`user`**  | <code>string \| null</code> |
-| **`email`** | <code>string \| null</code> |
-| **`name`**  | <code>string \| null</code> |
-| **`token`** | <code>string</code>         |
-| **`code`**  | <code>string</code>         |
+| Prop                    | Type                        |
+| ----------------------- | --------------------------- |
+| **`email`**             | <code>string \| null</code> |
+| **`identityToken`**     | <code>string</code>         |
+| **`authorizationCode`** | <code>string</code>         |
 
 
 #### TwitterLoginResponse
@@ -243,7 +290,12 @@ removeAllListeners() => Promise<void>
 
 #### LoginProviderPayload
 
-<code>{ provider: string; token: string; secret: string; email: string; avatarUrl: string; inviteCode?: string; }</code>
+<code>{ provider: <a href="#providername">ProviderName</a>; token: string; secret: string; email: string; avatarUrl: string; inviteCode?: string; }</code>
+
+
+#### ProviderName
+
+<code>'GOOGLE' | 'APPLE' | 'FACEBOOK' | 'TWITTER' | 'EMAIL'</code>
 
 
 #### Record
@@ -256,18 +308,5 @@ Construct a type with a set of properties K of type T
 #### AppStateChangeListener
 
 <code>(change: <a href="#appstatechange">AppStateChange</a>): void</code>
-
-
-### Enums
-
-
-#### ProviderName
-
-| Members        |
-| -------------- |
-| **`FACEBOOK`** |
-| **`GOOGLE`**   |
-| **`APPLE`**    |
-| **`TWITTER`**  |
 
 </docgen-api>

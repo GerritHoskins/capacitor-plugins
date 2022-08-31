@@ -1,168 +1,101 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type {
-  GoogleLoginResponse,
-  GoogleInterface,
-  LoginProviderOptions,
-} from './definitions';
+import type { GoogleInterface, LoginProviderOptions } from './definitions';
+
+import GoogleUser = gapi.auth2.GoogleUser;
+import ClientConfig = gapi.auth2.ClientConfig;
+
+let auth2: gapi.auth2.GoogleAuth | undefined;
+let loadingPromise: Promise<unknown> | undefined;
 
 export class GooglePlugin extends WebPlugin implements GoogleInterface {
-  gapiLoaded: Promise<void> | undefined;
-  options: LoginProviderOptions | undefined;
-
   constructor() {
     super();
   }
 
-  loadScript(): void {
-    if (typeof document === 'undefined') {
-      return;
-    }
-
-    const scriptId = 'gapi';
-    const scriptEl = document?.getElementById(scriptId);
-
-    if (scriptEl) {
-      return;
-    }
-
-    const head = document.getElementsByTagName('head')[0];
-    const script = document.createElement('script');
-
-    script.type = 'text/javascript';
-    script.defer = true;
-    script.async = true;
-    script.id = scriptId;
-    script.onload = this.platformJsLoaded.bind(this);
-    script.src = 'https://apis.google.com/js/platform.js';
-    head.appendChild(script);
-  }
-
-  async initialize(_options: LoginProviderOptions): Promise<void> {
-    if (typeof window === 'undefined') return;
-
-    const metaClientId = (
-      document.getElementsByName('google-signin-client_id')[0] as any
-    )?.content;
-    const clientId = _options.clientId || metaClientId || '';
-
-    if (!clientId) {
-      console.warn('GoogleAuthPlugin - clientId is empty');
-    }
-
-    this.options = {
-      clientId,
-      grantOfflineAccess: _options.grantOfflineAccess ?? false,
-      scopes: _options.scopes || [],
-    };
-
-    this.gapiLoaded = new Promise(resolve => {
-      // HACK: Relying on window object, can't get property in gapi.load callback
-      (window as any).gapiResolve = resolve;
-      this.loadScript();
+  loadScript = (): Promise<void> => {
+    return new Promise(resolve => {
+      const el = document.getElementById('auth2_script_id');
+      if (!el) {
+        const gplatformScript = document.createElement('script');
+        gplatformScript.setAttribute(
+          'src',
+          'https://apis.google.com/js/platform.js?onload=onGapiLoad',
+        );
+        gplatformScript.type = 'text/javascript';
+        gplatformScript.defer = true;
+        gplatformScript.async = true;
+        gplatformScript.id = 'auth2_script_id';
+        document.head.appendChild(gplatformScript);
+      }
+      resolve();
     });
+  };
 
-    await this.addUserChangeListener();
-  }
-
-  platformJsLoaded(): void {
-    gapi.load('auth2', () => {
-      // https://github.com/CodetrixStudio/CapacitorGoogleAuth/issues/202#issuecomment-1147393785
-      const clientConfig: gapi.auth2.ClientConfig & { plugin_name: string } = {
-        client_id: this.options?.clientId,
-        plugin_name: 'BitBurstGmbHLoginProvider',
+  onGapiLoadPromise = (params: LoginProviderOptions): Promise<unknown> => {
+    const settings: ClientConfig = {
+      client_id: params.clientId,
+      scope: params.scope || '',
+    };
+    return new Promise((resolve, reject) => {
+      (window as any).onGapiLoad = () => {
+        gapi.load('auth2', () => {
+          try {
+            auth2 = gapi.auth2.init(Object.assign({}, settings));
+          } catch (err) {
+            reject({
+              err: 'client_id missing or is incorrect, or if you added extra params maybe they are written incorrectly, did you add it to the component or plugin?',
+            });
+          }
+          resolve(auth2);
+        });
       };
-
-      if (this.options?.scopes?.length) {
-        clientConfig.scope = this.options.scopes.join(' ');
-      }
-
-      gapi.auth2.init(clientConfig);
-      (window as any).gapiResolve();
     });
-  }
+  };
 
-  private async addUserChangeListener() {
-    await this.gapiLoaded;
-    gapi.auth2.getAuthInstance().currentUser.listen(googleUser => {
-      this.notifyListeners(
-        'userChange',
-        googleUser.isSignedIn() ? this.getUserFrom(googleUser) : null,
-      );
-    });
-  }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  loadingAuth2 = (params): Promise<unknown> => {
+    if (auth2) {
+      return Promise.resolve(auth2);
+    } else {
+      if (!loadingPromise) loadingPromise = this.onGapiLoadPromise(params);
+      return loadingPromise;
+    }
+  };
 
-  private getUserFrom(googleUser: gapi.auth2.GoogleUser) {
-    const user = {} as GoogleLoginResponse;
-    const profile = googleUser.getBasicProfile();
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  load = (params): Promise<unknown> => {
+    return Promise.all([this.loadingAuth2(params), this.loadScript()]).then(
+      results => {
+        return results[0];
+      },
+    );
+  };
 
-    user.email = profile.getEmail();
-    user.familyName = profile.getFamilyName();
-    user.givenName = profile.getGivenName();
-    user.id = profile.getId();
-    user.imageUrl = profile.getImageUrl();
-    user.name = profile.getName();
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  wrapper = (f, method: string): any => {
+    if (f) return f[method]();
+    else {
+      const err = {
+        err: 'Script not loaded correctly, did you added the plugin or the client_id to the component?',
+      };
+      return Promise.reject(err);
+    }
+  };
 
-    const authResponse = googleUser.getAuthResponse(true);
-    user.authentication = {
-      accessToken: authResponse.access_token,
-      idToken: authResponse.id_token,
-      refreshToken: '',
-    };
+  login = (): Promise<GoogleUser> => this.wrapper(auth2, 'signIn');
 
-    return user;
-  }
+  logout = (): any => this.wrapper(auth2, 'signOut');
 
-  async refresh(): Promise<any> {
-    const authResponse = await gapi.auth2
-      .getAuthInstance()
-      .currentUser.get()
-      .reloadAuthResponse();
-    return {
-      accessToken: authResponse.access_token,
-      idToken: authResponse.id_token,
-      refreshToken: '',
-    };
-  }
+  isSignedIn = (): boolean => this.wrapper(auth2?.isSignedIn, 'get');
 
-  async login(): Promise<GoogleLoginResponse> {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise<GoogleLoginResponse>(async (resolve, reject) => {
-      try {
-        let serverAuthCode: string | undefined = undefined;
-        const needsOfflineAccess = this.options?.grantOfflineAccess ?? false;
+  currentUser = (): GoogleUser => this.wrapper(auth2?.currentUser, 'get');
 
-        if (needsOfflineAccess) {
-          const offlineAccessResponse = await gapi.auth2
-            .getAuthInstance()
-            .grantOfflineAccess();
-          serverAuthCode = offlineAccessResponse.code;
-        } else {
-          await gapi.auth2.getAuthInstance().signIn();
-        }
-
-        const googleUser = gapi.auth2.getAuthInstance().currentUser.get();
-
-        if (needsOfflineAccess) {
-          // HACK: AuthResponse is null if we don't do this when using grantOfflineAccess
-          await googleUser.reloadAuthResponse();
-        }
-
-        const user: GoogleLoginResponse = (await this.getUserFrom(
-          googleUser,
-        )) as GoogleLoginResponse;
-
-        if (serverAuthCode) {
-          user.serverAuthCode = serverAuthCode;
-          resolve(user);
-        }
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-  async logout(): Promise<any> {
-    return gapi.auth2.getAuthInstance().signOut();
-  }
+  grantOfflineAccess = (): any => this.wrapper(auth2, 'grantOfflineAccess');
 }
