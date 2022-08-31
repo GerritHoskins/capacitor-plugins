@@ -151,46 +151,10 @@ removeAllListeners() => Promise<void>
 
 #### LoginProviderOptions
 
-| Prop        | Type                                                                                                                                                                                                                                                                     |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **`init`**  | <code>{ apple?: <a href="#appleinitoptions">AppleInitOptions</a>; facebook?: <a href="#facebookinitoptions">FacebookInitOptions</a>; google?: <a href="#googleinitoptions">GoogleInitOptions</a>; custom?: <a href="#record">Record</a>&lt;string, unknown&gt;; }</code> |
-| **`login`** | <code>{ facebook?: <a href="#facebookloginoptions">FacebookLoginOptions</a>; custom?: <a href="#record">Record</a>&lt;string, unknown&gt;; }</code>                                                                                                                      |
-
-
-#### AppleInitOptions
-
-| Prop              | Type                 |
-| ----------------- | -------------------- |
-| **`clientId`**    | <code>string</code>  |
-| **`redirectURI`** | <code>string</code>  |
-| **`state`**       | <code>string</code>  |
-| **`scope`**       | <code>string</code>  |
-| **`usePopup`**    | <code>boolean</code> |
-
-
-#### FacebookInitOptions
-
-| Prop                   | Type                 |
-| ---------------------- | -------------------- |
-| **`appId`**            | <code>string</code>  |
-| **`autoLogAppEvents`** | <code>boolean</code> |
-| **`xfbml`**            | <code>boolean</code> |
-| **`version`**          | <code>string</code>  |
-| **`locale`**           | <code>string</code>  |
-
-
-#### GoogleInitOptions
-
-| Prop                     | Type                 |
-| ------------------------ | -------------------- |
-| **`grantOfflineAccess`** | <code>boolean</code> |
-
-
-#### FacebookLoginOptions
-
-| Prop              | Type                  |
-| ----------------- | --------------------- |
-| **`permissions`** | <code>string[]</code> |
+| Prop                     | Type                                                             |
+| ------------------------ | ---------------------------------------------------------------- |
+| **`grantOfflineAccess`** | <code>boolean</code>                                             |
+| **`custom`**             | <code><a href="#record">Record</a>&lt;string, unknown&gt;</code> |
 
 
 #### PluginListenerHandle
@@ -279,7 +243,7 @@ removeAllListeners() => Promise<void>
 
 #### LoginProviderPayload
 
-<code>{ provider: <a href="#providername">ProviderName</a>; token: string; secret: string; email: string; avatarUrl: string; inviteCode?: string; }</code>
+<code>{ provider: string; token: string; secret: string; email: string; avatarUrl: string; inviteCode?: string; }</code>
 
 
 #### Record
@@ -301,9 +265,9 @@ Construct a type with a set of properties K of type T
 
 | Members        |
 | -------------- |
-| **`Facebook`** |
-| **`Google`**   |
-| **`Apple`**    |
-| **`Twitter`**  |
+| **`FACEBOOK`** |
+| **`GOOGLE`**   |
+| **`APPLE`**    |
+| **`TWITTER`**  |
 
 </docgen-api>

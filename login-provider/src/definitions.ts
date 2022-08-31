@@ -6,26 +6,26 @@ declare module '@capacitor/cli' {
   export interface PluginsConfig {
     LoginProvider?: {
       apple?: {
-        clientId: string;
-        redirectURI: string;
-        scope: string;
+        clientId?: string;
+        redirectURI?: string;
+        scope?: string;
       };
       facebook?: {
-        appId: string;
-        autoLogAppEvents: boolean;
-        xfbml: boolean;
-        version: string;
-        locale: string;
-        permissions: string[];
+        appId?: string;
+        autoLogAppEvents?: boolean;
+        xfbml?: boolean;
+        version?: string;
+        locale?: string;
+        permissions?: string[];
       };
       google?: {
-        scopes: string[];
-        serverClientId: string;
-        forceCodeForRefreshToken: boolean;
+        scopes?: string[];
+        serverClientId?: string;
+        forceCodeForRefreshToken?: boolean;
       };
       twitter?: {
-        consumerKey: string;
-        consumerSecret: string;
+        consumerKey?: string;
+        consumerSecret?: string;
       };
     };
   }

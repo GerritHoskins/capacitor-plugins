@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/login-provider",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "capacitor plugin for managing authentication for multiple login providers",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GerritHoskins/capacitor-plugins.git"
+    "url": "https://github.com/GerritHoskins/capacitor-plugins"
   },
   "bugs": {
     "url": "https://github.com/GerritHoskins/capacitor-plugins.git/issues"
