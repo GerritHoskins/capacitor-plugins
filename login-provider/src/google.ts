@@ -5,27 +5,26 @@ import type { GoogleInterface, LoginProviderOptions } from './definitions';
 import GoogleUser = gapi.auth2.GoogleUser;
 import ClientConfig = gapi.auth2.ClientConfig;
 
-let auth2: gapi.auth2.GoogleAuth | undefined;
-let loadingPromise: Promise<unknown> | undefined;
-
 export class GooglePlugin extends WebPlugin implements GoogleInterface {
+  private authInstance: gapi.auth2.GoogleAuth | undefined;
+  private loadingPromise: Promise<unknown> | undefined;
+  private gapiScript =
+    'https://apis.google.com/js/platform.js?onload=onGapiLoad';
+
   constructor() {
     super();
   }
 
   loadScript = (): Promise<void> => {
     return new Promise(resolve => {
-      const el = document.getElementById('auth2_script_id');
+      const el = document.getElementById('auth2_script');
       if (!el) {
         const gplatformScript = document.createElement('script');
-        gplatformScript.setAttribute(
-          'src',
-          'https://apis.google.com/js/platform.js?onload=onGapiLoad',
-        );
+        gplatformScript.src = this.gapiScript;
         gplatformScript.type = 'text/javascript';
         gplatformScript.defer = true;
         gplatformScript.async = true;
-        gplatformScript.id = 'auth2_script_id';
+        gplatformScript.id = 'auth2_script';
         document.head.appendChild(gplatformScript);
       }
       resolve();
@@ -41,13 +40,13 @@ export class GooglePlugin extends WebPlugin implements GoogleInterface {
       (window as any).onGapiLoad = () => {
         gapi.load('auth2', () => {
           try {
-            auth2 = gapi.auth2.init(Object.assign({}, settings));
+            this.authInstance = gapi.auth2.init(Object.assign({}, settings));
           } catch (err) {
             reject({
-              err: 'client_id missing or is incorrect, or if you added extra params maybe they are written incorrectly, did you add it to the component or plugin?',
+              err: 'incorrect or missing settings or options',
             });
           }
-          resolve(auth2);
+          resolve(this.authInstance);
         });
       };
     });
@@ -57,11 +56,12 @@ export class GooglePlugin extends WebPlugin implements GoogleInterface {
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   loadingAuth2 = (params): Promise<unknown> => {
-    if (auth2) {
-      return Promise.resolve(auth2);
+    if (this.authInstance) {
+      return Promise.resolve(this.authInstance);
     } else {
-      if (!loadingPromise) loadingPromise = this.onGapiLoadPromise(params);
-      return loadingPromise;
+      if (!this.loadingPromise)
+        this.loadingPromise = this.onGapiLoadPromise(params);
+      return this.loadingPromise;
     }
   };
 
@@ -83,19 +83,22 @@ export class GooglePlugin extends WebPlugin implements GoogleInterface {
     if (f) return f[method]();
     else {
       const err = {
-        err: 'Script not loaded correctly, did you added the plugin or the client_id to the component?',
+        err: 'script failed to load correctly.',
       };
       return Promise.reject(err);
     }
   };
 
-  login = (): Promise<GoogleUser> => this.wrapper(auth2, 'signIn');
+  login = (): Promise<GoogleUser> => this.wrapper(this.authInstance, 'signIn');
 
-  logout = (): any => this.wrapper(auth2, 'signOut');
+  logout = (): any => this.wrapper(this.authInstance, 'signOut');
 
-  isSignedIn = (): boolean => this.wrapper(auth2?.isSignedIn, 'get');
+  isSignedIn = (): boolean =>
+    this.wrapper(this.authInstance?.isSignedIn, 'get');
 
-  currentUser = (): GoogleUser => this.wrapper(auth2?.currentUser, 'get');
+  currentUser = (): GoogleUser =>
+    this.wrapper(this.authInstance?.currentUser, 'get');
 
-  grantOfflineAccess = (): any => this.wrapper(auth2, 'grantOfflineAccess');
+  grantOfflineAccess = (): any =>
+    this.wrapper(this.authInstance, 'grantOfflineAccess');
 }
