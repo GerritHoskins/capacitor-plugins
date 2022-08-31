@@ -13,22 +13,18 @@ npx cap sync
 
 <docgen-index>
 
-* [`getUID(...)`](#getuid)
+* [`getUID()`](#getuid)
 
 </docgen-index>
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### getUID(...)
+### getUID()
 
 ```typescript
-getUID(options: { uid: string; }) => Promise<{ uid: string; }>
+getUID() => Promise<{ uid: string; }>
 ```
-
-| Param         | Type                          |
-| ------------- | ----------------------------- |
-| **`options`** | <code>{ uid: string; }</code> |
 
 **Returns:** <code>Promise&lt;{ uid: string; }&gt;</code>
 

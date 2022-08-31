@@ -10,9 +10,6 @@ public class AppsflyerUidPlugin: CAPPlugin {
     private let implementation = AppsflyerUid()
 
     @objc func getUID(_ call: CAPPluginCall) {
-        let uid = call.getString("uid") ?? ""
-        call.resolve([
-            "uid": implementation.getUID(uid)
-        ])
+        call.unimplemented();
     }
 }
