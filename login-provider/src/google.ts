@@ -16,7 +16,8 @@ export class GooglePlugin extends WebPlugin implements GoogleInterface {
   }
 
   loadScript = (): Promise<void> => {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
+      if (typeof window === undefined) reject();
       const el = document.getElementById('auth2_script');
       if (!el) {
         const gplatformScript = document.createElement('script');
@@ -37,6 +38,7 @@ export class GooglePlugin extends WebPlugin implements GoogleInterface {
       scope: params.scope || '',
     };
     return new Promise((resolve, reject) => {
+      if (typeof window === undefined) reject();
       (window as any).onGapiLoad = () => {
         gapi.load('auth2', () => {
           try {

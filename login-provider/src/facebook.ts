@@ -3,58 +3,11 @@ import { WebPlugin } from '@capacitor/core';
 import type {
   FacebookInitOptions,
   FacebookCurrentAccessTokenResponse,
-  FacebookGetLoginStatusResponse,
   FacebookGetProfileResponse,
   FacebookLoginResponse,
   FacebookInterface,
   LoginProviderOptions,
 } from './definitions';
-
-declare interface Facebook {
-  init(options: Partial<LoginProviderOptions>): void;
-
-  login(handle: (response: any) => void, options?: { scope: string }): void;
-
-  logout(handle: (response: any) => void): void;
-
-  reauthorize(handle: (response: any) => void): void;
-
-  getLoginStatus(
-    handle: (response: FacebookGetLoginStatusResponse) => void,
-  ): void;
-
-  api<TResponse>(path: string, callback: (response: TResponse) => void): void;
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  api<TParams extends object, TResponse>(
-    path: string,
-    params: TParams,
-    callback: (response: TResponse) => void,
-  ): void;
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  api<TParams extends object, TResponse>(
-    path: string,
-    method: 'get' | 'post' | 'delete',
-    params: TParams,
-    callback: (response: TResponse) => void,
-  ): void;
-}
-
-declare let FB: Facebook;
-
-declare global {
-  interface Window {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    fbAsyncInit: Function;
-  }
-}
 
 export class FacebookPlugin extends WebPlugin implements FacebookInterface {
   constructor() {
@@ -100,8 +53,6 @@ export class FacebookPlugin extends WebPlugin implements FacebookInterface {
   }
 
   async login(options: LoginProviderOptions): Promise<FacebookLoginResponse> {
-    console.log('FacebookLoginWeb.login', options);
-
     return new Promise<FacebookLoginResponse>((resolve, reject) => {
       FB.login(
         response => {
@@ -129,12 +80,6 @@ export class FacebookPlugin extends WebPlugin implements FacebookInterface {
   async logout(): Promise<void> {
     return new Promise<void>(resolve => {
       FB.logout(() => resolve());
-    });
-  }
-
-  async reauthorize(): Promise<FacebookLoginResponse> {
-    return new Promise<FacebookLoginResponse>(resolve => {
-      FB.reauthorize(it => resolve(it));
     });
   }
 

@@ -121,7 +121,6 @@ export interface FacebookInterface {
   initialize(options: Partial<FacebookInitOptions>): Promise<void>;
   login(options: FacebookLoginOptions): Promise<FacebookLoginResponse>;
   logout(): Promise<void>;
-  reauthorize(): Promise<FacebookLoginResponse>;
   getCurrentAccessToken(): Promise<FacebookCurrentAccessTokenResponse>;
   getProfile<T extends Record<string, unknown>>(options: {
     fields: readonly string[];
@@ -144,16 +143,6 @@ export interface FacebookLoginResponse {
 }
 export interface FacebookCurrentAccessTokenResponse {
   accessToken: FacebookAuth | null;
-}
-export interface FacebookGetLoginStatusResponse {
-  status: 'connected';
-  authResponse: {
-    accessToken: string;
-    expiresIn: number;
-    reauthorize_required_in: number;
-    signedRequest: string;
-    userID: string;
-  };
 }
 export interface FacebookError {
   message: string;
