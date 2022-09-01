@@ -16,11 +16,11 @@ declare module '@capacitor/cli' {
 }
 
 export interface LoginProviderPlugin {
-  loginWithProvider(
-    provider: ProviderName,
-    options?: LoginProviderOptions,
-    inviteCode?: string,
-  ): Promise<LoginProviderPayload>;
+  loginWithProvider(options: {
+    provider: ProviderName;
+    options?: LoginProviderOptions;
+    inviteCode?: string;
+  }): Promise<LoginProviderPayload>;
   loginWithApple(
     options: LoginProviderOptions,
     inviteCode?: string,
@@ -38,11 +38,11 @@ export interface LoginProviderPlugin {
     options?: LoginProviderOptions,
     inviteCode?: string,
   ): Promise<LoginProviderPayload>;
-  logoutFromProvider(provider: ProviderName): Promise<void | any>;
-  addListener(
-    eventName: 'appStateChange',
-    listenerFunc: AppStateChangeListener,
-  ): Promise<PluginListenerHandle> & PluginListenerHandle;
+  logoutFromProvider(options: { provider: ProviderName }): Promise<void | any>;
+  addListener(options: {
+    eventName: 'appStateChange';
+    listenerFunc: AppStateChangeListener;
+  }): Promise<PluginListenerHandle> & PluginListenerHandle;
   removeAllListeners(): Promise<void>;
 }
 export type LoginProviderPayload = {

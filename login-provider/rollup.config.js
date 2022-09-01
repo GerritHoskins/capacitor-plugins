@@ -4,7 +4,7 @@ export default {
     {
       file: 'dist/plugin.js',
       format: 'iife',
-      name: 'capacitorPlugin',
+      name: 'capacitorLoginProvider',
       globals: {
         '@capacitor/core': 'capacitorExports',
         '@capacitor/cli': 'capacitorExports',

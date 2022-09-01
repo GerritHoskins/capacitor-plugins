@@ -8,10 +8,7 @@ import type {
 
 export class TwitterPlugin extends WebPlugin implements TwitterInterface {
   constructor() {
-    super({
-      name: 'Twitter',
-      platforms: ['web'],
-    });
+    super();
   }
   isLogged(): Promise<TwitterUserStatusResponse> {
     throw this.unimplemented('Not implemented on web.');
