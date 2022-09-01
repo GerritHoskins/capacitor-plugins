@@ -67,7 +67,7 @@ onLoginWith(provider: ProviderName, inviteCode: string): Promise<void> {
 * [`loginWithApple(...)`](#loginwithapple)
 * [`loginWithFacebook(...)`](#loginwithfacebook)
 * [`loginWithGoogle(...)`](#loginwithgoogle)
-* [`loginWithTwitter()`](#loginwithtwitter)
+* [`loginWithTwitter(...)`](#loginwithtwitter)
 * [`logoutFromProvider(...)`](#logoutfromprovider)
 * [`addListener('appStateChange', ...)`](#addlistenerappstatechange)
 * [`removeAllListeners()`](#removealllisteners)
@@ -144,11 +144,17 @@ loginWithGoogle(options: LoginProviderOptions, inviteCode?: string | undefined) 
 --------------------
 
 
-### loginWithTwitter()
+### loginWithTwitter(...)
 
 ```typescript
-loginWithTwitter() => Promise<LoginProviderPayload>
+loginWithTwitter(provider: ProviderName, options?: LoginProviderOptions | undefined, inviteCode?: string | undefined) => Promise<LoginProviderPayload>
 ```
+
+| Param            | Type                                                                  |
+| ---------------- | --------------------------------------------------------------------- |
+| **`provider`**   | <code><a href="#providername">ProviderName</a></code>                 |
+| **`options`**    | <code><a href="#loginprovideroptions">LoginProviderOptions</a></code> |
+| **`inviteCode`** | <code>string</code>                                                   |
 
 **Returns:** <code>Promise&lt;<a href="#loginproviderpayload">LoginProviderPayload</a>&gt;</code>
 

@@ -1,4 +1,4 @@
-package net.bitburst.plugins.loginprovider.handlers;
+package net.bitburst.plugins.loginprovider.providers;
 
 import android.util.Log;
 import com.getcapacitor.JSArray;
@@ -21,13 +21,13 @@ import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class AppleAuthProviderHandler {
+public class AppleProvider {
 
     private final LoginProvider pluginImplementation;
     private final OAuthProvider fBOAuthProvider;
     private String currentNonce;
 
-    public AppleAuthProviderHandler(LoginProvider pluginImplementation, OAuthProvider fBOAuthProvider) {
+    public AppleProvider(LoginProvider pluginImplementation, OAuthProvider fBOAuthProvider) {
         this.pluginImplementation = pluginImplementation;
         this.fBOAuthProvider = fBOAuthProvider;
     }

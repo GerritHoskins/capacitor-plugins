@@ -5,7 +5,7 @@ public class LoginProviderUserModel {
     private String provider;
     private String displayName;
     private String email;
-    private Uri photoUrl;
+    private String photoUrl;
     private String providerId;
     private String tenantId;
     private String uid;
@@ -15,7 +15,7 @@ public class LoginProviderUserModel {
         String provider,
         String displayName,
         String email,
-        Uri photoUrl,
+        String photoUrl,
         String providerId,
         String tenantId,
         String uid,
@@ -30,6 +30,8 @@ public class LoginProviderUserModel {
         this.uid = uid;
         this.secret = secret;
     }
+
+    public LoginProviderUserModel() {}
 
     public String getProvider() {
         return provider;
@@ -55,11 +57,11 @@ public class LoginProviderUserModel {
         this.email = email;
     }
 
-    public Uri getPhotoUrl() {
+    public String getPhotoUrl() {
         return photoUrl;
     }
 
-    public void setPhotoUrl(Uri photoUrl) {
+    public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
     }
 

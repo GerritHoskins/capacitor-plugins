@@ -2,32 +2,21 @@ package net.bitburst.plugins.loginprovider;
 
 import androidx.annotation.Nullable;
 import com.getcapacitor.JSObject;
+import com.google.firebase.auth.AdditionalUserInfo;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.OAuthCredential;
 import java.util.Map;
-import net.bitburst.plugins.loginprovider.LoginProviderUserModel;
 
 public class LoginProviderHelper {
 
-    public interface LoginProviderUser {
-        String provider;
-        String displayName;
-        String email;
-        URI photoUrl;
-        String providerId;
-        String tenantId;
-        String uid;
-        String secret;
-    }
-
     public static JSObject createSignInResult(
-        @Nullable LoginProviderUser user,
+        @Nullable LoginProviderUserModel user,
         @Nullable AuthCredential credential,
         @Nullable String idToken,
         @Nullable String nonce,
         @Nullable String accessToken,
         @Nullable AdditionalUserInfo additionalUserInfo
     ) {
-        LoginProviderUserModel usr = new LoginProviderUserModel();
-
         JSObject userResult = LoginProviderHelper.createUserResult(user);
         JSObject credentialResult = LoginProviderHelper.createCredentialResult(credential, idToken, nonce, accessToken);
         JSObject additionalUserInfoResult = LoginProviderHelper.createAdditionalUserInfoResult(additionalUserInfo);
@@ -39,19 +28,19 @@ public class LoginProviderHelper {
     }
 
     @Nullable
-    public static JSObject createUserResult(@Nullable LoginProviderUser user) {
+    public static JSObject createUserResult(@Nullable LoginProviderUserModel user) {
         if (user == null) {
             return null;
         }
         JSObject result = new JSObject();
         result.put("displayName", user.getDisplayName());
         result.put("email", user.getEmail());
-        result.put("emailVerified", user.isEmailVerified());
+        /* result.put("emailVerified", user.isEmailVerified());
         result.put("isAnonymous", user.isAnonymous());
         result.put("photoUrl", user.getPhotoUrl());
         result.put("providerId", user.getProviderId());
         result.put("tenantId", user.getTenantId());
-        result.put("uid", user.getUid());
+        result.put("uid", user.getUid());*/
         return result;
     }
 

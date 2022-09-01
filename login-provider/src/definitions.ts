@@ -7,33 +7,14 @@ import GoogleUser = gapi.auth2.GoogleUser;
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
     LoginProvider?: {
-      apple?: {
-        clientId?: string;
-        redirectURI?: string;
-        scope?: string;
-      };
-      facebook?: {
-        appId?: string;
-        autoLogAppEvents?: boolean;
-        xfbml?: boolean;
-        version?: string;
-        locale?: string;
-        permissions?: string[];
-      };
-      google?: {
-        scopes?: string[];
-        serverClientId?: string;
-        forceCodeForRefreshToken?: boolean;
-      };
-      twitter?: {
-        consumerKey?: string;
-        consumerSecret?: string;
-      };
+      apple?: AppleInitOptions;
+      facebook?: FacebookInitOptions;
+      google?: GoogleInitOptions;
+      twitter?: TwitterInitOptions;
     };
   }
 }
 
-/***/
 export interface LoginProviderPlugin {
   loginWithProvider(
     provider: ProviderName,
@@ -52,8 +33,11 @@ export interface LoginProviderPlugin {
     options: LoginProviderOptions,
     inviteCode?: string,
   ): Promise<LoginProviderPayload>;
-  loginWithTwitter(): Promise<LoginProviderPayload>;
-
+  loginWithTwitter(
+    provider: ProviderName,
+    options?: LoginProviderOptions,
+    inviteCode?: string,
+  ): Promise<LoginProviderPayload>;
   logoutFromProvider(provider: ProviderName): Promise<void | any>;
   addListener(
     eventName: 'appStateChange',
@@ -61,7 +45,6 @@ export interface LoginProviderPlugin {
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
   removeAllListeners(): Promise<void>;
 }
-
 export type LoginProviderPayload = {
   provider: ProviderName;
   token: string;
@@ -70,12 +53,11 @@ export type LoginProviderPayload = {
   avatarUrl: string;
   inviteCode?: string;
 };
-
 export interface LoginProviderOptions
   extends AppleInitOptions,
     FacebookInitOptions,
     GoogleInitOptions,
-    FacebookLoginOptions,
+    TwitterInitOptions,
     Pick<GoogleInitOptions, 'scope' | 'clientId' | 'forceCodeForRefreshToken'> {
   grantOfflineAccess?: boolean;
   custom?: Record<string, unknown>;
@@ -89,21 +71,12 @@ export interface AppStateChange {
     | TwitterLoginResponse
     | null;
 }
-
 export type ProviderName =
   | 'GOOGLE'
   | 'APPLE'
   | 'FACEBOOK'
   | 'TWITTER'
   | 'EMAIL';
-/*
-export enum ProviderName {
-  FACEBOOK,
-  GOOGLE,
-  APPLE,
-  TWITTER,
-}*/
-/***/
 
 // GOOGLE
 export interface GoogleInterface {
@@ -193,7 +166,7 @@ export interface FacebookGetProfileResponse {
 export interface FacebookLoginOptions {
   permissions?: string[];
 }
-export interface FacebookInitOptions {
+export interface FacebookInitOptions extends FacebookLoginOptions {
   appId?: string;
   autoLogAppEvents?: boolean;
   xfbml?: boolean;
@@ -224,6 +197,10 @@ export interface TwitterInterface {
   isLogged(): Promise<TwitterUserStatusResponse>;
   login(): Promise<TwitterLoginResponse>;
   logout(): Promise<void>;
+}
+export interface TwitterInitOptions {
+  consumerKey?: string;
+  consumerSecret?: string;
 }
 export interface TwitterLoginResponse {
   authToken: string;

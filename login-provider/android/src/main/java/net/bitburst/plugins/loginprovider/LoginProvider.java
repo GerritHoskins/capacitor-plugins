@@ -1,10 +1,21 @@
 package net.bitburst.plugins.loginprovider;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
-import net.bitburst.plugins.loginprovider.handlers.AppleAuthProviderHandler;
-import net.bitburst.plugins.loginprovider.handlers.FacebookAuthProviderHandler;
-import net.bitburst.plugins.loginprovider.handlers.GoogleAuthProviderHandler;
-import net.bitburst.plugins.loginprovider.handlers.OAuthProviderHandler;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import com.getcapacitor.JSObject;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginConfig;
+import com.google.firebase.auth.AdditionalUserInfo;
+import com.google.firebase.auth.AuthCredential;
+import java.util.Objects;
+import net.bitburst.plugins.loginprovider.providers.AppleProvider;
+import net.bitburst.plugins.loginprovider.providers.FacebookProvider;
+import net.bitburst.plugins.loginprovider.providers.GoogleProvider;
+import net.bitburst.plugins.loginprovider.providers.TwitterProvider;
 
 public class LoginProvider {
 
@@ -12,28 +23,82 @@ public class LoginProvider {
         void onAppStatusChanged(Boolean isActive);
     }
 
+    //public Activity activity;
+    public AppCompatActivity activity;
+    public Context context;
+
     private AppStatusChangeListener statusChangeListener;
 
     private LoginProviderPlugin plugin;
-    private LoginProviderConfig config;
+    private PluginConfig config;
 
-    private AppleAuthProviderHandler appleAuthProviderHandler;
-    private FacebookAuthProviderHandler facebookAuthProviderHandler;
-    private GoogleAuthProviderHandler googleAuthProviderHandler;
+    public AppleProvider appleProvider;
+    public FacebookProvider facebookProvider;
+    public GoogleProvider googleProvider;
+    public TwitterProvider twitterProvider;
 
-    public LoginProvider(LoginProviderPlugin plugin, LoginProviderConfig config) {
+    public LoginProvider(LoginProviderPlugin plugin, Context context, AppCompatActivity activity, PluginConfig pluginConfig) {
         this.plugin = plugin;
-        this.config = config;
-        this.initAuthProviderHandlers(config);
-        // add auth listeners?
-        this.statusChangeListener =
-            execute(
-                () -> {
-                    if (statusChangeListener != null) {
-                        statusChangeListener.onAppStatusChanged();
-                    }
-                }
-            );
+        this.context = context;
+        this.activity = activity;
+        this.config = pluginConfig;
+        this.initAuthProviderHandlers();
+    }
+
+    public void loginWithProvider(final PluginCall call, Activity activity) {
+        if (call == null) return;
+        if (!call.hasOption("provider")) call.reject("provider name missing");
+
+        String providerName = call.getString("provider");
+        call.setKeepAlive(true);
+
+        Intent loginIntent = activity.getIntent();
+
+        switch (Objects.requireNonNull(providerName)) {
+            case "APPLE":
+                //appleProvider.login(call);
+                break;
+            case "GOOGLE":
+                loginIntent = googleProvider.login(call);
+                plugin.startActivityForResult(call, loginIntent, "loginResult");
+                break;
+            case "FACEBOOK":
+                plugin.startActivityForResult(call, loginIntent, "loginResult");
+                facebookProvider.login(call);
+                break;
+            case "TWITTER":
+                //  loginIntent = twitterProvider.activity.getIntent();
+                Intent loginIntent2 = createIntent();
+                plugin.startActivityForResult(call, loginIntent2, "loginResult");
+                twitterProvider = twitterProvider.login(twitterProvider, call, activity);
+                break;
+        }
+
+        call.resolve();
+    }
+
+    public void logoutFromProvider(final PluginCall call) {
+        if (call == null) return;
+        if (!call.hasOption("provider")) call.reject("provider name missing");
+
+        String providerName = call.getString("provider");
+
+        switch (Objects.requireNonNull(providerName)) {
+            case "APPLE":
+                //appleProvider.login(call);
+                break;
+            case "GOOGLE":
+                googleProvider.logout();
+                break;
+            case "FACEBOOK":
+                facebookProvider.logout(call);
+                break;
+            case "TWITTER":
+                twitterProvider.logout(twitterProvider, call);
+                break;
+        }
+
+        call.resolve();
     }
 
     public void setAppStatusChangeListener(@Nullable AppStatusChangeListener listener) {
@@ -45,45 +110,9 @@ public class LoginProvider {
         return statusChangeListener;
     }
 
-    public void signInWithApple(final PluginCall call) {
-        appleAuthProviderHandler.signIn(call);
-    }
-
-    public void signInWithFacebook(final PluginCall call) {
-        facebookAuthProviderHandler.signIn(call);
-    }
-
-    public void signInWithGoogle(final PluginCall call) {
-        googleAuthProviderHandler.signIn(call);
-    }
-
-    public void signInWithTwitter(final PluginCall call) {
-        oAuthProviderHandler.signIn(call, "TWITTER");
-    }
-
-    public void signOut(final PluginCall call) {
-        if (googleAuthProviderHandler != null) {
-            googleAuthProviderHandler.signOut();
-        }
-        if (facebookAuthProviderHandler != null) {
-            facebookAuthProviderHandler.signOut();
-        }
-        call.resolve();
-    }
-
-    public void startActivityForResult(final PluginCall call, Intent intent, String callbackName) {
+    /*public void startActivityForResult(final PluginCall call, Intent intent, String callbackName) {
         plugin.startActivityForResult(call, intent, callbackName);
-    }
-
-    public void handleGoogleAuthProviderActivityResult(final PluginCall call, ActivityResult result) {
-        googleAuthProviderHandler.handleOnActivityResult(call, result);
-    }
-
-    public void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == FacebookAuthProviderHandler.RC_FACEBOOK_AUTH && facebookAuthProviderHandler != null) {
-            facebookAuthProviderHandler.handleOnActivityResult(requestCode, resultCode, data);
-        }
-    }
+    }*/
 
     public void handleSuccessfulSignIn(
         final PluginCall call,
@@ -93,7 +122,13 @@ public class LoginProvider {
         @Nullable String accessToken,
         @Nullable AdditionalUserInfo additionalUserInfo
     ) {
-        //return auth data
+        JSObject response = new JSObject();
+        response.put("credential", credential);
+        response.put("idToken", idToken);
+        response.put("nonce", nonce);
+        response.put("accessToken", accessToken);
+        response.put("additionalUserInfo", additionalUserInfo);
+        call.resolve(response);
     }
 
     public void handleFailedSignIn(final PluginCall call, String message, Exception exception) {
@@ -103,29 +138,38 @@ public class LoginProvider {
         call.reject(message, exception);
     }
 
-    public LoginProvider getLoginProviderInstance() {
-        return loginProviderInstance;
-    }
-
     public LoginProviderPlugin getPlugin() {
         return plugin;
     }
 
-    public LoginProviderConfig getConfig() {
-        return config;
+    private void initAuthProviderHandlers() {
+        String appleProvider = config.getString("apple");
+        String facebookProvider = config.getString("facebook");
+        String googleProvider = config.getString("google");
+        String twitterProvider = config.getString("twitter");
+
+        if (!Objects.equals(appleProvider, "")) {
+            //appleProvider = new AppleProvider();
+        } else if (!Objects.equals(facebookProvider, "")) {
+            this.facebookProvider = new FacebookProvider(this);
+        } else if (!Objects.equals(googleProvider, "")) {
+            //googleProvider = new GoogleProvider(this);
+        } else if (!Objects.equals(twitterProvider, "")) {
+            this.twitterProvider = new TwitterProvider(context, activity, config);
+        }
     }
 
-    private void initAuthProviderHandlers(LoginProviderConfig config) {
-        List providerList = Arrays.asList(config.getProviders());
-        if (providerList.contains("FACEBOOK")) {
-            facebookAuthProviderHandler = new FacebookAuthProviderHandler(this);
+    private Intent createIntent() {
+        Intent intent;
+        try {
+            Context context = this.plugin.getBridge().getActivity().getApplicationContext();
+            intent = new Intent(Intent.ACTION_VIEW);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            // context.startActivity(intent);
+            return intent;
+        } catch (Exception exception) {
+            Log.e(LoginProviderPlugin.LOG_TAG, "initialization failed.", exception);
+            return null;
         }
-        if (providerList.contains("GOOGLE")) {
-            googleAuthProviderHandler = new GoogleAuthProviderHandler(this);
-        }
-        if (providerList.contains("APPLE")) {
-            appleAuthProviderHandler = new AppleAuthProviderHandler(this);
-        }
-        oAuthProviderHandler = new OAuthProviderHandler(this);
     }
 }

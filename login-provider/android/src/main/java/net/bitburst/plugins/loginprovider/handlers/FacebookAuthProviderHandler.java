@@ -11,7 +11,6 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.getcapacitor.JSArray;
-import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
@@ -58,7 +57,7 @@ public class FacebookAuthProviderHandler {
                 }
             );
         } catch (Exception exception) {
-            Log.e(LoginProviderPlugin.TAG, "initialization failed.", exception);
+            Log.e(LoginProviderPlugin.LOG_TAG, "initialization failed.", exception);
         }
     }
 
@@ -85,7 +84,7 @@ public class FacebookAuthProviderHandler {
                 scopeList.add("public_profile");
                 button.setPermissions(scopeList);
             } catch (JSONException exception) {
-                Log.e(LoginProviderPlugin.TAG, "applySignInOptions failed.", exception);
+                Log.e(LoginProviderPlugin.LOG_TAG, "applySignInOptions failed.", exception);
             }
         }
     }

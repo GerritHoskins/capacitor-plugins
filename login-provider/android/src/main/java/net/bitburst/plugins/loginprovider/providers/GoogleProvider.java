@@ -1,11 +1,10 @@
-package net.bitburst.plugins.loginprovider.handlers;
+package net.bitburst.plugins.loginprovider.providers;
 
 import android.content.Intent;
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
-import com.getcapacitor.PluginMethod;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -16,7 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import net.bitburst.plugins.loginprovider.LoginProvider;
 
-public class GoogleAuthProviderHandler {
+public class GoogleProvider {
 
     private static final String VERIFY_TOKEN_URL = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=";
     private static final String FIELD_TOKEN_EXPIRES_IN = "expires_in";
@@ -31,18 +30,18 @@ public class GoogleAuthProviderHandler {
     private GoogleSignInClient googleSignInClient;
     private LoginProvider pluginImplementation;
 
-    public GoogleAuthProviderHandler(LoginProvider pluginImplementation) {
+    public GoogleProvider(LoginProvider pluginImplementation) {
         this.pluginImplementation = pluginImplementation;
         this.googleSignInClient = buildGoogleSignInClient();
     }
 
-    public void signIn(PluginCall call) {
+    public Intent login(PluginCall call) {
         googleSignInClient = buildGoogleSignInClient(call);
         Intent signInIntent = googleSignInClient.getSignInIntent();
-        pluginImplementation.startActivityForResult(call, signInIntent, "handleGoogleAuthProviderActivityResult");
+        return signInIntent;
     }
 
-    public void signOut() {
+    public void logout() {
         googleSignInClient.signOut();
     }
 
@@ -50,12 +49,6 @@ public class GoogleAuthProviderHandler {
         call.reject("I don't know how to refresh token on Android");
     }
 
-    public void signOut(final PluginCall call) {
-        googleSignInClient.signOut();
-        call.resolve();
-    }
-
-    @PluginMethod
     public void initialize(final PluginCall call) {
         call.resolve();
     }
@@ -131,11 +124,7 @@ public class GoogleAuthProviderHandler {
         googleSignInBuilder.requestScopes(firstScope, scopes);*/
 
         GoogleSignInOptions googleSignInOptions = googleSignInBuilder.build();
-        googleSignInClient =
-            GoogleSignIn.getClient(
-                this.pluginImplementation.getLoginProviderInstance().getPlugin().getActivity().getApplicationContext(),
-                googleSignInOptions
-            );
+        googleSignInClient = GoogleSignIn.getClient(this.pluginImplementation.getPlugin().getBridge().getContext(), googleSignInOptions);
 
         return googleSignInClient;
     }
