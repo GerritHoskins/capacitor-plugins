@@ -1,5 +1,7 @@
 package net.bitburst.plugins.loginprovider;
 
+import android.content.Intent;
+
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
 
@@ -10,8 +12,8 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
 
-import net.bitburst.plugins.loginprovider.providers.AppleProvider;
 import net.bitburst.plugins.loginprovider.providers.FacebookProvider;
 import net.bitburst.plugins.loginprovider.providers.GoogleProvider;
 import net.bitburst.plugins.loginprovider.providers.TwitterProvider;
@@ -159,9 +161,10 @@ public class LoginProviderPlugin extends Plugin {
     @ActivityCallback
     protected void twitterLoginResult(PluginCall call, ActivityResult result) {}
 
-    public void handleOnActivityResult(PluginCall call, ActivityResult result) {
-        if (call == null) return;
-        getTwitterProviderInstance().handleLoginResult(TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE, -1, result.getData());
+    @Override
+    public void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
+        super.handleOnActivityResult(requestCode, resultCode, data);
+        getTwitterProviderInstance().handleLoginResult(TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE, resultCode, data);
     }
 
     public void notifyListeners(String eventName, JSObject data) {

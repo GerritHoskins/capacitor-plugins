@@ -1,6 +1,5 @@
 package net.bitburst.plugins.loginprovider.providers;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
 
@@ -61,7 +60,7 @@ public class TwitterProvider extends AppCompatActivity {
             return;
         }
 
-        mAuthClient.authorize(mActivity, new Callback<TwitterSession>() {
+        mAuthClient.authorize(pluginImplementation.getActivity(), new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {
                 TwitterSession session = getTwitterSession();
