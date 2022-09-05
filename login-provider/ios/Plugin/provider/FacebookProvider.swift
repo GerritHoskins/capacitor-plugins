@@ -4,7 +4,7 @@ import Capacitor
 import FBSDKLoginKit
 #endif
 
-class FacebookAuthProviderHandler: NSObject {
+class FacebookProvider: NSObject {
     public let errorSignInCanceled = "Sign in canceled."
     private var pluginImplementation: LoginProvider
     #if RGCFA_INCLUDE_FACEBOOK

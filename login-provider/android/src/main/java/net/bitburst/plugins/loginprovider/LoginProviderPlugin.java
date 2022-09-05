@@ -1,67 +1,93 @@
 package net.bitburst.plugins.loginprovider;
 
-import android.Manifest;
-import android.content.Intent;
 import androidx.activity.result.ActivityResult;
+import androidx.annotation.Nullable;
+
 import com.getcapacitor.JSObject;
-import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
-import com.getcapacitor.PluginConfig;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
-import com.getcapacitor.annotation.PermissionCallback;
 
-//@CapacitorPlugin(name = "LoginProvider", requestCodes = { FacebookProvider.RC_FACEBOOK_AUTH, FacebookProvider.FACEBOOK_SDK_REQUEST_CODE_OFFSET, TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE })
-@CapacitorPlugin(name = "LoginProvider", permissions = { @Permission(alias = "internet", strings = { Manifest.permission.INTERNET }) })
+import net.bitburst.plugins.loginprovider.providers.AppleProvider;
+import net.bitburst.plugins.loginprovider.providers.FacebookProvider;
+import net.bitburst.plugins.loginprovider.providers.GoogleProvider;
+import net.bitburst.plugins.loginprovider.providers.TwitterProvider;
+
+import java.util.Objects;
+
+@CapacitorPlugin(name = "LoginProvider", permissions = { @Permission(alias = "internet", strings = {} )}, requestCodes = { TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE })
 public class LoginProviderPlugin extends Plugin {
+
+    public interface AppStatusChangeListener {
+        void onAppStatusChanged(Boolean isActive);
+    }
 
     public static final String LOG_TAG = "LoginProvider ";
     public static final String AUTH_STATE_CHANGE_EVENT = "authStateChange";
 
-    private PluginConfig config;
-    private LoginProvider implementation;
-    private String callbackId;
+    private AppStatusChangeListener statusChangeListener;
+
+    private FacebookProvider facebookProvider;
+    private GoogleProvider googleProvider;
+    private TwitterProvider twitterProvider = null;
+
+    private JSObject facebookOptions;
+    private JSObject googleOptions;
+    private JSObject twitterOptions;
 
     @Override
     public void load() {
-        implementation = new LoginProvider(this, getContext(), getActivity(), getConfig());
-        implementation.setAppStatusChangeListener(null);
-
         super.load();
+        initializeProviders();
+    }
+
+    private void initializeProviders() {
+        facebookOptions = LoginProviderHelper.convertJSONObject(getConfig().getObject("facebook"));
+        googleOptions = LoginProviderHelper.convertJSONObject(getConfig().getObject("google"));
+        twitterOptions = LoginProviderHelper.convertJSONObject(getConfig().getObject("twitter"));
+
+        facebookProvider = new FacebookProvider(this, facebookOptions);
+        googleProvider = new GoogleProvider(this, googleOptions);
+        twitterProvider = getTwitterProviderInstance();
     }
 
     @PluginMethod
     public void loginWithProvider(PluginCall call) {
-        call.setKeepAlive(true);
-
-        callbackId = call.getCallbackId();
-        bridge.saveCall(call);
+        if (call == null) return;
+        if (!call.hasOption("provider")) call.reject("provider name missing");
 
         try {
-            if (getPermissionState("internet") != PermissionState.GRANTED) {
-                requestPermissionForAlias("internet", call, "internetPermissionCallback");
-            } else {
-                implementation.loginWithProvider(call, getActivity());
+            String providerName = call.getString("provider");
+
+            call.setKeepAlive(true);
+            switch (Objects.requireNonNull(providerName)) {
+                case "APPLE":
+                    call.unimplemented();
+                    break;
+                case "GOOGLE":
+                    googleProvider.login(call);
+                    break;
+                case "FACEBOOK":
+                    facebookProvider.login(call);
+                    break;
+                case "TWITTER":
+                   getTwitterProviderInstance().login(call);
+                   break;
             }
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage());
         }
     }
 
-    @PermissionCallback
-    public void internetPermissionCallback(PluginCall call) {
-        if (getPermissionState("internet") == PermissionState.GRANTED) {
-            try {
-                implementation.loginWithProvider(call, getActivity());
-            } catch (Exception ex) {
-                call.reject(ex.getLocalizedMessage());
-            }
-        } else {
-            call.reject("Permission is required");
+    public TwitterProvider getTwitterProviderInstance() {
+        if(twitterProvider == null) {
+            twitterProvider = new TwitterProvider(this,  twitterOptions);
         }
+
+        return twitterProvider;
     }
 
     @PluginMethod
@@ -86,13 +112,28 @@ public class LoginProviderPlugin extends Plugin {
 
     @PluginMethod
     public void logoutFromProvider(PluginCall call) {
+        if (call == null) return;
+        if (!call.hasOption("provider")) call.reject("provider name missing");
+
         try {
-            implementation.logoutFromProvider(call);
+            String providerName = call.getString("provider");
+            switch (Objects.requireNonNull(providerName)) {
+                case "APPLE":
+                    call.unimplemented();
+                    break;
+                case "GOOGLE":
+                    googleProvider.logout();
+                    break;
+                case "FACEBOOK":
+                    facebookProvider.logout(call);
+                    break;
+                case "TWITTER":
+                    twitterProvider.logout(call);
+                    break;
+            }
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage());
         }
-
-        call.resolve();
     }
 
     @PluginMethod
@@ -105,34 +146,34 @@ public class LoginProviderPlugin extends Plugin {
         call.unimplemented();
     }
 
-    @Override
-    public void startActivityForResult(PluginCall call, Intent intent, String callbackName) {
-        super.startActivityForResult(call, intent, callbackName);
+    @ActivityCallback
+    protected void facebookLoginResult(PluginCall call, ActivityResult result) {
+        facebookProvider.handleFacebookLoginResult(call, result);
     }
 
     @ActivityCallback
-    protected void loginResult(PluginCall call, ActivityResult result, String provider) {
-        switch (provider) {
-            case "FACEBOOK":
-                implementation.facebookProvider.handleOnActivityResult(call, result);
-                break;
-            case "GOOGLE":
-                implementation.googleProvider.handleOnActivityResult(call, result);
-                break;
-            case "TWITTER":
-                implementation.twitterProvider.handleOnActivityResult(call, result);
-                break;
-        }
+    protected void googleLoginResult(PluginCall call, ActivityResult result) {
+        googleProvider.handleGoogleLoginResult(call, result);
+    }
+
+    @ActivityCallback
+    protected void twitterLoginResult(PluginCall call, ActivityResult result) {}
+
+    public void handleOnActivityResult(PluginCall call, ActivityResult result) {
+        if (call == null) return;
+        getTwitterProviderInstance().handleLoginResult(TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE, -1, result.getData());
     }
 
     public void notifyListeners(String eventName, JSObject data) {
         super.notifyListeners(eventName, data);
     }
-    /* private void updateAppState() {
-       LoginProviderUserModel user = implementation.get();
-        JSObject userResult = LoginProviderHelper.createUserResult(user);
-        JSObject result = new JSObject();
-        result.put("user", userResult);
-        notifyListeners(AUTH_STATE_CHANGE_EVENT, result);
-    }*/
+
+    public void setAppStatusChangeListener(@Nullable AppStatusChangeListener listener) {
+        statusChangeListener = listener;
+    }
+
+    @Nullable
+    public AppStatusChangeListener getAppStatusChangeListener() {
+        return statusChangeListener;
+    }
 }

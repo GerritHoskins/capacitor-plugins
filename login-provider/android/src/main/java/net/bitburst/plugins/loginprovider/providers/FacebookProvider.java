@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
+
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -16,17 +18,19 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
+
+import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-import net.bitburst.plugins.loginprovider.LoginProvider;
-import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class FacebookProvider {
 
@@ -35,16 +39,18 @@ public class FacebookProvider {
     public static final int RC_FACEBOOK_AUTH = 0xface;
     public static final int FACEBOOK_SDK_REQUEST_CODE_OFFSET = 0xface;
     public static final String ERROR_SIGN_IN_CANCELED = "Sign in canceled.";
-    private LoginProvider pluginImplementation;
+
+    private LoginProviderPlugin pluginImplementation;
+    private JSObject configSettings;
     private CallbackManager mCallbackManager;
-    private LoginButton loginButton;
     private String callbackId;
 
     @Nullable
     private PluginCall savedCall;
 
-    public FacebookProvider(LoginProvider pluginImplementation) {
-        this.pluginImplementation = pluginImplementation;
+    public FacebookProvider(LoginProviderPlugin loginProviderPlugin, JSObject config) {
+        pluginImplementation = loginProviderPlugin;
+        configSettings = config;
 
         try {
             this.callbackManager = CallbackManager.Factory.create();
@@ -58,7 +64,7 @@ public class FacebookProvider {
                         public void onSuccess(LoginResult loginResult) {
                             Log.d(LoginProviderPlugin.LOG_TAG, "LoginManager.onSuccess");
 
-                            PluginCall savedCall = pluginImplementation.getPlugin().getSavedCall();
+                            PluginCall savedCall = pluginImplementation.getBridge().getSavedCall(callbackId);
 
                             if (savedCall == null) {
                                 Log.e(LoginProviderPlugin.LOG_TAG, "LoginManager.onSuccess: no plugin saved call found.");
@@ -70,7 +76,7 @@ public class FacebookProvider {
 
                                 savedCall.resolve(ret);
 
-                                pluginImplementation.getPlugin().saveCall(null);
+                                pluginImplementation.getBridge().saveCall(null);
                             }
                         }
 
@@ -78,7 +84,7 @@ public class FacebookProvider {
                         public void onCancel() {
                             Log.d(LoginProviderPlugin.LOG_TAG, "LoginManager.onCancel");
 
-                            PluginCall savedCall = pluginImplementation.getPlugin().getSavedCall();
+                            PluginCall savedCall = pluginImplementation.getBridge().getSavedCall(callbackId);
 
                             if (savedCall == null) {
                                 Log.e(LoginProviderPlugin.LOG_TAG, "LoginManager.onCancel: no plugin saved call found.");
@@ -88,7 +94,7 @@ public class FacebookProvider {
 
                                 savedCall.resolve(ret);
 
-                                pluginImplementation.getPlugin().saveCall(null);
+                                pluginImplementation.getBridge().saveCall(null);
                             }
                         }
 
@@ -96,14 +102,14 @@ public class FacebookProvider {
                         public void onError(FacebookException exception) {
                             Log.e(LoginProviderPlugin.LOG_TAG, "LoginManager.onError", exception);
 
-                            PluginCall savedCall = pluginImplementation.getPlugin().getSavedCall();
+                            PluginCall savedCall = pluginImplementation.getBridge().getSavedCall(callbackId);
 
                             if (savedCall == null) {
                                 Log.e(LoginProviderPlugin.LOG_TAG, "LoginManager.onError: no plugin saved call found.");
                             } else {
                                 savedCall.reject(exception.toString());
 
-                                pluginImplementation.getPlugin().saveCall(null);
+                                pluginImplementation.getBridge().saveCall(null);
                             }
                         }
                     }
@@ -113,22 +119,26 @@ public class FacebookProvider {
         }
     }
 
-    public void handleOnActivityResult(PluginCall call, ActivityResult result) {
+    public void handleFacebookLoginResult(PluginCall call, ActivityResult result) {
         if (call == null) return;
 
-        int resultCode = result.getResultCode();
-        Intent data = result.getData();
-
-        callbackManager.onActivityResult(FACEBOOK_SDK_REQUEST_CODE_OFFSET, resultCode, data);
+        if (result.getResultCode() == FACEBOOK_SDK_REQUEST_CODE_OFFSET) {
+            callbackManager.onActivityResult(FACEBOOK_SDK_REQUEST_CODE_OFFSET, result.getResultCode(), result.getData());
+            call.resolve();
+        } else {
+            call.reject("fail!");
+        }
     }
 
-    public void login(PluginCall call) {
+    public void login(PluginCall call, Activity activity) {
         Log.d(LoginProviderPlugin.LOG_TAG, "Entering login()");
 
-        Activity activity = pluginImplementation.activity;
+
+        Intent loginIntent = activity.getIntent();
+        //Activity activity = pluginImplementation.activity;
 
         callbackId = call.getCallbackId();
-        PluginCall savedCall = pluginImplementation.getPlugin().getBridge().getSavedCall(callbackId);
+        PluginCall savedCall = pluginImplementation.getBridge().getSavedCall(callbackId);
 
         if (savedCall != null) {
             Log.e(LoginProviderPlugin.LOG_TAG, "login: overlapped calls not supported");
@@ -138,12 +148,26 @@ public class FacebookProvider {
             return;
         }
 
-        JSArray arg = call.getArray("permissions");
+        JSONArray arg = null;
+        try {
+            arg = call.getObject("loginOptions").getJSONArray("permissions");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JSArray permissionArray =  new JSArray();
+
+        for (int i = 0; i < arg.length(); i++) {
+            try {
+                permissionArray.put(i, arg.get(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
         Collection<String> permissions;
 
         try {
-            permissions = arg.toList();
+            permissions = permissionArray.toList();
         } catch (Exception e) {
             Log.e(LoginProviderPlugin.LOG_TAG, "login: invalid 'permissions' argument", e);
 
@@ -152,9 +176,10 @@ public class FacebookProvider {
             return;
         }
 
-        LoginManager.getInstance().logIn(activity, permissions);
+        pluginImplementation.getBridge().saveCall(call);
 
-        pluginImplementation.getPlugin().getBridge().saveCall(call);
+        pluginImplementation.startActivityForResult(call, loginIntent, "facebookLoginResult");
+        LoginManager.getInstance().logIn(activity, permissions);
     }
 
     public void logout(PluginCall call) {
@@ -168,9 +193,10 @@ public class FacebookProvider {
     public void reauthorize(PluginCall call) {
         Log.d(LoginProviderPlugin.LOG_TAG, "Entering reauthorize()");
 
-        Activity activity = pluginImplementation.activity;
+        Activity activity = pluginImplementation.getActivity();
         callbackId = call.getCallbackId();
-        PluginCall savedCall = pluginImplementation.getPlugin().getBridge().getSavedCall(callbackId);
+        PluginCall savedCall = pluginImplementation.getBridge().getSavedCall(callbackId);
+
 
         if (savedCall != null) {
             Log.e(LoginProviderPlugin.LOG_TAG, "reauthorize: overlapped calls not supported");
@@ -182,7 +208,7 @@ public class FacebookProvider {
 
         LoginManager.getInstance().reauthorizeDataAccess(activity);
 
-        pluginImplementation.getPlugin().getBridge().saveCall(call);
+        pluginImplementation.getBridge().saveCall(call);
     }
 
     public void getCurrentAccessToken(PluginCall call) {

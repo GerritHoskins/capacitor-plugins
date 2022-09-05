@@ -69,8 +69,6 @@ onLoginWith(provider: ProviderName, inviteCode: string): Promise<void> {
 * [`loginWithGoogle(...)`](#loginwithgoogle)
 * [`loginWithTwitter(...)`](#loginwithtwitter)
 * [`logoutFromProvider(...)`](#logoutfromprovider)
-* [`addListener('appStateChange', ...)`](#addlistenerappstatechange)
-* [`removeAllListeners()`](#removealllisteners)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -82,14 +80,12 @@ onLoginWith(provider: ProviderName, inviteCode: string): Promise<void> {
 ### loginWithProvider(...)
 
 ```typescript
-loginWithProvider(provider: ProviderName, options?: LoginProviderOptions | undefined, inviteCode?: string | undefined) => Promise<LoginProviderPayload>
+loginWithProvider(options: LoginProviderInitOptions) => Promise<LoginProviderPayload>
 ```
 
-| Param            | Type                                                                  |
-| ---------------- | --------------------------------------------------------------------- |
-| **`provider`**   | <code><a href="#providername">ProviderName</a></code>                 |
-| **`options`**    | <code><a href="#loginprovideroptions">LoginProviderOptions</a></code> |
-| **`inviteCode`** | <code>string</code>                                                   |
+| Param         | Type                                                                          |
+| ------------- | ----------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#loginproviderinitoptions">LoginProviderInitOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#loginproviderpayload">LoginProviderPayload</a>&gt;</code>
 
@@ -99,13 +95,12 @@ loginWithProvider(provider: ProviderName, options?: LoginProviderOptions | undef
 ### loginWithApple(...)
 
 ```typescript
-loginWithApple(options: LoginProviderOptions, inviteCode?: string | undefined) => Promise<LoginProviderPayload>
+loginWithApple(options: { loginOptions: LoginProviderOptions; inviteCode?: string; }) => Promise<LoginProviderPayload>
 ```
 
-| Param            | Type                                                                  |
-| ---------------- | --------------------------------------------------------------------- |
-| **`options`**    | <code><a href="#loginprovideroptions">LoginProviderOptions</a></code> |
-| **`inviteCode`** | <code>string</code>                                                   |
+| Param         | Type                                                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ loginOptions: <a href="#loginprovideroptions">LoginProviderOptions</a>; inviteCode?: string; }</code> |
 
 **Returns:** <code>Promise&lt;<a href="#loginproviderpayload">LoginProviderPayload</a>&gt;</code>
 
@@ -115,13 +110,12 @@ loginWithApple(options: LoginProviderOptions, inviteCode?: string | undefined) =
 ### loginWithFacebook(...)
 
 ```typescript
-loginWithFacebook(options: LoginProviderOptions, inviteCode?: string | undefined) => Promise<LoginProviderPayload>
+loginWithFacebook(options: { loginOptions: LoginProviderOptions; inviteCode?: string; }) => Promise<LoginProviderPayload>
 ```
 
-| Param            | Type                                                                  |
-| ---------------- | --------------------------------------------------------------------- |
-| **`options`**    | <code><a href="#loginprovideroptions">LoginProviderOptions</a></code> |
-| **`inviteCode`** | <code>string</code>                                                   |
+| Param         | Type                                                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ loginOptions: <a href="#loginprovideroptions">LoginProviderOptions</a>; inviteCode?: string; }</code> |
 
 **Returns:** <code>Promise&lt;<a href="#loginproviderpayload">LoginProviderPayload</a>&gt;</code>
 
@@ -131,13 +125,12 @@ loginWithFacebook(options: LoginProviderOptions, inviteCode?: string | undefined
 ### loginWithGoogle(...)
 
 ```typescript
-loginWithGoogle(options: LoginProviderOptions, inviteCode?: string | undefined) => Promise<LoginProviderPayload>
+loginWithGoogle(options: { loginOptions: LoginProviderOptions; inviteCode?: string; }) => Promise<LoginProviderPayload>
 ```
 
-| Param            | Type                                                                  |
-| ---------------- | --------------------------------------------------------------------- |
-| **`options`**    | <code><a href="#loginprovideroptions">LoginProviderOptions</a></code> |
-| **`inviteCode`** | <code>string</code>                                                   |
+| Param         | Type                                                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ loginOptions: <a href="#loginprovideroptions">LoginProviderOptions</a>; inviteCode?: string; }</code> |
 
 **Returns:** <code>Promise&lt;<a href="#loginproviderpayload">LoginProviderPayload</a>&gt;</code>
 
@@ -147,14 +140,12 @@ loginWithGoogle(options: LoginProviderOptions, inviteCode?: string | undefined) 
 ### loginWithTwitter(...)
 
 ```typescript
-loginWithTwitter(provider: ProviderName, options?: LoginProviderOptions | undefined, inviteCode?: string | undefined) => Promise<LoginProviderPayload>
+loginWithTwitter(options: { loginOptions: LoginProviderOptions; inviteCode?: string; }) => Promise<LoginProviderPayload>
 ```
 
-| Param            | Type                                                                  |
-| ---------------- | --------------------------------------------------------------------- |
-| **`provider`**   | <code><a href="#providername">ProviderName</a></code>                 |
-| **`options`**    | <code><a href="#loginprovideroptions">LoginProviderOptions</a></code> |
-| **`inviteCode`** | <code>string</code>                                                   |
+| Param         | Type                                                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ loginOptions: <a href="#loginprovideroptions">LoginProviderOptions</a>; inviteCode?: string; }</code> |
 
 **Returns:** <code>Promise&lt;<a href="#loginproviderpayload">LoginProviderPayload</a>&gt;</code>
 
@@ -164,44 +155,28 @@ loginWithTwitter(provider: ProviderName, options?: LoginProviderOptions | undefi
 ### logoutFromProvider(...)
 
 ```typescript
-logoutFromProvider(provider: ProviderName) => Promise<void | any>
+logoutFromProvider(options: { provider: ProviderName; }) => Promise<void | any>
 ```
 
-| Param          | Type                                                  |
-| -------------- | ----------------------------------------------------- |
-| **`provider`** | <code><a href="#providername">ProviderName</a></code> |
+| Param         | Type                                                                 |
+| ------------- | -------------------------------------------------------------------- |
+| **`options`** | <code>{ provider: <a href="#providername">ProviderName</a>; }</code> |
 
 **Returns:** <code>Promise&lt;any&gt;</code>
 
 --------------------
 
 
-### addListener('appStateChange', ...)
-
-```typescript
-addListener(eventName: 'appStateChange', listenerFunc: AppStateChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
-```
-
-| Param              | Type                                                                      |
-| ------------------ | ------------------------------------------------------------------------- |
-| **`eventName`**    | <code>'appStateChange'</code>                                             |
-| **`listenerFunc`** | <code><a href="#appstatechangelistener">AppStateChangeListener</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
---------------------
-
-
-### removeAllListeners()
-
-```typescript
-removeAllListeners() => Promise<void>
-```
-
---------------------
-
-
 ### Interfaces
+
+
+#### LoginProviderInitOptions
+
+| Prop               | Type                                                                  |
+| ------------------ | --------------------------------------------------------------------- |
+| **`provider`**     | <code><a href="#providername">ProviderName</a></code>                 |
+| **`loginOptions`** | <code><a href="#loginprovideroptions">LoginProviderOptions</a></code> |
+| **`inviteCode`**   | <code>string</code>                                                   |
 
 
 #### LoginProviderOptions
@@ -210,85 +185,6 @@ removeAllListeners() => Promise<void>
 | ------------------------ | ---------------------------------------------------------------- |
 | **`grantOfflineAccess`** | <code>boolean</code>                                             |
 | **`custom`**             | <code><a href="#record">Record</a>&lt;string, unknown&gt;</code> |
-
-
-#### PluginListenerHandle
-
-| Prop         | Type                                      |
-| ------------ | ----------------------------------------- |
-| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
-
-
-#### AppStateChange
-
-| Prop       | Type                                                                                                                                                                                                                                                          |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`user`** | <code><a href="#googleloginresponse">GoogleLoginResponse</a> \| <a href="#facebookloginresponse">FacebookLoginResponse</a> \| <a href="#appleloginresponse">AppleLoginResponse</a> \| <a href="#twitterloginresponse">TwitterLoginResponse</a> \| null</code> |
-
-
-#### GoogleLoginResponse
-
-| Prop                 | Type                                              |
-| -------------------- | ------------------------------------------------- |
-| **`id`**             | <code>string</code>                               |
-| **`email`**          | <code>string</code>                               |
-| **`name`**           | <code>string</code>                               |
-| **`familyName`**     | <code>string</code>                               |
-| **`givenName`**      | <code>string</code>                               |
-| **`imageUrl`**       | <code>string</code>                               |
-| **`serverAuthCode`** | <code>string</code>                               |
-| **`authentication`** | <code><a href="#googleauth">GoogleAuth</a></code> |
-
-
-#### GoogleAuth
-
-| Prop               | Type                |
-| ------------------ | ------------------- |
-| **`accessToken`**  | <code>string</code> |
-| **`idToken`**      | <code>string</code> |
-| **`refreshToken`** | <code>string</code> |
-
-
-#### FacebookLoginResponse
-
-| Prop                             | Type                                                          |
-| -------------------------------- | ------------------------------------------------------------- |
-| **`accessToken`**                | <code><a href="#facebookauth">FacebookAuth</a> \| null</code> |
-| **`recentlyGrantedPermissions`** | <code>string[]</code>                                         |
-| **`recentlyDeniedPermissions`**  | <code>string[]</code>                                         |
-
-
-#### FacebookAuth
-
-| Prop                      | Type                  |
-| ------------------------- | --------------------- |
-| **`applicationId`**       | <code>string</code>   |
-| **`declinedPermissions`** | <code>string[]</code> |
-| **`expires`**             | <code>string</code>   |
-| **`isExpired`**           | <code>boolean</code>  |
-| **`lastRefresh`**         | <code>string</code>   |
-| **`permissions`**         | <code>string[]</code> |
-| **`token`**               | <code>string</code>   |
-| **`userId`**              | <code>string</code>   |
-
-
-#### AppleLoginResponse
-
-| Prop                    | Type                        |
-| ----------------------- | --------------------------- |
-| **`email`**             | <code>string \| null</code> |
-| **`identityToken`**     | <code>string</code>         |
-| **`authorizationCode`** | <code>string</code>         |
-
-
-#### TwitterLoginResponse
-
-| Prop                  | Type                |
-| --------------------- | ------------------- |
-| **`authToken`**       | <code>string</code> |
-| **`authTokenSecret`** | <code>string</code> |
-| **`userName`**        | <code>string</code> |
-| **`userID`**          | <code>string</code> |
 
 
 ### Type Aliases
@@ -309,10 +205,5 @@ removeAllListeners() => Promise<void>
 Construct a type with a set of properties K of type T
 
 <code>{ [P in K]: T; }</code>
-
-
-#### AppStateChangeListener
-
-<code>(change: <a href="#appstatechange">AppStateChange</a>): void</code>
 
 </docgen-api>

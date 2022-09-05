@@ -3,9 +3,12 @@ import { WebPlugin } from '@capacitor/core';
 import { ApplePlugin } from './apple';
 import type {
   LoginProviderPlugin,
-  LoginProviderOptions,
   LoginProviderPayload,
   ProviderName,
+  LoginProviderInitOptions,
+  AppleInitOptions,
+  FacebookInitOptions,
+  LoginProviderOptions,
 } from './definitions';
 import { FacebookPlugin } from './facebook';
 import { GooglePlugin } from './google';
@@ -15,43 +18,45 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
     super();
   }
 
-  logoutFromProvider(provider: ProviderName): Promise<any> {
+  async logoutFromProvider(options: { provider: ProviderName }): Promise<any> {
     return Promise.reject(
-      'logout method not implemented yet.' + provider.toString(),
+      'logout method not implemented yet.' + options.provider.toString(),
     );
   }
 
   public async loginWithProvider(
-    providerName: ProviderName,
-    options: LoginProviderOptions,
-    inviteCode?: '',
+    options: LoginProviderInitOptions,
   ): Promise<LoginProviderPayload> {
-    if (!options)
-      return Promise.reject(
-        providerName + ' initialization settings required.',
-      );
+    const { provider, loginOptions, inviteCode } = options;
 
-    if (providerName === 'APPLE') {
-      return await this.loginWithApple(options, inviteCode);
-    } else if (providerName === 'FACEBOOK') {
-      return await this.loginWithFacebook(options, inviteCode);
-    } else if (providerName === 'GOOGLE') {
-      return await this.loginWithGoogle(options, inviteCode);
-    } else if (providerName === 'TWITTER') {
-      return await this.loginWithTwitter();
+    if (!loginOptions)
+      return Promise.reject(provider + ' initialization settings required.');
+
+    if (provider === 'APPLE') {
+      return await this.loginWithApple({ loginOptions, inviteCode });
+    } else if (provider === 'FACEBOOK') {
+      return await this.loginWithFacebook({ loginOptions, inviteCode });
+    } else if (provider === 'GOOGLE') {
+      return await this.loginWithGoogle({ loginOptions, inviteCode });
+    } else if (provider === 'TWITTER') {
+      return await this.loginWithTwitter({ loginOptions, inviteCode });
     }
 
     return Promise.reject(
-      providerName + ' does not exit or did not return valid payload.',
+      provider + ' does not exit or did not return valid payload.',
     );
   }
 
-  async loginWithApple(
-    options: LoginProviderOptions,
-    inviteCode?: '',
-  ): Promise<LoginProviderPayload> {
+  async loginWithApple(options: {
+    loginOptions?: LoginProviderOptions;
+    inviteCode?: string;
+  }): Promise<LoginProviderPayload> {
+    const { loginOptions, inviteCode } = options;
+
     const apple: ApplePlugin = new ApplePlugin();
-    const response = await apple.initialize(options).then(() => apple.login());
+    const response = await apple
+      .initialize(loginOptions as AppleInitOptions)
+      .then(() => apple.login());
 
     if (!response)
       return Promise.reject(
@@ -68,14 +73,16 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
     } as LoginProviderPayload;
   }
 
-  async loginWithFacebook(
-    options: LoginProviderOptions,
-    inviteCode?: '',
-  ): Promise<LoginProviderPayload> {
+  async loginWithFacebook(options: {
+    loginOptions?: LoginProviderOptions;
+    inviteCode?: string;
+  }): Promise<LoginProviderPayload> {
+    const { loginOptions, inviteCode } = options;
+
     const facebook: FacebookPlugin = new FacebookPlugin();
     const response = await facebook
-      .initialize(options)
-      .then(() => facebook.login(options))
+      .initialize(loginOptions as Partial<FacebookInitOptions>)
+      .then(() => facebook.login(loginOptions as Partial<FacebookInitOptions>))
       .then(() => facebook.getCurrentAccessToken());
 
     if (!response)
@@ -103,13 +110,15 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
     } as LoginProviderPayload;
   }
 
-  async loginWithGoogle(
-    options: LoginProviderOptions,
-    inviteCode?: '',
-  ): Promise<LoginProviderPayload> {
+  async loginWithGoogle(options: {
+    loginOptions?: LoginProviderOptions;
+    inviteCode?: string;
+  }): Promise<LoginProviderPayload> {
+    const { loginOptions, inviteCode } = options;
+
     const google: GooglePlugin = new GooglePlugin();
     return google
-      .load(options)
+      .load(loginOptions)
       .then(() => {
         if (google.isSignedIn()) {
           return google.currentUser();
@@ -138,7 +147,24 @@ export class LoginProviderWeb extends WebPlugin implements LoginProviderPlugin {
       });
   }
 
-  loginWithTwitter(): Promise<LoginProviderPayload> {
-    throw this.unimplemented('Not implemented on web.');
+  loginWithTwitter(options: {
+    loginOptions?: LoginProviderOptions;
+    inviteCode?: string;
+  }): Promise<LoginProviderPayload> {
+    const { loginOptions, inviteCode } = options;
+    throw this.unimplemented(
+      'Not implemented on web.' + loginOptions?.locale + inviteCode,
+    );
   }
+
+  /*async addListener(options: {
+    eventName: 'appStateChange';
+    listenerFunc: AppStateChangeListener;
+  }): Promise<PluginListenerHandle> & PluginListenerHandle {
+    return Promise.reject('Not implemented on web.');
+  }
+
+  async removeAllListeners(): Promise<void> {
+    return Promise.reject('Not implemented on web.');
+  }*/
 }

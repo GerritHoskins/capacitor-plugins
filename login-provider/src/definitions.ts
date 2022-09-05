@@ -1,7 +1,5 @@
 /// <reference types="@capacitor/cli" />
 
-import type { PluginListenerHandle } from '@capacitor/core';
-
 import GoogleUser = gapi.auth2.GoogleUser;
 
 declare module '@capacitor/cli' {
@@ -16,34 +14,36 @@ declare module '@capacitor/cli' {
 }
 
 export interface LoginProviderPlugin {
-  loginWithProvider(options: {
-    provider: ProviderName;
-    options?: LoginProviderOptions;
+  loginWithProvider(
+    options: LoginProviderInitOptions,
+  ): Promise<LoginProviderPayload>;
+  loginWithApple(options: {
+    loginOptions: LoginProviderOptions;
     inviteCode?: string;
   }): Promise<LoginProviderPayload>;
-  loginWithApple(
-    options: LoginProviderOptions,
-    inviteCode?: string,
-  ): Promise<LoginProviderPayload>;
-  loginWithFacebook(
-    options: LoginProviderOptions,
-    inviteCode?: string,
-  ): Promise<LoginProviderPayload>;
-  loginWithGoogle(
-    options: LoginProviderOptions,
-    inviteCode?: string,
-  ): Promise<LoginProviderPayload>;
-  loginWithTwitter(
-    provider: ProviderName,
-    options?: LoginProviderOptions,
-    inviteCode?: string,
-  ): Promise<LoginProviderPayload>;
+  loginWithFacebook(options: {
+    loginOptions: LoginProviderOptions;
+    inviteCode?: string;
+  }): Promise<LoginProviderPayload>;
+  loginWithGoogle(options: {
+    loginOptions: LoginProviderOptions;
+    inviteCode?: string;
+  }): Promise<LoginProviderPayload>;
+  loginWithTwitter(options: {
+    loginOptions: LoginProviderOptions;
+    inviteCode?: string;
+  }): Promise<LoginProviderPayload>;
   logoutFromProvider(options: { provider: ProviderName }): Promise<void | any>;
-  addListener(options: {
+  /*addListener(options: {
     eventName: 'appStateChange';
     listenerFunc: AppStateChangeListener;
   }): Promise<PluginListenerHandle> & PluginListenerHandle;
-  removeAllListeners(): Promise<void>;
+  removeAllListeners(): Promise<void>;*/
+}
+export interface LoginProviderInitOptions {
+  provider?: ProviderName;
+  loginOptions?: LoginProviderOptions;
+  inviteCode?: string;
 }
 export type LoginProviderPayload = {
   provider: ProviderName;

@@ -1,29 +1,60 @@
 package net.bitburst.plugins.loginprovider;
 
+import android.net.Uri;
+
 import androidx.annotation.Nullable;
+
 import com.getcapacitor.JSObject;
 import com.google.firebase.auth.AdditionalUserInfo;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.OAuthCredential;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Map;
+import java.util.Objects;
 
 public class LoginProviderHelper {
+    public static JSObject convertJSONObject(@Nullable JSONObject jsonObject) {
+        if(jsonObject == null) return null;
 
-    public static JSObject createSignInResult(
-        @Nullable LoginProviderUserModel user,
-        @Nullable AuthCredential credential,
-        @Nullable String idToken,
-        @Nullable String nonce,
-        @Nullable String accessToken,
-        @Nullable AdditionalUserInfo additionalUserInfo
+        JSObject returnJSObject = new JSObject();
+        JSONArray keys = jsonObject.names();
+
+        for (int i = 0; i < Objects.requireNonNull(keys).length(); i++) {
+            String key = null;
+            String value = null;
+            try {
+                key = keys.getString(i);
+                value = jsonObject.getString(key);
+                returnJSObject.put(key, value);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return returnJSObject;
+    }
+
+    public static JSObject createLoginProviderResponsePayload(
+        @Nullable String provider,
+        @Nullable String token,
+        @Nullable String secret,
+        @Nullable String email,
+        @Nullable Uri avatarUrl,
+        @Nullable String inviteCode
     ) {
-        JSObject userResult = LoginProviderHelper.createUserResult(user);
-        JSObject credentialResult = LoginProviderHelper.createCredentialResult(credential, idToken, nonce, accessToken);
-        JSObject additionalUserInfoResult = LoginProviderHelper.createAdditionalUserInfoResult(additionalUserInfo);
         JSObject result = new JSObject();
-        result.put("user", userResult);
-        result.put("credential", credentialResult);
-        result.put("additionalUserInfo", additionalUserInfoResult);
+        result.put("provider", provider);
+        result.put("token", token);
+        result.put("secret", secret);
+        result.put("email", email);
+        if(avatarUrl != null) {
+            result.put("avatarUrl", avatarUrl.toString());
+        }
+        result.put("inviteCode", inviteCode);
         return result;
     }
 
@@ -33,7 +64,7 @@ public class LoginProviderHelper {
             return null;
         }
         JSObject result = new JSObject();
-        result.put("displayName", user.getDisplayName());
+        result.put("name", user.getDisplayName());
         result.put("email", user.getEmail());
         /* result.put("emailVerified", user.isEmailVerified());
         result.put("isAnonymous", user.isAnonymous());
