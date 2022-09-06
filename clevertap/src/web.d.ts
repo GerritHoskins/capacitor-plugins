@@ -1,1 +1,2 @@
-declare module 'clevertap-web-sdk';
+declare module '@types/clevertap-web-sdk';
+

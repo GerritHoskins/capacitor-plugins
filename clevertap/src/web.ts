@@ -1,42 +1,21 @@
-import { WebPlugin } from '@capacitor/core';
-import clevertap from 'clevertap-web-sdk';
+import CleverTap from 'clevertap-web-sdk/clevertap';
 
-import type {
-  ClevertapInstance,
-  ClevertapPlugin,
-  DeliveredNotifications,
-} from './definitions';
+import type { ClevertapPlugin, Region } from './definitions';
 
-export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
-  isReady(): Promise<ClevertapInstance> {
-    throw this.unimplemented('Not implemented on web.');
-  }
+export declare class ClevertapWeb extends CleverTap implements ClevertapPlugin {
+  getRegion(): Region;
 
-  async getClevertapId(): Promise<ClevertapInstance> {
-    return { clevertapId: clevertap.getCleverTapID() || '' };
-  }
+  getCleverTapID(): string | null;
 
-  registerFBM(): Promise<void> {
-    throw this.unimplemented('Not implemented on web.');
-  }
+  raiseNotificationClicked: () => void;
 
-  getDeliveredNotifications(): Promise<DeliveredNotifications> {
-    throw this.unimplemented('Not implemented on web.');
-  }
+  clear(): void;
 
-  removeDeliveredNotifications(): Promise<void> {
-    throw this.unimplemented('Not implemented on web.');
-  }
+  init(accountId: string, region?: Region, targetDomain?: string): void;
 
-  createChannel(): Promise<void> {
-    throw this.unimplemented('Not implemented on web.');
-  }
+  logout(): void;
 
-  onUserLogin(): Promise<void> {
-    throw this.unimplemented('Not implemented on web.');
-  }
+  pageChanged(): void;
 
-  pushEvent(): Promise<void> {
-    throw this.unimplemented('Not implemented on web.');
-  }
+  setLogLevel(logLevel: 0 | 1 | 2 | 3): void;
 }

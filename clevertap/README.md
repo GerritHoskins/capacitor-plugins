@@ -74,12 +74,12 @@ getDeliveredNotifications() => Promise<DeliveredNotifications>
 ### removeDeliveredNotifications(...)
 
 ```typescript
-removeDeliveredNotifications(delivered: DeliveredNotifications) => Promise<void>
+removeDeliveredNotifications(options: { delivered?: DeliveredNotifications; }) => Promise<void>
 ```
 
-| Param           | Type                                                                      |
-| --------------- | ------------------------------------------------------------------------- |
-| **`delivered`** | <code><a href="#deliverednotifications">DeliveredNotifications</a></code> |
+| Param         | Type                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------ |
+| **`options`** | <code>{ delivered?: <a href="#deliverednotifications">DeliveredNotifications</a>; }</code> |
 
 --------------------
 
@@ -87,12 +87,12 @@ removeDeliveredNotifications(delivered: DeliveredNotifications) => Promise<void>
 ### createChannel(...)
 
 ```typescript
-createChannel(channel: Channel) => Promise<void>
+createChannel(options: { channel?: Channel; }) => Promise<void>
 ```
 
-| Param         | Type                                        |
-| ------------- | ------------------------------------------- |
-| **`channel`** | <code><a href="#channel">Channel</a></code> |
+| Param         | Type                                                       |
+| ------------- | ---------------------------------------------------------- |
+| **`options`** | <code>{ channel?: <a href="#channel">Channel</a>; }</code> |
 
 --------------------
 
@@ -100,12 +100,12 @@ createChannel(channel: Channel) => Promise<void>
 ### onUserLogin(...)
 
 ```typescript
-onUserLogin(profile: UserProfile) => Promise<void>
+onUserLogin(options: { profile?: UserProfile; }) => Promise<void>
 ```
 
-| Param         | Type                                                |
-| ------------- | --------------------------------------------------- |
-| **`profile`** | <code><a href="#userprofile">UserProfile</a></code> |
+| Param         | Type                                                               |
+| ------------- | ------------------------------------------------------------------ |
+| **`options`** | <code>{ profile?: <a href="#userprofile">UserProfile</a>; }</code> |
 
 --------------------
 
@@ -113,12 +113,12 @@ onUserLogin(profile: UserProfile) => Promise<void>
 ### pushEvent(...)
 
 ```typescript
-pushEvent(event: PushEvent) => Promise<void>
+pushEvent(options: { event?: PushEvent; }) => Promise<void>
 ```
 
-| Param       | Type                                            |
-| ----------- | ----------------------------------------------- |
-| **`event`** | <code><a href="#pushevent">PushEvent</a></code> |
+| Param         | Type                                                         |
+| ------------- | ------------------------------------------------------------ |
+| **`options`** | <code>{ event?: <a href="#pushevent">PushEvent</a>; }</code> |
 
 --------------------
 

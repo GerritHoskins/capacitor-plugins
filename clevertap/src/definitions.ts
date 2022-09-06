@@ -1,4 +1,22 @@
+/// <reference types="@capacitor/cli" />
+declare module '@capacitor/cli' {
+  export interface PluginsConfig {
+    Clevertap?: {
+      accountId?: string;
+      region?: Region;
+      targetDomain?: string;
+    };
+  }
+}
+
+export type Region = 'eu1' | 'in1' | 'sg1' | 'us1' | 'sk1';
+
 export interface ClevertapPlugin {
+  getRegion(): Region;
+}
+
+export interface ClevertapNativePlugin extends ClevertapPlugin {
+  getRegion(): Region;
   getClevertapId(): Promise<ClevertapInstance>;
   isReady(): Promise<ClevertapInstance>;
   registerFBM(): Promise<void>;
