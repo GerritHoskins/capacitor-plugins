@@ -3,12 +3,12 @@ export interface ClevertapPlugin {
   isReady(): Promise<ClevertapInstance>;
   registerFBM(): Promise<void>;
   getDeliveredNotifications(): Promise<DeliveredNotifications>;
-  removeDeliveredNotifications(
-    delivered: DeliveredNotifications,
-  ): Promise<void>;
-  createChannel(channel: Channel): Promise<void>;
-  onUserLogin(profile: UserProfile): Promise<void>;
-  pushEvent(event: PushEvent): Promise<void>;
+  removeDeliveredNotifications(options: {
+    delivered?: DeliveredNotifications;
+  }): Promise<void>;
+  createChannel(options: { channel?: Channel }): Promise<void>;
+  onUserLogin(options: { profile?: UserProfile }): Promise<void>;
+  pushEvent(options: { event?: PushEvent }): Promise<void>;
 }
 
 export interface ClevertapInstance {

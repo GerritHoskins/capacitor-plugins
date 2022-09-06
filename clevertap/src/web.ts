@@ -5,9 +5,6 @@ import type {
   ClevertapInstance,
   ClevertapPlugin,
   DeliveredNotifications,
-  UserProfile,
-  Channel,
-  PushEvent,
 } from './definitions';
 
 export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
@@ -27,29 +24,19 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
     throw this.unimplemented('Not implemented on web.');
   }
 
-  removeDeliveredNotifications(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    delivered: DeliveredNotifications,
-  ): Promise<void> {
+  removeDeliveredNotifications(): Promise<void> {
     throw this.unimplemented('Not implemented on web.');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  createChannel(channel: Channel): Promise<void> {
+  createChannel(): Promise<void> {
     throw this.unimplemented('Not implemented on web.');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  onUserLogin(profile: UserProfile): Promise<void> {
+  onUserLogin(): Promise<void> {
     throw this.unimplemented('Not implemented on web.');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  pushEvent(event: PushEvent): Promise<void> {
+  pushEvent(): Promise<void> {
     throw this.unimplemented('Not implemented on web.');
   }
 }
