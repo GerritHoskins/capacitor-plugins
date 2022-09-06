@@ -64,7 +64,7 @@ public class LoginProviderPlugin extends Plugin {
         try {
             String providerName = call.getString("provider");
 
-            call.setKeepAlive(true);
+            //   call.setKeepAlive(true);
             switch (Objects.requireNonNull(providerName)) {
                 case "APPLE":
                     call.unimplemented();
@@ -149,18 +149,19 @@ public class LoginProviderPlugin extends Plugin {
     }
 
     @ActivityCallback
-    protected void facebookLoginResult(PluginCall call, ActivityResult result) {
-        facebookProvider.handleFacebookLoginResult(call, result);
+    protected void facebookLoginRequest(PluginCall call, ActivityResult result) {
+        facebookProvider.handleLoginRequest(call, result);
     }
 
     @ActivityCallback
-    protected void googleLoginResult(PluginCall call, ActivityResult result) {
-        googleProvider.handleGoogleLoginResult(call, result);
+    protected void googleLoginRequest(PluginCall call, ActivityResult result) {
+        googleProvider.handleLoginRequest(call, result);
     }
 
     @ActivityCallback
     protected void twitterLoginResult(PluginCall call, ActivityResult result) {}
 
+    @SuppressWarnings("deprecation")
     @Override
     public void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
         super.handleOnActivityResult(requestCode, resultCode, data);

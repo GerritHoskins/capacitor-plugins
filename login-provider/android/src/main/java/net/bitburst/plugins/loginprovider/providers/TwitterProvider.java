@@ -20,6 +20,7 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 import net.bitburst.plugins.loginprovider.LoginProviderHelper;
+import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
 
 public class TwitterProvider extends AppCompatActivity {
 
@@ -84,7 +85,7 @@ public class TwitterProvider extends AppCompatActivity {
 
                 @Override
                 public void failure(TwitterException exception) {
-                    call.reject("twitter was not able to authorize correctly");
+                    call.reject(LoginProviderPlugin.LOG_TAG, "twitter was not able to authorize correctly");
                 }
             }
         );

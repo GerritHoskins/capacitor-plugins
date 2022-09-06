@@ -2,11 +2,8 @@ package net.bitburst.plugins.loginprovider;
 
 import android.net.Uri;
 import androidx.annotation.Nullable;
+import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
-import com.google.firebase.auth.AdditionalUserInfo;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.OAuthCredential;
-import java.util.Map;
 import java.util.Objects;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +32,40 @@ public class LoginProviderHelper {
         return returnJSObject;
     }
 
+    public static JSArray convertJSONArray(@Nullable JSONArray jsonArray) {
+        if (jsonArray == null) return null;
+
+        JSArray returnJSArray = new JSArray();
+        JSONArray sourceArray = jsonArray;
+
+        for (int i = 0; i < sourceArray.length(); i++) {
+            try {
+                returnJSArray.put(i, sourceArray.get(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return returnJSArray;
+    }
+
+    public static JSArray convertStringArray(@Nullable String[] stringArray) {
+        if (stringArray == null) return null;
+
+        JSArray returnJSArray = new JSArray();
+        String[] sourceArray = stringArray;
+
+        for (int i = 0; i < sourceArray.length; i++) {
+            try {
+                returnJSArray.put(i, sourceArray);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return returnJSArray;
+    }
+
     public static JSObject createLoginProviderResponsePayload(
         @Nullable String provider,
         @Nullable String token,
@@ -52,69 +83,6 @@ public class LoginProviderHelper {
             result.put("avatarUrl", avatarUrl.toString());
         }
         result.put("inviteCode", inviteCode);
-        return result;
-    }
-
-    @Nullable
-    public static JSObject createCredentialResult(
-        @Nullable AuthCredential credential,
-        @Nullable String idToken,
-        @Nullable String nonce,
-        @Nullable String accessToken
-    ) {
-        if (credential == null && idToken == null && nonce == null && accessToken == null) {
-            return null;
-        }
-        JSObject result = new JSObject();
-        if (credential != null) {
-            result.put("providerId", credential.getProvider());
-            if (credential instanceof OAuthCredential) {
-                String oAuthAccessToken = ((OAuthCredential) credential).getAccessToken();
-                if (oAuthAccessToken != null) {
-                    result.put("accessToken", oAuthAccessToken);
-                }
-                String oAuthIdToken = ((OAuthCredential) credential).getIdToken();
-                if (oAuthIdToken != null) {
-                    result.put("idToken", oAuthIdToken);
-                }
-                String oAuthSecret = ((OAuthCredential) credential).getSecret();
-                if (oAuthSecret != null) {
-                    result.put("secret", oAuthSecret);
-                }
-            }
-        }
-        if (idToken != null) {
-            result.put("idToken", idToken);
-        }
-        if (nonce != null) {
-            result.put("nonce", nonce);
-        }
-        if (accessToken != null) {
-            result.put("accessToken", accessToken);
-        }
-        return result;
-    }
-
-    @Nullable
-    public static JSObject createAdditionalUserInfoResult(@Nullable AdditionalUserInfo additionalUserInfo) {
-        if (additionalUserInfo == null) {
-            return null;
-        }
-        JSObject result = new JSObject();
-        result.put("isNewUser", additionalUserInfo.isNewUser());
-        if (additionalUserInfo.getProfile() != null) {
-            JSObject profileResult = new JSObject();
-            for (Map.Entry<String, Object> entry : additionalUserInfo.getProfile().entrySet()) {
-                profileResult.put(entry.getKey(), entry.getValue());
-            }
-            result.put("profile", profileResult);
-        }
-        if (additionalUserInfo.getProviderId() != null) {
-            result.put("providerId", additionalUserInfo.getProviderId());
-        }
-        if (additionalUserInfo.getUsername() != null) {
-            result.put("username", additionalUserInfo.getUsername());
-        }
         return result;
     }
 }

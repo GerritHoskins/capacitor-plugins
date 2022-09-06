@@ -5,7 +5,6 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.NonNull;
 import com.getcapacitor.JSObject;
@@ -54,9 +53,9 @@ public class GoogleProvider {
     private String[] targetScopes;
     private boolean forceCodeForRefreshToken;
 
-    public GoogleProvider(LoginProviderPlugin loginProviderPlugin, JSObject config) {
+    public GoogleProvider(LoginProviderPlugin loginProviderPlugin, JSObject googleConfig) {
         this.loginProviderPlugin = loginProviderPlugin;
-        this.config = config;
+        this.config = googleConfig;
         this.clientId = config.getString("clientId");
         this.targetScopes = Objects.requireNonNull(config.getString("scope")).split(" ");
         this.forceCodeForRefreshToken = Boolean.TRUE.equals(config.getBoolean("forceCodeForRefreshToken", true));
@@ -65,44 +64,10 @@ public class GoogleProvider {
 
     public void login(PluginCall call) {
         Intent loginIntent = googleSignInClient.getSignInIntent();
-        loginProviderPlugin.startActivityForResult(call, loginIntent, "googleLoginResult");
+        loginProviderPlugin.startActivityForResult(call, loginIntent, "googleLoginRequest");
     }
 
-    public void logout() {
-        googleSignInClient.signOut();
-    }
-
-    public void refresh(final PluginCall call) {
-        call.reject("I don't know how to refresh token on Android");
-    }
-
-    public void initialize(final PluginCall call) {
-        call.resolve();
-    }
-
-    private GoogleSignInClient buildGoogleSignInClient() {
-        GoogleSignInOptions.Builder googleSignInBuilder = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(this.clientId)
-            .requestEmail();
-
-        if (forceCodeForRefreshToken) googleSignInBuilder.requestServerAuthCode(this.clientId, true);
-
-        String[] scopeArray = this.targetScopes;
-        Scope[] scopes = new Scope[scopeArray.length - 1];
-        Scope firstScope = new Scope(scopeArray[0]);
-        for (int i = 1; i < scopeArray.length; i++) {
-            scopes[i - 1] = new Scope(scopeArray[i]);
-        }
-
-        googleSignInBuilder.requestScopes(firstScope, scopes);
-
-        GoogleSignInOptions googleSignInOptions = googleSignInBuilder.build();
-        googleSignInClient = GoogleSignIn.getClient(loginProviderPlugin.getContext(), googleSignInOptions);
-
-        return googleSignInClient;
-    }
-
-    public void handleGoogleLoginResult(final PluginCall call, ActivityResult result) {
+    public void handleLoginRequest(final PluginCall call, ActivityResult result) {
         if (call == null) return;
 
         Task<GoogleSignInAccount> completedTask = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
@@ -126,17 +91,43 @@ public class GoogleProvider {
                         call.resolve(data);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        call.reject("Something went wrong while retrieving access token", e);
+                        call.reject(LoginProviderPlugin.LOG_TAG, "Something went wrong while retrieving access token", e);
                     }
                 }
             );
         } catch (ApiException e) {
             if (SIGN_IN_CANCELLED == e.getStatusCode()) {
-                call.reject("The user canceled the sign-in flow.", "" + e.getStatusCode());
+                call.reject(LoginProviderPlugin.LOG_TAG, "The user canceled the sign-in flow. " + e.getStatusCode());
             } else {
-                call.reject("Something went wrong", "" + e.getStatusCode());
+                call.reject(LoginProviderPlugin.LOG_TAG, "Something went wrong " + e.getStatusCode());
             }
         }
+    }
+
+    public void logout() {
+        googleSignInClient.signOut();
+    }
+
+    private GoogleSignInClient buildGoogleSignInClient() {
+        GoogleSignInOptions.Builder googleSignInBuilder = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(this.clientId)
+            .requestEmail();
+
+        if (forceCodeForRefreshToken) googleSignInBuilder.requestServerAuthCode(this.clientId, true);
+
+        String[] scopeArray = this.targetScopes;
+        Scope[] scopes = new Scope[scopeArray.length - 1];
+        Scope firstScope = new Scope(scopeArray[0]);
+        for (int i = 1; i < scopeArray.length; i++) {
+            scopes[i - 1] = new Scope(scopeArray[i]);
+        }
+
+        googleSignInBuilder.requestScopes(firstScope, scopes);
+
+        GoogleSignInOptions googleSignInOptions = googleSignInBuilder.build();
+        googleSignInClient = GoogleSignIn.getClient(loginProviderPlugin.getContext(), googleSignInOptions);
+
+        return googleSignInClient;
     }
 
     private JSONObject getAuthToken(Account account, boolean retry) throws Exception {
@@ -162,11 +153,10 @@ public class GoogleProvider {
         urlConnection.setInstanceFollowRedirects(true);
         String stringResponse = fromStream(new BufferedInputStream(urlConnection.getInputStream()));
 
-        Log.d("AuthenticatedBackend", "token: " + authToken + ", verification: " + stringResponse);
         JSONObject jsonResponse = new JSONObject(stringResponse);
         int expires_in = jsonResponse.getInt(FIELD_TOKEN_EXPIRES_IN);
         if (expires_in < KAssumeStaleTokenSec) {
-            throw new IOException("Auth token soon expiring.");
+            throw new IOException("auth token expiring soon.");
         }
         jsonResponse.put(FIELD_ACCESS_TOKEN, authToken);
         jsonResponse.put(FIELD_TOKEN_EXPIRES, expires_in + (System.currentTimeMillis() / 1000));

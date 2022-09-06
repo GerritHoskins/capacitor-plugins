@@ -1,9 +1,10 @@
 package net.bitburst.plugins.loginprovider.providers;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import androidx.activity.result.ActivityResult;
-import androidx.annotation.Nullable;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -17,6 +18,7 @@ import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import java.util.Collection;
+import java.util.Objects;
 import net.bitburst.plugins.loginprovider.LoginProviderHelper;
 import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
 import org.json.JSONException;
@@ -24,9 +26,6 @@ import org.json.JSONObject;
 
 public class FacebookProvider {
 
-    CallbackManager callbackManager;
-
-    public static final int RC_FACEBOOK_AUTH = 0xface;
     public static final int FACEBOOK_SDK_REQUEST_CODE_OFFSET = 0xface;
     public static final String ERROR_SIGN_IN_CANCELED = "Sign in canceled.";
 
@@ -36,64 +35,39 @@ public class FacebookProvider {
     private String callbackId;
     private static final String EMAIL = "email";
 
-    @Nullable
-    private PluginCall savedCall;
-
     public FacebookProvider(LoginProviderPlugin loginProviderPlugin, JSObject config) {
         pluginImplementation = loginProviderPlugin;
         configSettings = config;
 
         try {
-            this.callbackManager = CallbackManager.Factory.create();
+            mCallbackManager = CallbackManager.Factory.create();
 
             LoginManager
                 .getInstance()
                 .registerCallback(
-                    callbackManager,
+                    mCallbackManager,
                     new FacebookCallback<LoginResult>() {
                         @Override
                         public void onSuccess(LoginResult loginResult) {
-                            PluginCall savedCall = pluginImplementation.getBridge().getSavedCall(callbackId);
-                            if (savedCall == null) {
-                                Log.e(LoginProviderPlugin.LOG_TAG, "LoginManager.onSuccess: no plugin saved call found.");
-                            } else {
-                                JSObject ret = new JSObject();
-                                JSObject data = LoginProviderHelper.createLoginProviderResponsePayload(
-                                    "FACEBOOK",
-                                    loginResult.getAccessToken().getToken(),
-                                    null,
-                                    null,
-                                    null,
-                                    savedCall.getData().getString("inviteCode")
-                                );
-                                savedCall.resolve(data);
+                            if (guardSavedCalls() == null) return;
+                            GraphRequest request = completeLogin();
+                            request.executeAsync();
 
-                                pluginImplementation.getBridge().saveCall(null);
-                            }
+                            pluginImplementation.getBridge().saveCall(null);
                         }
 
                         @Override
                         public void onCancel() {
-                            PluginCall savedCall = pluginImplementation.getBridge().getSavedCall(callbackId);
-                            if (savedCall == null) {
-                                Log.e(LoginProviderPlugin.LOG_TAG, "LoginManager.onCancel: no plugin saved call found.");
-                            } else {
-                                JSObject ret = new JSObject();
-                                ret.put("accessToken", null);
-                                savedCall.resolve(ret);
-                                pluginImplementation.getBridge().saveCall(null);
-                            }
+                            guardSavedCalls()
+                                .resolve(LoginProviderHelper.createLoginProviderResponsePayload("FACEBOOK", null, null, null, null, null));
+
+                            pluginImplementation.getBridge().saveCall(null);
                         }
 
                         @Override
                         public void onError(FacebookException exception) {
-                            PluginCall savedCall = pluginImplementation.getBridge().getSavedCall(callbackId);
-                            if (savedCall == null) {
-                                Log.e(LoginProviderPlugin.LOG_TAG, "LoginManager.onError: no plugin saved call found.");
-                            } else {
-                                savedCall.reject(exception.toString());
-                                pluginImplementation.getBridge().saveCall(null);
-                            }
+                            guardSavedCalls().reject(LoginProviderPlugin.LOG_TAG, exception.toString());
+                            pluginImplementation.getBridge().saveCall(null);
                         }
                     }
                 );
@@ -102,37 +76,76 @@ public class FacebookProvider {
         }
     }
 
-    public void handleFacebookLoginResult(PluginCall call, ActivityResult result) {
+    public void handleLoginRequest(PluginCall call, ActivityResult result) {
         if (call == null) return;
-        callbackManager.onActivityResult(FACEBOOK_SDK_REQUEST_CODE_OFFSET, result.getResultCode(), result.getData());
-        call.resolve();
+        mCallbackManager.onActivityResult(FACEBOOK_SDK_REQUEST_CODE_OFFSET, result.getResultCode(), result.getData());
     }
 
     public void login(PluginCall call) {
         if (call == null) return;
-        callbackId = call.getCallbackId();
 
+        callbackId = call.getCallbackId();
         rejectSavedCalls(call);
 
-        JSArray permissionArray = new JSArray();
-        permissionArray.put(EMAIL);
-
+        JSArray jsArray = new JSArray();
         Collection<String> permissions;
         try {
-            permissions = permissionArray.toList();
-        } catch (Exception e) {
-            call.reject("Invalid permissions argument");
+            LoginProviderHelper.convertStringArray(Objects.requireNonNull(configSettings.getString("permissions")).split(" "));
+            permissions = jsArray.toList();
+        } catch (JSONException e) {
+            call.reject(LoginProviderPlugin.LOG_TAG, "invalid permissions argument", e);
             return;
         }
 
-        pluginImplementation.getBridge().saveCall(call);
-        //LoginManager.getInstance().logIn(pluginImplementation.getActivity(), permissions);
+        call.setKeepAlive(true);
 
         LoginManager.FacebookLoginActivityResultContract contract = LoginManager
             .getInstance()
-            .createLogInActivityResultContract(callbackManager);
+            .createLogInActivityResultContract(mCallbackManager);
         Intent loginIntent = contract.createIntent(pluginImplementation.getActivity(), permissions);
-        pluginImplementation.startActivityForResult(call, loginIntent, "facebookLoginResult");
+        pluginImplementation.startActivityForResult(call, loginIntent, "facebookLoginRequest");
+    }
+
+    public GraphRequest completeLogin() {
+        GraphRequest request = GraphRequest.newMeRequest(
+            getCurrentAccessToken(),
+            new GraphRequest.GraphJSONObjectCallback() {
+                @Override
+                public void onCompleted(JSONObject object, GraphResponse response) {
+                    FacebookRequestError requestError = response.getError();
+                    if (requestError != null) return;
+
+                    JSONObject graphData = response.getJSONObject();
+                    try {
+                        assert graphData != null;
+                        JSONObject picture = graphData.getJSONObject("picture");
+                        JSONObject pictureData = picture.getJSONObject("data");
+                        String pictureUrl = pictureData.getString("url");
+
+                        PluginCall tempCall = guardSavedCalls();
+
+                        JSObject payload = LoginProviderHelper.createLoginProviderResponsePayload(
+                            "FACEBOOK",
+                            getCurrentAccessToken().getToken(),
+                            null,
+                            graphData.getString("email"),
+                            Uri.parse(pictureUrl),
+                            tempCall.getData().getString("inviteCode")
+                        );
+
+                        guardSavedCalls().resolve(payload);
+                    } catch (JSONException e) {
+                        guardSavedCalls().reject(LoginProviderPlugin.LOG_TAG, "failed to complete login response", e);
+                    }
+                }
+            }
+        );
+
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "email,picture");
+        request.setParameters(parameters);
+
+        return request;
     }
 
     public void logout(PluginCall call) {
@@ -147,49 +160,27 @@ public class FacebookProvider {
         pluginImplementation.getBridge().saveCall(call);
     }
 
-    public void getCurrentAccessToken(PluginCall call) {
+    public AccessToken getCurrentAccessToken() {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        JSObject ret = new JSObject();
-
         if (accessToken == null) {
-            Log.d(LoginProviderPlugin.LOG_TAG, "getCurrentAccessToken: accessToken is null");
-        } else {
-            Log.d(LoginProviderPlugin.LOG_TAG, "getCurrentAccessToken: accessToken found");
-            ret.put("accessToken", accessToken.getToken());
+            Log.d(LoginProviderPlugin.LOG_TAG, "accessToken is null");
         }
-
-        call.resolve(ret);
-    }
-
-    public void getProfilePicture(PluginCall call) {
-        GraphRequest graphRequest = GraphRequest.newMeRequest(
-            AccessToken.getCurrentAccessToken(),
-            new GraphRequest.GraphJSONObjectCallback() {
-                @Override
-                public void onCompleted(JSONObject object, GraphResponse response) {
-                    FacebookRequestError requestError = response.getError();
-                    if (requestError != null) {
-                        return;
-                    }
-
-                    try {
-                        JSONObject jsonObject = response.getJSONObject();
-                        JSObject jsObject = JSObject.fromJSONObject(jsonObject);
-                        call.resolve(jsObject);
-                    } catch (JSONException e) {
-                        call.reject("Can't create response", e);
-                    }
-                }
-            }
-        );
-        graphRequest.executeAsync();
+        return accessToken;
     }
 
     private void rejectSavedCalls(PluginCall call) {
         String callbackId = call.getCallbackId();
-        if (callbackId != null && pluginImplementation.getBridge().getSavedCall(callbackId) != null) {
-            call.reject("Overlapped calls call not supported");
-            return;
+        if (callbackId != null && guardSavedCalls() != null) {
+            call.reject(LoginProviderPlugin.LOG_TAG, "overlapped calls are not supported");
         }
+    }
+
+    private PluginCall guardSavedCalls() {
+        PluginCall call = pluginImplementation.getBridge().getSavedCall(callbackId);
+        if (call == null) {
+            Log.d(LoginProviderPlugin.LOG_TAG, "no saved plugin call found.");
+        }
+
+        return call;
     }
 }

@@ -153,7 +153,7 @@ export interface FacebookGetProfileResponse {
   error: FacebookError | null;
 }
 export interface FacebookLoginOptions {
-  permissions?: string[];
+  permissions?: string;
 }
 export interface FacebookInitOptions extends FacebookLoginOptions {
   appId?: string;
