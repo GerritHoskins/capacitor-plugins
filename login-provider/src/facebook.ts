@@ -72,7 +72,7 @@ export class FacebookPlugin extends WebPlugin implements FacebookInterface {
             });
           }
         },
-        { scope: options?.permissions?.map((s: string) => s).join(',') || '' },
+        { scope: options?.permissions || '' },
       );
     });
   }
