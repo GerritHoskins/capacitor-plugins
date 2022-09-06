@@ -1,12 +1,11 @@
 package net.bitburst.plugins.loginprovider;
 
 import android.content.Intent;
-
 import com.getcapacitor.BridgeActivity;
 import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 
-
 public class LoginProvider extends BridgeActivity {
+
     public LoginProviderPlugin mProvider;
 
     public LoginProvider() {}
@@ -18,9 +17,9 @@ public class LoginProvider extends BridgeActivity {
     }
 
     public void mTwitterActivityResult(int requestCode, int resultCode, Intent data) {
-        try{
+        try {
             TwitterAuthClient mAuthClient = new TwitterAuthClient();
-            if(mAuthClient != null) {
+            if (mAuthClient != null) {
                 mAuthClient.onActivityResult(requestCode, resultCode, data);
             }
         } catch (Exception e) {

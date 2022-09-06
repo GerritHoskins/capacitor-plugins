@@ -6,10 +6,8 @@ import android.accounts.AccountManagerFuture;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.NonNull;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -19,13 +17,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.Task;
-
-import net.bitburst.plugins.loginprovider.LoginProviderHelper;
-import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,6 +27,10 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import net.bitburst.plugins.loginprovider.LoginProviderHelper;
+import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class GoogleProvider {
 
@@ -51,11 +46,13 @@ public class GoogleProvider {
 
     private GoogleSignInClient googleSignInClient;
     private LoginProviderPlugin loginProviderPlugin;
-    @NonNull private JSObject config;
+
+    @NonNull
+    private JSObject config;
+
     private String clientId;
     private String[] targetScopes;
     private boolean forceCodeForRefreshToken;
-
 
     public GoogleProvider(LoginProviderPlugin loginProviderPlugin, JSObject config) {
         this.loginProviderPlugin = loginProviderPlugin;
@@ -83,12 +80,12 @@ public class GoogleProvider {
         call.resolve();
     }
 
-    private GoogleSignInClient buildGoogleSignInClient()  {
+    private GoogleSignInClient buildGoogleSignInClient() {
         GoogleSignInOptions.Builder googleSignInBuilder = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(this.clientId)
             .requestEmail();
 
-        if (forceCodeForRefreshToken)  googleSignInBuilder.requestServerAuthCode(this.clientId, true);
+        if (forceCodeForRefreshToken) googleSignInBuilder.requestServerAuthCode(this.clientId, true);
 
         String[] scopeArray = this.targetScopes;
         Scope[] scopes = new Scope[scopeArray.length - 1];
@@ -118,7 +115,14 @@ public class GoogleProvider {
                 () -> {
                     try {
                         JSONObject accessTokenObject = getAuthToken(account.getAccount(), true);
-                        JSObject data = LoginProviderHelper.createLoginProviderResponsePayload("GOOGLE", account.getIdToken(), null,  account.getEmail(),  account.getPhotoUrl(), call.getData().getString("inviteCode"));
+                        JSObject data = LoginProviderHelper.createLoginProviderResponsePayload(
+                            "GOOGLE",
+                            account.getIdToken(),
+                            null,
+                            account.getEmail(),
+                            account.getPhotoUrl(),
+                            call.getData().getString("inviteCode")
+                        );
                         call.resolve(data);
                     } catch (Exception e) {
                         e.printStackTrace();

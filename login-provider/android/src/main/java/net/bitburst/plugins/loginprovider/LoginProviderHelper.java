@@ -1,24 +1,21 @@
 package net.bitburst.plugins.loginprovider;
 
 import android.net.Uri;
-
 import androidx.annotation.Nullable;
-
 import com.getcapacitor.JSObject;
 import com.google.firebase.auth.AdditionalUserInfo;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.OAuthCredential;
-
+import java.util.Map;
+import java.util.Objects;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Map;
-import java.util.Objects;
-
 public class LoginProviderHelper {
+
     public static JSObject convertJSONObject(@Nullable JSONObject jsonObject) {
-        if(jsonObject == null) return null;
+        if (jsonObject == null) return null;
 
         JSObject returnJSObject = new JSObject();
         JSONArray keys = jsonObject.names();
@@ -51,7 +48,7 @@ public class LoginProviderHelper {
         result.put("token", token);
         result.put("secret", secret);
         result.put("email", email);
-        if(avatarUrl != null) {
+        if (avatarUrl != null) {
             result.put("avatarUrl", avatarUrl.toString());
         }
         result.put("inviteCode", inviteCode);

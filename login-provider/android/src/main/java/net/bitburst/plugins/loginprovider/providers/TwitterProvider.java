@@ -2,10 +2,8 @@ package net.bitburst.plugins.loginprovider.providers;
 
 import android.content.Intent;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -21,7 +19,6 @@ import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterAuthClient;
-
 import net.bitburst.plugins.loginprovider.LoginProviderHelper;
 
 public class TwitterProvider extends AppCompatActivity {
@@ -30,7 +27,7 @@ public class TwitterProvider extends AppCompatActivity {
 
     private TwitterAuthConfig mAuthConfig;
     private TwitterConfig mConfig;
-    private LoginProviderHelper helper;;
+    private LoginProviderHelper helper;
 
     public Plugin pluginImplementation;
 
@@ -42,7 +39,8 @@ public class TwitterProvider extends AppCompatActivity {
         mTwitterApiKey = config.getString("consumerKey");
         mTwitterSecreteKey = config.getString("consumerSecret");
         mAuthConfig = new TwitterAuthConfig(mTwitterApiKey, mTwitterSecreteKey);
-        mConfig = new TwitterConfig.Builder(pluginImplementation.getContext())
+        mConfig =
+            new TwitterConfig.Builder(pluginImplementation.getContext())
                 .logger(new DefaultLogger(Log.DEBUG))
                 .twitterAuthConfig(mAuthConfig)
                 .debug(true)
@@ -54,25 +52,42 @@ public class TwitterProvider extends AppCompatActivity {
 
     public void login(PluginCall call) {
         if (getTwitterSession() != null) {
-            TwitterSession session = getTwitterSession() ;
-            JSObject data = LoginProviderHelper.createLoginProviderResponsePayload("TWITTER", session.getAuthToken().token, session.getAuthToken().secret, null, null, call.getData().getString("inviteCode"));
+            TwitterSession session = getTwitterSession();
+            JSObject data = LoginProviderHelper.createLoginProviderResponsePayload(
+                "TWITTER",
+                session.getAuthToken().token,
+                session.getAuthToken().secret,
+                null,
+                null,
+                call.getData().getString("inviteCode")
+            );
             call.resolve(data);
             return;
         }
 
-        mAuthClient.authorize(pluginImplementation.getActivity(), new Callback<TwitterSession>() {
-            @Override
-            public void success(Result<TwitterSession> result) {
-                TwitterSession session = getTwitterSession();
-                JSObject data = LoginProviderHelper.createLoginProviderResponsePayload("TWITTER", session.getAuthToken().token, session.getAuthToken().secret, null, null, call.getData().getString("inviteCode"));
-                call.resolve(data);
-            }
+        mAuthClient.authorize(
+            pluginImplementation.getActivity(),
+            new Callback<TwitterSession>() {
+                @Override
+                public void success(Result<TwitterSession> result) {
+                    TwitterSession session = getTwitterSession();
+                    JSObject data = LoginProviderHelper.createLoginProviderResponsePayload(
+                        "TWITTER",
+                        session.getAuthToken().token,
+                        session.getAuthToken().secret,
+                        null,
+                        null,
+                        call.getData().getString("inviteCode")
+                    );
+                    call.resolve(data);
+                }
 
-            @Override
-            public void failure(TwitterException exception) {
-                call.reject("twitter was not able to authorize correctly");
+                @Override
+                public void failure(TwitterException exception) {
+                    call.reject("twitter was not able to authorize correctly");
+                }
             }
-        });
+        );
     }
 
     public void logout(PluginCall call) {
@@ -102,7 +117,7 @@ public class TwitterProvider extends AppCompatActivity {
     }
 
     public void handleLoginResult(int requestCode, int resultCode, Intent data) {
-        if(mAuthClient != null) mAuthClient.onActivityResult(requestCode, resultCode, data);
+        if (mAuthClient != null) mAuthClient.onActivityResult(requestCode, resultCode, data);
     }
 
     private TwitterSession getTwitterSession() {

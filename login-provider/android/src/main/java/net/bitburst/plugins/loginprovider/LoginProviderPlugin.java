@@ -1,10 +1,8 @@
 package net.bitburst.plugins.loginprovider;
 
 import android.content.Intent;
-
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -13,14 +11,16 @@ import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
-
+import java.util.Objects;
 import net.bitburst.plugins.loginprovider.providers.FacebookProvider;
 import net.bitburst.plugins.loginprovider.providers.GoogleProvider;
 import net.bitburst.plugins.loginprovider.providers.TwitterProvider;
 
-import java.util.Objects;
-
-@CapacitorPlugin(name = "LoginProvider", permissions = { @Permission(alias = "internet", strings = {} )}, requestCodes = { TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE })
+@CapacitorPlugin(
+    name = "LoginProvider",
+    permissions = { @Permission(alias = "internet", strings = {}) },
+    requestCodes = { TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE }
+)
 public class LoginProviderPlugin extends Plugin {
 
     public interface AppStatusChangeListener {
@@ -76,8 +76,8 @@ public class LoginProviderPlugin extends Plugin {
                     facebookProvider.login(call);
                     break;
                 case "TWITTER":
-                   getTwitterProviderInstance().login(call);
-                   break;
+                    getTwitterProviderInstance().login(call);
+                    break;
             }
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage());
@@ -85,8 +85,8 @@ public class LoginProviderPlugin extends Plugin {
     }
 
     public TwitterProvider getTwitterProviderInstance() {
-        if(twitterProvider == null) {
-            twitterProvider = new TwitterProvider(this,  twitterOptions);
+        if (twitterProvider == null) {
+            twitterProvider = new TwitterProvider(this, twitterOptions);
         }
 
         return twitterProvider;

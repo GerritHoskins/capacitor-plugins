@@ -2,10 +2,8 @@ package net.bitburst.plugins.loginprovider.providers;
 
 import android.content.Intent;
 import android.util.Log;
-
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
-
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -18,14 +16,11 @@ import com.facebook.login.LoginResult;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
-
+import java.util.Collection;
 import net.bitburst.plugins.loginprovider.LoginProviderHelper;
 import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Collection;
 
 public class FacebookProvider {
 
@@ -63,7 +58,14 @@ public class FacebookProvider {
                                 Log.e(LoginProviderPlugin.LOG_TAG, "LoginManager.onSuccess: no plugin saved call found.");
                             } else {
                                 JSObject ret = new JSObject();
-                                JSObject data = LoginProviderHelper.createLoginProviderResponsePayload("FACEBOOK", loginResult.getAccessToken().getToken(), null, null, null, savedCall.getData().getString("inviteCode"));
+                                JSObject data = LoginProviderHelper.createLoginProviderResponsePayload(
+                                    "FACEBOOK",
+                                    loginResult.getAccessToken().getToken(),
+                                    null,
+                                    null,
+                                    null,
+                                    savedCall.getData().getString("inviteCode")
+                                );
                                 savedCall.resolve(data);
 
                                 pluginImplementation.getBridge().saveCall(null);
@@ -107,7 +109,7 @@ public class FacebookProvider {
     }
 
     public void login(PluginCall call) {
-        if(call == null) return;
+        if (call == null) return;
         callbackId = call.getCallbackId();
 
         rejectSavedCalls(call);
@@ -126,8 +128,9 @@ public class FacebookProvider {
         pluginImplementation.getBridge().saveCall(call);
         //LoginManager.getInstance().logIn(pluginImplementation.getActivity(), permissions);
 
-
-        LoginManager.FacebookLoginActivityResultContract contract = LoginManager.getInstance().createLogInActivityResultContract(callbackManager);
+        LoginManager.FacebookLoginActivityResultContract contract = LoginManager
+            .getInstance()
+            .createLogInActivityResultContract(callbackManager);
         Intent loginIntent = contract.createIntent(pluginImplementation.getActivity(), permissions);
         pluginImplementation.startActivityForResult(call, loginIntent, "facebookLoginResult");
     }
@@ -184,9 +187,9 @@ public class FacebookProvider {
 
     private void rejectSavedCalls(PluginCall call) {
         String callbackId = call.getCallbackId();
-        if(callbackId != null && pluginImplementation.getBridge().getSavedCall(callbackId) != null) {
+        if (callbackId != null && pluginImplementation.getBridge().getSavedCall(callbackId) != null) {
             call.reject("Overlapped calls call not supported");
             return;
-        };
-    };
+        }
+    }
 }
