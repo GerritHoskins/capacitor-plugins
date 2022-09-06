@@ -28,7 +28,7 @@ public class NativeMarket extends Plugin {
                 call.reject("appId is missing");
             }
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage());
+            call.reject(ex.getLocalizedMessage());
         }
     }
 
@@ -49,7 +49,7 @@ public class NativeMarket extends Plugin {
                 call.reject("devId is missing");
             }
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage());
+            call.reject(ex.getLocalizedMessage());
         }
     }
 
@@ -70,7 +70,7 @@ public class NativeMarket extends Plugin {
                 call.reject("name is missing");
             }
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage());
+            call.reject(ex.getLocalizedMessage());
         }
     }
 
@@ -91,7 +91,7 @@ public class NativeMarket extends Plugin {
                 call.reject("editorChoice is missing");
             }
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage());
+            call.reject(ex.getLocalizedMessage());
         }
     }
 
@@ -111,7 +111,7 @@ public class NativeMarket extends Plugin {
                 call.reject("terms is missing");
             }
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage());
+            call.reject(ex.getLocalizedMessage());
         }
     }
 }
