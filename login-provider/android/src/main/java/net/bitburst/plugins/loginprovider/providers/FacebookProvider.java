@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+
 import androidx.activity.result.ActivityResult;
+import androidx.annotation.NonNull;
+
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -17,23 +20,27 @@ import com.facebook.login.LoginResult;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
-import java.util.Collection;
-import java.util.Objects;
+
 import net.bitburst.plugins.loginprovider.LoginProviderHelper;
 import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Collection;
 
 public class FacebookProvider {
 
     public static final int FACEBOOK_SDK_REQUEST_CODE_OFFSET = 0xface;
     public static final String ERROR_SIGN_IN_CANCELED = "Sign in canceled.";
 
-    private LoginProviderPlugin pluginImplementation;
-    private JSObject configSettings;
+    private final LoginProviderPlugin pluginImplementation;
+    private final JSObject configSettings;
+
     private CallbackManager mCallbackManager;
     private String callbackId;
-    private static final String EMAIL = "email";
+
+    private static Collection<String> permissions = null;
 
     public FacebookProvider(LoginProviderPlugin loginProviderPlugin, JSObject config) {
         pluginImplementation = loginProviderPlugin;
@@ -65,7 +72,7 @@ public class FacebookProvider {
                         }
 
                         @Override
-                        public void onError(FacebookException exception) {
+                        public void onError(@NonNull FacebookException exception) {
                             guardSavedCalls().reject(LoginProviderPlugin.LOG_TAG, exception.toString());
                             pluginImplementation.getBridge().saveCall(null);
                         }
@@ -87,11 +94,10 @@ public class FacebookProvider {
         callbackId = call.getCallbackId();
         rejectSavedCalls(call);
 
-        JSArray jsArray = new JSArray();
-        Collection<String> permissions;
+        JSArray permissionStrings = new JSArray();
         try {
-            LoginProviderHelper.convertStringArray(Objects.requireNonNull(configSettings.getString("permissions")).split(" "));
-            permissions = jsArray.toList();
+            permissionStrings.put(0,  configSettings.getString("permissions"));
+            permissions = permissionStrings.toList();
         } catch (JSONException e) {
             call.reject(LoginProviderPlugin.LOG_TAG, "invalid permissions argument", e);
             return;

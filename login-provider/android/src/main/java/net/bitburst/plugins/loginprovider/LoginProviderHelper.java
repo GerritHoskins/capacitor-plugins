@@ -1,13 +1,17 @@
 package net.bitburst.plugins.loginprovider;
 
 import android.net.Uri;
+
 import androidx.annotation.Nullable;
+
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
-import java.util.Objects;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Objects;
 
 public class LoginProviderHelper {
 
