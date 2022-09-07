@@ -48,7 +48,7 @@ init(options?: InitOptions | undefined) => Promise<any>
 ### cleverTap()
 
 ```typescript
-cleverTap() => CleverTap | undefined
+cleverTap() => CleverTap
 ```
 
 **Returns:** <code>CleverTap</code>

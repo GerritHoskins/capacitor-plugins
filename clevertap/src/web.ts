@@ -12,57 +12,49 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
   private scriptUrl =
     'https://d2r1yp2w7bby2u.cloudfront.net/js/clevertap.min.js';
   private scriptLoaded = false;
-  cleverTAP: CleverTap | undefined = undefined;
+  cleverTAP: CleverTap = {} as CleverTap;
 
   constructor() {
     super();
-    this.loadScript().then(() => {
-      this.scriptLoaded = true;
-      this.cleverTAP = window.clevertap;
-      console.log('PP_DEBUG CLEVERTAP LOADED');
-    });
   }
 
-  private async loadScript(): Promise<boolean> {
+  private async loadScript(options: InitOptions): Promise<boolean> {
     return new Promise(resolve => {
-      if (!this.scriptLoaded) {
-        if (typeof window !== undefined) {
-          const script = document.createElement('script');
-          script.src = this.scriptUrl;
-          script.type = 'text/javascript';
-          script.defer = true;
-          script.async = true;
-          script.id = 'clevertap_web_sdk';
-          script.onload = () => resolve(true);
-          const s = document.getElementsByTagName('script')[0];
-          s.parentNode && s
-            ? s.parentNode.insertBefore(script, s)
-            : document.head.appendChild(script);
-        } else {
-          resolve(false);
-        }
-      } else {
+      if (typeof window === undefined) resolve(false);
+      if (this.scriptLoaded) resolve(true);
+      const script = document.createElement('script');
+      script.src = this.scriptUrl;
+      script.type = 'text/javascript';
+      script.defer = true;
+      script.async = true;
+      script.id = 'clevertap_web_sdk';
+      script.onload = () => {
+        this.cleverTAP = window.clevertap;
+        this.cleverTAP.init(
+          options.accountId,
+          options.region,
+          options.targetDomain,
+        );
         resolve(true);
-      }
+      };
+      const s = document.getElementsByTagName('script')[0];
+      s.parentNode && s
+        ? s.parentNode.insertBefore(script, s)
+        : document.head.appendChild(script);
     });
   }
 
-  async init(options: InitOptions): Promise<void> {
-    //  this.scriptLoaded = await this.loadScript();
-    if (this.scriptLoaded && this.cleverTAP) {
-      this.cleverTAP.init(
-        options.accountId,
-        options.region,
-        options.targetDomain,
-      );
+  async init(options: InitOptions): Promise<any> {
+    this.scriptLoaded = await this.loadScript(options);
+    if (this.scriptLoaded) {
+      return Promise.resolve(this.cleverTap());
     } else {
       return Promise.reject('failed to init clevertap web sdk.');
     }
   }
 
-  cleverTap(): CleverTap | undefined {
-    if (this.scriptLoaded) return this.cleverTAP;
-    return undefined;
+  cleverTap(): CleverTap {
+    return this.cleverTAP;
   }
 
   createChannel(): Promise<void> {
@@ -93,55 +85,3 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
     return Promise.reject(this.unavailable('not implemented on web'));
   }
 }
-
-/*
-export class ClevertapWeb extends CleverTap {
-  public clevertapClient: CleverTap;
-  // enablePersonalization: any;
-  // event: any;
-  // notifications: any;
-  // onUserLogin: any;
-  // privacy: any;
-  // profile: any;
-  // session: any;
-  // spa: any;
-  // user: any;
-
-  constructor() {
-    super();
-    this.clevertapClient = new CleverTap();
-    // this.enablePersonalization = this.clevertapClient.enablePersonalization;
-    // this.event = this.clevertapClient.event;
-    // this.notifications = this.clevertapClient.notifications;
-    // this.onUserLogin = this.clevertapClient.onUserLogin;
-    // this.privacy = this.clevertapClient.privacy;
-    // this.profile = this.clevertapClient.profile;
-    // this.session = this.clevertapClient.session;
-    // this.spa = this.clevertapClient.spa;
-    // this.user = this.clevertapClient.user;
-  }
-  client(): CleverTap {
-    return this.clevertapClient;
-  }
-  getCleverTapID(): string | null {
-    return this.clevertapClient.getCleverTapID();
-  }
-  raiseNotificationClicked = (): void =>
-    this.clevertapClient.raiseNotificationClicked();
-
-  clear(): void {
-    this.clevertapClient.clear();
-  }
-  init(accountId: string, region?: Region, targetDomain?: string): void {
-    this.clevertapClient.init(accountId, region, targetDomain);
-  }
-  logout(): void {
-    this.clevertapClient.logout();
-  }
-  pageChanged(): void {
-    this.clevertapClient.pageChanged();
-  }
-  setLogLevel(logLevel: 0 | 1 | 2 | 3): void {
-    this.clevertapClient.setLogLevel(logLevel);
-  }
-}*/

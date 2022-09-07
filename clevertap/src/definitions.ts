@@ -15,7 +15,7 @@ declare module '@capacitor/cli' {
 export type Region = 'eu1' | 'in1' | 'sg1' | 'us1' | 'sk1';
 export interface ClevertapPlugin {
   init(options?: InitOptions): Promise<any>;
-  cleverTap(): CleverTap | undefined;
+  cleverTap(): CleverTap;
   getClevertapId(): Promise<string | null>;
   registerFBM(): Promise<void>;
   getDeliveredNotifications(): Promise<DeliveredNotifications>;
