@@ -8,7 +8,7 @@ export default {
       globals: {
         '@capacitor/core': 'capacitorExports',
         '@capacitor/cli': 'capacitorExports',
-        '@types/clevertap-web-sdk': 'capacitorExports',
+        'clevertap-web-sdk/clevertap': 'CleverTap',
       },
       sourcemap: true,
       inlineDynamicImports: true,
@@ -20,5 +20,10 @@ export default {
       inlineDynamicImports: true,
     },
   ],
-  external: ['@capacitor/core', '@capacitor/cli', '@types/clevertap-web-sdk'],
+  external: [
+    '@capacitor/core',
+    '@capacitor/cli',
+    '@types/clevertap-web-sdk',
+    'clevertap-web-sdk/clevertap',
+  ],
 };

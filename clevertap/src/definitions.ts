@@ -1,4 +1,6 @@
 /// <reference types="@capacitor/cli" />
+import type CleverTap from 'clevertap-web-sdk/clevertap';
+
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
     Clevertap?: {
@@ -10,29 +12,19 @@ declare module '@capacitor/cli' {
 }
 
 export type Region = 'eu1' | 'in1' | 'sg1' | 'us1' | 'sk1';
-
 export interface ClevertapPlugin {
-  getRegion(): Region;
-}
-
-export interface ClevertapNativePlugin extends ClevertapPlugin {
-  getRegion(): Region;
-  getClevertapId(): Promise<ClevertapInstance>;
-  isReady(): Promise<ClevertapInstance>;
+  cleverTap(): CleverTap;
+  getClevertapId(): Promise<string | null>;
   registerFBM(): Promise<void>;
   getDeliveredNotifications(): Promise<DeliveredNotifications>;
   removeDeliveredNotifications(options: {
-    delivered?: DeliveredNotifications;
+    delivered: DeliveredNotifications;
   }): Promise<void>;
-  createChannel(options: { channel?: Channel }): Promise<void>;
-  onUserLogin(options: { profile?: UserProfile }): Promise<void>;
-  pushEvent(options: { event?: PushEvent }): Promise<void>;
+  createChannel(options: { channel: Channel }): Promise<void>;
+  onUserLogin(options: { profile: UserProfile }): Promise<void>;
+  pushEvent(options: { event: PushEvent }): Promise<void>;
 }
 
-export interface ClevertapInstance {
-  clevertapId?: string;
-  isReady?: boolean;
-}
 export interface UserProfile {
   uid: string;
   internalId: string;
@@ -55,9 +47,6 @@ export interface PushNotificationSchema {
   link?: string;
   group?: string;
   groupSummary?: boolean;
-}
-export interface Token {
-  value: string;
 }
 export interface DeliveredNotifications {
   notifications: PushNotificationSchema[];

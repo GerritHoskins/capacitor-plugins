@@ -13,8 +13,8 @@ npx cap sync
 
 <docgen-index>
 
+* [`cleverTap()`](#clevertap)
 * [`getClevertapId()`](#getclevertapid)
-* [`isReady()`](#isready)
 * [`registerFBM()`](#registerfbm)
 * [`getDeliveredNotifications()`](#getdeliverednotifications)
 * [`removeDeliveredNotifications(...)`](#removedeliverednotifications)
@@ -29,24 +29,24 @@ npx cap sync
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### getClevertapId()
+### cleverTap()
 
 ```typescript
-getClevertapId() => Promise<ClevertapInstance>
+cleverTap() => CleverTap
 ```
 
-**Returns:** <code>Promise&lt;<a href="#clevertapinstance">ClevertapInstance</a>&gt;</code>
+**Returns:** <code>CleverTap</code>
 
 --------------------
 
 
-### isReady()
+### getClevertapId()
 
 ```typescript
-isReady() => Promise<ClevertapInstance>
+getClevertapId() => Promise<string | null>
 ```
 
-**Returns:** <code>Promise&lt;<a href="#clevertapinstance">ClevertapInstance</a>&gt;</code>
+**Returns:** <code>Promise&lt;string | null&gt;</code>
 
 --------------------
 
@@ -74,12 +74,12 @@ getDeliveredNotifications() => Promise<DeliveredNotifications>
 ### removeDeliveredNotifications(...)
 
 ```typescript
-removeDeliveredNotifications(options: { delivered?: DeliveredNotifications; }) => Promise<void>
+removeDeliveredNotifications(options: { delivered: DeliveredNotifications; }) => Promise<void>
 ```
 
-| Param         | Type                                                                                       |
-| ------------- | ------------------------------------------------------------------------------------------ |
-| **`options`** | <code>{ delivered?: <a href="#deliverednotifications">DeliveredNotifications</a>; }</code> |
+| Param         | Type                                                                                      |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ delivered: <a href="#deliverednotifications">DeliveredNotifications</a>; }</code> |
 
 --------------------
 
@@ -87,12 +87,12 @@ removeDeliveredNotifications(options: { delivered?: DeliveredNotifications; }) =
 ### createChannel(...)
 
 ```typescript
-createChannel(options: { channel?: Channel; }) => Promise<void>
+createChannel(options: { channel: Channel; }) => Promise<void>
 ```
 
-| Param         | Type                                                       |
-| ------------- | ---------------------------------------------------------- |
-| **`options`** | <code>{ channel?: <a href="#channel">Channel</a>; }</code> |
+| Param         | Type                                                      |
+| ------------- | --------------------------------------------------------- |
+| **`options`** | <code>{ channel: <a href="#channel">Channel</a>; }</code> |
 
 --------------------
 
@@ -100,12 +100,12 @@ createChannel(options: { channel?: Channel; }) => Promise<void>
 ### onUserLogin(...)
 
 ```typescript
-onUserLogin(options: { profile?: UserProfile; }) => Promise<void>
+onUserLogin(options: { profile: UserProfile; }) => Promise<void>
 ```
 
-| Param         | Type                                                               |
-| ------------- | ------------------------------------------------------------------ |
-| **`options`** | <code>{ profile?: <a href="#userprofile">UserProfile</a>; }</code> |
+| Param         | Type                                                              |
+| ------------- | ----------------------------------------------------------------- |
+| **`options`** | <code>{ profile: <a href="#userprofile">UserProfile</a>; }</code> |
 
 --------------------
 
@@ -113,25 +113,17 @@ onUserLogin(options: { profile?: UserProfile; }) => Promise<void>
 ### pushEvent(...)
 
 ```typescript
-pushEvent(options: { event?: PushEvent; }) => Promise<void>
+pushEvent(options: { event: PushEvent; }) => Promise<void>
 ```
 
-| Param         | Type                                                         |
-| ------------- | ------------------------------------------------------------ |
-| **`options`** | <code>{ event?: <a href="#pushevent">PushEvent</a>; }</code> |
+| Param         | Type                                                        |
+| ------------- | ----------------------------------------------------------- |
+| **`options`** | <code>{ event: <a href="#pushevent">PushEvent</a>; }</code> |
 
 --------------------
 
 
 ### Interfaces
-
-
-#### ClevertapInstance
-
-| Prop              | Type                 |
-| ----------------- | -------------------- |
-| **`clevertapId`** | <code>string</code>  |
-| **`isReady`**     | <code>boolean</code> |
 
 
 #### DeliveredNotifications
@@ -206,13 +198,6 @@ pushEvent(options: { event?: PushEvent; }) => Promise<void>
 
 #### EventData
 
-<code><a href="#record">Record</a>&lt;string, unknown&gt;</code>
-
-
-#### Record
-
-Construct a type with a set of properties K of type T
-
-<code>{ [P in K]: T; }</code>
+<code>object</code>
 
 </docgen-api>
