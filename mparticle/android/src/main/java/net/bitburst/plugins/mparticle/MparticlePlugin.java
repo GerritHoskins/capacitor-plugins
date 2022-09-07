@@ -19,9 +19,9 @@ import com.mparticle.identity.IdentityApiRequest;
 import com.mparticle.identity.IdentityApiResult;
 import com.mparticle.identity.TaskSuccessListener;
 import java.util.*;
+import net.bitburst.plugins.mparticle.Mparticle;
 import org.json.JSONException;
 import org.json.JSONObject;
-import net.bitburst.plugins.mparticle.Mparticle;
 
 @CapacitorPlugin(name = "MparticlePlugin")
 public class MparticlePlugin extends Plugin {
@@ -45,11 +45,12 @@ public class MparticlePlugin extends Plugin {
         planId = dataPlan.getString("planId", "bitcode_frontend_plan");
         planVersion = dataPlan.getInt("planVersion", 4);
 
-        MParticleOptions options = MParticleOptions.builder(this)
-                .credentials(mParticleKey, mParticleSecret)
-                .environment(MParticle.Environment.AutoDetect)
-                .dataplan(planId, planVersion)
-                .build();
+        MParticleOptions options = MParticleOptions
+            .builder(this)
+            .credentials(mParticleKey, mParticleSecret)
+            .environment(MParticle.Environment.AutoDetect)
+            .dataplan(planId, planVersion)
+            .build();
 
         MParticle.start(options);
         notifyListeners("mParticleReady", MParticle.getInstance().isInitialized(), false);

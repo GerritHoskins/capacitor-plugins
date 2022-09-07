@@ -9,23 +9,8 @@ import mParticle from '@mparticle/web-sdk';
 import type { MparticlePlugin, Identifier } from './definitions';
 
 export class MparticleWeb extends WebPlugin implements MparticlePlugin {
-  async initConfig(options: MPConfiguration): Promise<MPConfiguration> {
-    return {
-      isDevelopmentMode: options.isDevelopmentMode || true,
-      dataPlan: {
-        planId: options.dataPlan?.planId || '',
-        planVersion: options.dataPlan?.planVersion || 2,
-      },
-      identifyRequest: options.identifyRequest || undefined,
-      logLevel:
-        options.logLevel == 'verbose' || 'warning' || 'none'
-          ? options.logLevel
-          : 'verbose',
-      identityCallback: options.identityCallback || undefined,
-    };
-  }
-  async init(options: { key: string; configs: MPConfiguration }): Promise<any> {
-    return mParticle.init(options.key, options.configs as MPConfiguration);
+  async init(options: { key: string; config: any }): Promise<any> {
+    return mParticle.init(options.key, options.config as MPConfiguration);
   }
   async identifyUser(options: { identifier: Identifier }): Promise<void> {
     if (!mParticle.isInitialized()) return;

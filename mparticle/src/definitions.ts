@@ -12,8 +12,7 @@ declare module '@capacitor/cli' {
 }
 
 export interface MparticlePlugin {
-  initConfig(options: MPConfiguration): Promise<MPConfiguration>;
-  init(options: { key?: string; configs: MPConfiguration }): Promise<any>;
+  init(options: { key?: string; config: any }): Promise<any>;
   identifyUser(options: { identifier: Identifier }): Promise<void>;
   setUserAttribute(options: {
     attributeName: string;
