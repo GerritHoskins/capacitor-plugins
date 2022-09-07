@@ -19,8 +19,13 @@ export interface ClevertapPlugin {
   }): Promise<void>;
   createChannel(options: { channel: Channel }): Promise<void>;
   onUserLogin(options: { profile: UserProfile }): Promise<void>;
-  pushEvent(options: { event: PushEvent }): Promise<void>;
-  push(options: { pushType: PushType; data: any }): Promise<void>;
+  pushEvent(options: {
+    evtName: string;
+    evtNameOrData: EventNameOrData[];
+  }): void;
+  pushNotification(options: { notificationData: NotificationData }): void;
+  pushPrivacy(options: { privacyArr: PrivacyData[] }): void;
+  pushUser(options: { profileData: any[] }): void;
 }
 export type PushType = 'Privacy' | 'Event' | 'Profile' | 'Notifications';
 export type Region = 'eu1' | 'in1' | 'sg1' | 'us1' | 'sk1';
@@ -92,3 +97,5 @@ export interface NotificationData {
 export type Importance = 1 | 2 | 3 | 4 | 5;
 export type Visibility = -1 | 0 | 1;
 export type EventData = Record<string, unknown>;
+export type EventName = string;
+export type EventNameOrData = EventName | EventData;

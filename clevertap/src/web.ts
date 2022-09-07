@@ -6,8 +6,8 @@ import type {
   DeliveredNotifications,
   InitOptions,
   NotificationData,
-  PushType,
   PrivacyData,
+  EventNameOrData,
 } from './definitions';
 
 export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
@@ -59,19 +59,23 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
     return this.cleverTAP;
   }
 
-  async push(options: { pushType: PushType; data: any }): Promise<void> {
-    switch (options.pushType) {
-      case 'Privacy':
-        this.cleverTap().privacy.push(options.data as PrivacyData);
-        break;
-      case 'Notifications':
-        this.cleverTap().notifications.push(options.data as NotificationData);
-        break;
-      default:
-        this.cleverTap().event.push(options.data);
-        break;
-    }
-    return Promise.resolve();
+  pushEvent(options: {
+    evtName: string;
+    evtNameOrData: EventNameOrData[];
+  }): void {
+    this.cleverTAP.event.push(options.evtName, options.evtNameOrData);
+  }
+
+  pushNotification(options: { notificationData: NotificationData }): void {
+    this.cleverTAP.notifications.push(options.notificationData);
+  }
+
+  pushPrivacy(options: { privacyArr: PrivacyData[] }): void {
+    this.cleverTAP.privacy.push(...options.privacyArr);
+  }
+
+  pushUser(options: { profileData: any[] }): void {
+    this.cleverTAP.profile.push(...options.profileData);
   }
 
   createChannel(): Promise<void> {
@@ -79,7 +83,7 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
   }
 
   getClevertapId(): Promise<string | null> {
-    return Promise.reject(this.unavailable('not implemented on web'));
+    return Promise.resolve(this.cleverTAP.getCleverTapID());
   }
 
   getDeliveredNotifications(): Promise<DeliveredNotifications> {
@@ -87,10 +91,6 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
   }
 
   onUserLogin(): Promise<void> {
-    return Promise.reject(this.unavailable('not implemented on web'));
-  }
-
-  pushEvent(): Promise<void> {
     return Promise.reject(this.unavailable('not implemented on web'));
   }
 
