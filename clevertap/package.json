@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/clevertap",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "capacitor plugin for clevertap",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
