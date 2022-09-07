@@ -1,118 +1,174 @@
 import { WebPlugin } from '@capacitor/core';
+import type { PrivacyConsentState, UserIdentities } from '@mparticle/web-sdk';
 import mParticle from '@mparticle/web-sdk';
 
-import type { MparticlePlugin, MparticleConfigType } from './definitions';
+import type {
+  MparticlePlugin,
+  InitConfig,
+  ConfigResponse,
+  Identifier,
+} from './definitions';
 
 export class MparticleWeb extends WebPlugin implements MparticlePlugin {
-  async mParticleConfig(call: {
-    isDevelopmentMode?: boolean;
-    planID?: string;
-    planVer?: number;
-    logLevel?: string;
-    identifyRequest?: any;
-    identityCallback?: () => void;
-  }): Promise<MparticleConfigType> {
-    const mParticleConfig = {
-      isDevelopmentMode: call.isDevelopmentMode || true,
+  async initConfig(options: InitConfig): Promise<ConfigResponse> {
+    return {
+      isDevelopmentMode: options.isDevelopmentMode || true,
       dataPlan: {
-        planId: call.planID || 'master_data_plan',
-        planVersion: call.planVer || 2,
+        planId: options.planID || 'master_data_plan',
+        planVersion: options.planVer || 2,
       },
-      identifyRequest: call.identifyRequest || undefined,
+      identifyRequest: options.identifyRequest || undefined,
       logLevel:
-        call.logLevel == 'verbose' || 'warning' || 'none'
-          ? call.logLevel
+        options.logLevel == 'verbose' || 'warning' || 'none'
+          ? options.logLevel
           : 'verbose',
-      identityCallback: call.identityCallback || undefined,
+      identityCallback: options.identityCallback || undefined,
     };
-    return mParticleConfig;
   }
-
-  async mParticleInit(call: {
+  async init(options: {
     key: string;
-    mParticleConfig: any;
+    configs: { key: string; config: any };
   }): Promise<any> {
-    return mParticle.init(call.key, call.mParticleConfig as any);
+    return mParticle.init(options.key, options.configs as any);
   }
+  async identifyUser(options: { identifier: Identifier }): Promise<void> {
+    if (!mParticle.isInitialized()) return;
+    const { email, customerId, other } = options.identifier;
 
-  async loginMparticleUser(call: {
+    return new Promise(resolve => {
+      if (!mParticle.isInitialized()) return resolve();
+      const userIdentities = {} as UserIdentities;
+      if (email) userIdentities.email = email;
+      if (customerId) userIdentities.customerid = customerId;
+      if (other) userIdentities.other = other;
+
+      mParticle.Identity.identify(
+        {
+          userIdentities: userIdentities,
+        },
+        () => resolve(),
+      );
+    });
+  }
+  async setUserAttribute(options: {
+    attributeName: string;
+    attributeValue: string;
+  }): Promise<void> {
+    const user = mParticle.Identity.getCurrentUser();
+    if (!user) return Promise.resolve();
+
+    user.setUserAttribute(options.attributeName, options.attributeValue);
+    return Promise.resolve();
+  }
+  setGDPRConsent(options: {
+    consents: Record<string, PrivacyConsentState>;
+  }): void {
+    if (!mParticle.isInitialized()) return;
+    const user = mParticle.Identity.getCurrentUser();
+    if (!user) return;
+
+    const consentState = mParticle.Consent.createConsentState();
+
+    for (const [key, value] of Object.entries(options.consents)) {
+      consentState.addGDPRConsentState(
+        key,
+        mParticle.Consent.createGDPRConsent(
+          value.Consented || false,
+          value.Timestamp || Date.now(),
+          value.ConsentDocument || '',
+          value.Location || '',
+          value.HardwareId || '',
+        ),
+      );
+    }
+
+    user.setConsentState(consentState);
+  }
+  getGDPRConsent(options: {
+    consents: string[];
+  }): Record<string, boolean> | void {
+    if (!mParticle.isInitialized()) return;
+    const user = mParticle.Identity.getCurrentUser();
+    if (!user) return;
+
+    const consentState = user.getConsentState();
+    if (!consentState) return;
+
+    const gdprConsentState = consentState.getGDPRConsentState();
+
+    return options.consents.reduce((consentsAcc, consent) => {
+      const state = gdprConsentState[consent];
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      consentsAcc[consent] = state ? state.Consented : false;
+
+      return consentsAcc;
+    }, {});
+  }
+  async getMPID(): Promise<string | void> {
+    if (!mParticle.isInitialized()) return Promise.resolve();
+    const user = mParticle.Identity.getCurrentUser();
+    if (!user) return Promise.resolve();
+
+    return Promise.resolve(user.getMPID());
+  }
+  async logEvent(options: {
+    eventName: string;
+    eventType: any;
+    eventProperties: any;
+  }): Promise<any> {
+    if (!mParticle.isInitialized()) return;
+    return mParticle.logEvent(
+      options.eventName,
+      options.eventType,
+      options.eventProperties,
+    );
+  }
+  async logPageView(options: {
+    pageName: string;
+    pageLink: string;
+  }): Promise<any> {
+    if (!mParticle.isInitialized()) return;
+    return mParticle.logPageView(options.pageName, { page: options.pageLink });
+  }
+  async loginUser(options: {
     email: string;
     customerId: string;
   }): Promise<any> {
+    if (!mParticle.isInitialized()) return;
     return mParticle.Identity.login(
-      this.identityRequest(call.email, call.customerId),
+      this.identityRequest(options.email, options.customerId),
     );
   }
-
-  async logoutMparticleUser(_call: any): Promise<any> {
-    const identityCallback = (result: any) => {
+  async logoutUser(_options: any): Promise<any> {
+    if (!mParticle.isInitialized()) return;
+    const identityoptionsback = (result: any) => {
       if (result.getUser()) {
-        console.log('logging out of mParticle', _call);
+        console.log('logging out of mParticle', _options);
       }
     };
-    return mParticle.Identity.logout({} as any, identityCallback);
+    return mParticle.Identity.logout({} as any, identityoptionsback);
   }
-
-  async registerMparticleUser(call: {
+  async registerUser(options: {
     email: string;
     customerId: string;
     userAttributes: any;
   }): Promise<any> {
     return mParticle.Identity.login(
-      this.identityRequest(call.email, call.customerId),
+      this.identityRequest(options.email, options.customerId),
       function (result: any) {
         if (!result) return;
         const currentUser = result.getUser();
-        for (const [key, value] of Object.entries(call.userAttributes)) {
+        for (const [key, value] of Object.entries(options.userAttributes)) {
           if (key && value) currentUser.setUserAttribute(key, value);
         }
       },
     );
   }
 
-  async logMparticleEvent(call: {
-    eventName: string;
-    eventType: any;
-    eventProperties: any;
-  }): Promise<any> {
-    return mParticle.logEvent(
-      call.eventName,
-      call.eventType,
-      call.eventProperties,
-    );
-  }
-
-  async logMparticlePageView(call: {
-    pageName: string;
-    pageLink: string;
-  }): Promise<any> {
-    return mParticle.logPageView(call.pageName, { page: call.pageLink });
-  }
-
-  async setUserAttribute(call: {
-    attributeName: string;
-    attributeValue: string;
-  }): Promise<any> {
-    return this.currentUser?.setUserAttribute(
-      call.attributeName,
-      call.attributeValue,
-    );
-  }
-
-  async setUserAttributeList(call: {
-    attributeName: string;
-    attributeValues: any;
-  }): Promise<any> {
-    return this.currentUser.setUserAttributeList(
-      call.attributeName,
-      call.attributeValues,
-    );
-  }
-
   public get currentUser(): mParticle.User {
     return mParticle.Identity.getCurrentUser();
   }
-
   private identityRequest(email: string, customerId: string): any {
     return {
       userIdentities: {
@@ -120,9 +176,5 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
         customerid: customerId,
       },
     };
-  }
-
-  async echo(options: { value: string }): Promise<{ value: string }> {
-    return options;
   }
 }

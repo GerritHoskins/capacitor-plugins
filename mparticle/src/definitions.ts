@@ -1,58 +1,48 @@
+import type { PrivacyConsentState } from '@mparticle/web-sdk';
+
 export type mParticleInitListener = (info: any) => any;
 
 export interface MparticlePlugin {
-  echo(options: { value: string }): Promise<{ value: string }>;
-
-  mParticleConfig(call: {
-    isDevelopmentMode?: boolean;
-    planID?: string;
-    planVer?: number;
-    logLevel?: string;
-    identifyRequest?: any;
-    identityCallback?: () => void;
-  }): Promise<MparticleConfigType>;
-
-  mParticleInit(call: { key: string; mParticleConfig: any }): Promise<any>;
-
-  loginMparticleUser(call: { email: string; customerId: string }): Promise<any>;
-
-  logoutMparticleUser(call?: any): Promise<any>;
-
-  logMparticleEvent(call: {
+  initConfig(options: InitConfig): Promise<ConfigResponse>;
+  init(options: {
+    key?: string;
+    configs: { key: string; config: any };
+  }): Promise<any>;
+  identifyUser(options: { identifier: Identifier }): Promise<void>;
+  setUserAttribute(options: {
+    attributeName: string;
+    attributeValue: string;
+  }): Promise<void>;
+  setGDPRConsent(options: {
+    consents: Record<string, PrivacyConsentState>;
+  }): void;
+  getGDPRConsent(options: {
+    consents: string[];
+  }): Record<string, boolean> | void;
+  getMPID(): Promise<string | void>;
+  logEvent(options: {
     eventName: string;
     eventType: any;
     eventProperties: any;
   }): Promise<any>;
-  logMparticlePageView(call: { pageName: string; pageLink: any }): Promise<any>;
-
-  setUserAttribute(call: {
-    attributeName: string;
-    attributeValue: string;
-  }): Promise<any>;
-  setUserAttributeList(call: {
-    attributeName: string;
-    attributeValues: any;
-  }): Promise<any>;
-
-  registerMparticleUser(call: {
+  logPageView(options: { pageName: string; pageLink: any }): Promise<any>;
+  loginUser(options: { email: string; customerId: string }): Promise<any>;
+  logoutUser(options?: any): Promise<any>;
+  registerUser(options: {
     email: string;
     customerId: string;
     userAttributes: any;
   }): Promise<any>;
 }
-
-export enum MparticleEventType {
-  Navigation = 1,
-  Location = 2,
-  Search = 3,
-  Transaction = 4,
-  UserContent = 5,
-  UserPreference = 6,
-  Social = 7,
-  Other = 8,
-}
-
-export type MparticleConfigType = {
+export type InitConfig = {
+  isDevelopmentMode?: boolean;
+  planID?: string;
+  planVer?: number;
+  logLevel?: string;
+  identifyRequest?: any;
+  identityCallback?: () => void;
+};
+export type ConfigResponse = {
   isDevelopmentMode?: boolean;
   dataPlan?: {
     planId?: string;
@@ -61,4 +51,16 @@ export type MparticleConfigType = {
   identifyRequest?: any;
   logLevel?: string;
   identityCallback?: () => void;
+};
+export type Identifier = {
+  email?: string;
+  customerId?: string;
+  other?: string;
+};
+export type Consent = {
+  consented?: boolean;
+  timestamp?: number;
+  consentDocument?: string;
+  location?: string;
+  hardwareId?: string;
 };

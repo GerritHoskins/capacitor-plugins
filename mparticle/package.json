@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/mparticle",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "capacitor plugin for mparticle",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -62,6 +62,9 @@
   "peerDependencies": {
     "@capacitor/core": "^4.0.0"
   },
+  "dependencies": {
+    "@mparticle/web-sdk": "^2.16.2"
+  },
   "prettier": "@ionic/prettier-config",
   "swiftlint": "@ionic/swiftlint-config",
   "eslintConfig": {
@@ -74,8 +77,5 @@
     "android": {
       "src": "android"
     }
-  },
-  "dependencies": {
-    "@mparticle/web-sdk": "^2.16.2"
   }
 }
