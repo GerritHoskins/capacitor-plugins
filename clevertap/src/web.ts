@@ -47,7 +47,7 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
   async init(options: InitOptions): Promise<any> {
     this.scriptLoaded = await this.loadScript(options);
     if (this.scriptLoaded) {
-      return Promise.resolve(this.cleverTap());
+      return this.cleverTap();
     } else {
       return Promise.reject('failed to init clevertap web sdk.');
     }

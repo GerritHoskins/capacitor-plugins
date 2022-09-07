@@ -4,15 +4,10 @@ import type CleverTap from 'clevertap-web-sdk/clevertap';
 
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
-    Clevertap?: {
-      accountId?: string;
-      region?: Region;
-      targetDomain?: string;
-    };
+    Clevertap?: InitOptions;
   }
 }
 
-export type Region = 'eu1' | 'in1' | 'sg1' | 'us1' | 'sk1';
 export interface ClevertapPlugin {
   init(options?: InitOptions): Promise<any>;
   cleverTap(): CleverTap;
@@ -27,12 +22,12 @@ export interface ClevertapPlugin {
   pushEvent(options: { event: PushEvent }): Promise<void>;
 }
 
+export type Region = 'eu1' | 'in1' | 'sg1' | 'us1' | 'sk1';
 export interface InitOptions {
   accountId: string;
   region?: Region;
   targetDomain?: string;
 }
-
 export interface UserProfile {
   uid: string;
   internalId: string;
