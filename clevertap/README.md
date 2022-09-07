@@ -48,10 +48,10 @@ init(options?: InitOptions | undefined) => Promise<any>
 ### cleverTap()
 
 ```typescript
-cleverTap() => Promise<any>
+cleverTap() => CleverTap | undefined
 ```
 
-**Returns:** <code>Promise&lt;any&gt;</code>
+**Returns:** <code>CleverTap</code>
 
 --------------------
 
@@ -228,13 +228,6 @@ pushEvent(options: { event: PushEvent; }) => Promise<void>
 
 #### EventData
 
-<code><a href="#record">Record</a>&lt;string, unknown&gt;</code>
-
-
-#### Record
-
-Construct a type with a set of properties K of type T
-
-<code>{ [P in K]: T; }</code>
+<code>object</code>
 
 </docgen-api>
