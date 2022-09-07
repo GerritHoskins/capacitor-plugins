@@ -20,8 +20,9 @@ export interface ClevertapPlugin {
   createChannel(options: { channel: Channel }): Promise<void>;
   onUserLogin(options: { profile: UserProfile }): Promise<void>;
   pushEvent(options: { event: PushEvent }): Promise<void>;
+  push(options: { pushType: PushType; data: any }): Promise<void>;
 }
-
+export type PushType = 'Privacy' | 'Event' | 'Profile' | 'Notifications';
 export type Region = 'eu1' | 'in1' | 'sg1' | 'us1' | 'sk1';
 export interface InitOptions {
   accountId: string;
@@ -65,6 +66,29 @@ export interface Channel {
   lightColor?: string;
   vibration?: boolean;
 }
+export interface PrivacyData {
+  optOut?: boolean;
+  useIP?: boolean;
+}
+export interface NotificationData {
+  titleText: string;
+  bodyText: string;
+  okButtonText: string;
+  rejectButtonText: string;
+  okButtonColor?: string;
+  skipDialog?: boolean;
+  askAgainTimeInSeconds?: number;
+  okCallback?: () => void;
+  rejectCallback?: () => void;
+  subscriptionCallback?: () => void;
+  hidePoweredByCT?: boolean;
+  serviceWorkerPath?: string;
+  httpsPopupPath?: string;
+  httpsIframePath?: string;
+  apnsWebPushId?: string;
+  apnsWebPushServiceUrl?: string;
+}
+
 export type Importance = 1 | 2 | 3 | 4 | 5;
 export type Visibility = -1 | 0 | 1;
 export type EventData = Record<string, unknown>;

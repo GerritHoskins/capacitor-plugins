@@ -22,6 +22,7 @@ npx cap sync
 * [`createChannel(...)`](#createchannel)
 * [`onUserLogin(...)`](#onuserlogin)
 * [`pushEvent(...)`](#pushevent)
+* [`push(...)`](#push)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -139,6 +140,19 @@ pushEvent(options: { event: PushEvent; }) => Promise<void>
 --------------------
 
 
+### push(...)
+
+```typescript
+push(options: { pushType: PushType; data: any; }) => Promise<void>
+```
+
+| Param         | Type                                                                    |
+| ------------- | ----------------------------------------------------------------------- |
+| **`options`** | <code>{ pushType: <a href="#pushtype">PushType</a>; data: any; }</code> |
+
+--------------------
+
+
 ### Interfaces
 
 
@@ -229,5 +243,10 @@ pushEvent(options: { event: PushEvent; }) => Promise<void>
 #### EventData
 
 <code>object</code>
+
+
+#### PushType
+
+<code>'Privacy' | 'Event' | 'Profile' | 'Notifications'</code>
 
 </docgen-api>

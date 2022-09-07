@@ -1,4 +1,3 @@
-/// <reference types="@types/clevertap-web-sdk" />
 import { WebPlugin } from '@capacitor/core';
 import type CleverTap from 'clevertap-web-sdk/clevertap';
 
@@ -6,6 +5,9 @@ import type {
   ClevertapPlugin,
   DeliveredNotifications,
   InitOptions,
+  NotificationData,
+  PushType,
+  PrivacyData,
 } from './definitions';
 
 export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
@@ -55,6 +57,21 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
 
   cleverTap(): CleverTap {
     return this.cleverTAP;
+  }
+
+  async push(options: { pushType: PushType; data: any }): Promise<void> {
+    switch (options.pushType) {
+      case 'Privacy':
+        this.cleverTap().privacy.push(options.data as PrivacyData);
+        break;
+      case 'Notifications':
+        this.cleverTap().notifications.push(options.data as NotificationData);
+        break;
+      default:
+        this.cleverTap().event.push(options.data);
+        break;
+    }
+    return Promise.resolve();
   }
 
   createChannel(): Promise<void> {
