@@ -1,13 +1,19 @@
-import type { PrivacyConsentState } from '@mparticle/web-sdk';
+/// <reference types="@capacitor/cli" />
+import type { PluginListenerHandle } from '@capacitor/core';
+import type { PrivacyConsentState, MPConfiguration } from '@mparticle/web-sdk';
 
-export type mParticleInitListener = (info: any) => any;
+declare module '@capacitor/cli' {
+  export interface PluginsConfig {
+    MparticlePlugin: {
+      appId?: string;
+      config?: MPConfiguration;
+    };
+  }
+}
 
 export interface MparticlePlugin {
-  initConfig(options: InitConfig): Promise<ConfigResponse>;
-  init(options: {
-    key?: string;
-    configs: { key: string; config: any };
-  }): Promise<any>;
+  initConfig(options: MPConfiguration): Promise<MPConfiguration>;
+  init(options: { key?: string; configs: MPConfiguration }): Promise<any>;
   identifyUser(options: { identifier: Identifier }): Promise<void>;
   setUserAttribute(options: {
     attributeName: string;
@@ -33,34 +39,17 @@ export interface MparticlePlugin {
     customerId: string;
     userAttributes: any;
   }): Promise<any>;
+  addListener(
+    eventName: 'mParticleReady',
+    listenerFunc: mParticleReadyListener,
+  ): Promise<PluginListenerHandle> & PluginListenerHandle;
 }
-export type InitConfig = {
-  isDevelopmentMode?: boolean;
-  planID?: string;
-  planVer?: number;
-  logLevel?: string;
-  identifyRequest?: any;
-  identityCallback?: () => void;
-};
-export type ConfigResponse = {
-  isDevelopmentMode?: boolean;
-  dataPlan?: {
-    planId?: string;
-    planVersion?: number;
-  };
-  identifyRequest?: any;
-  logLevel?: string;
-  identityCallback?: () => void;
-};
 export type Identifier = {
   email?: string;
   customerId?: string;
   other?: string;
 };
-export type Consent = {
-  consented?: boolean;
-  timestamp?: number;
-  consentDocument?: string;
-  location?: string;
-  hardwareId?: string;
-};
+export type mParticleReadyListener = (event: MparticleReadyEvent) => void;
+export interface MparticleReadyEvent {
+  ready: boolean;
+}

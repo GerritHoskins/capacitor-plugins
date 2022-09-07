@@ -1,21 +1,20 @@
 import { WebPlugin } from '@capacitor/core';
-import type { PrivacyConsentState, UserIdentities } from '@mparticle/web-sdk';
+import type {
+  PrivacyConsentState,
+  UserIdentities,
+  MPConfiguration,
+} from '@mparticle/web-sdk';
 import mParticle from '@mparticle/web-sdk';
 
-import type {
-  MparticlePlugin,
-  InitConfig,
-  ConfigResponse,
-  Identifier,
-} from './definitions';
+import type { MparticlePlugin, Identifier } from './definitions';
 
 export class MparticleWeb extends WebPlugin implements MparticlePlugin {
-  async initConfig(options: InitConfig): Promise<ConfigResponse> {
+  async initConfig(options: MPConfiguration): Promise<MPConfiguration> {
     return {
       isDevelopmentMode: options.isDevelopmentMode || true,
       dataPlan: {
-        planId: options.planID || 'master_data_plan',
-        planVersion: options.planVer || 2,
+        planId: options.dataPlan?.planId || '',
+        planVersion: options.dataPlan?.planVersion || 2,
       },
       identifyRequest: options.identifyRequest || undefined,
       logLevel:
@@ -25,11 +24,8 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
       identityCallback: options.identityCallback || undefined,
     };
   }
-  async init(options: {
-    key: string;
-    configs: { key: string; config: any };
-  }): Promise<any> {
-    return mParticle.init(options.key, options.configs as any);
+  async init(options: { key: string; configs: MPConfiguration }): Promise<any> {
+    return mParticle.init(options.key, options.configs as MPConfiguration);
   }
   async identifyUser(options: { identifier: Identifier }): Promise<void> {
     if (!mParticle.isInitialized()) return;

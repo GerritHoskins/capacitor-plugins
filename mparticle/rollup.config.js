@@ -8,6 +8,7 @@ export default {
       globals: {
         '@capacitor/core': 'capacitorExports',
         '@capacitor/cli': 'capacitorExports',
+        '@mparticle/web-sdk': 'capacitorExports',
       },
       sourcemap: true,
       inlineDynamicImports: true,
@@ -19,5 +20,5 @@ export default {
       inlineDynamicImports: true,
     },
   ],
-  external: ['@capacitor/core', '@capacitor/cli'],
+  external: ['@capacitor/core', '@capacitor/cli', '@mparticle/web-sdk'],
 };

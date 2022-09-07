@@ -13,16 +13,20 @@ npx cap sync
 
 <docgen-index>
 
-* [`echo(...)`](#echo)
-* [`mParticleConfig(...)`](#mparticleconfig)
-* [`mParticleInit(...)`](#mparticleinit)
-* [`loginMparticleUser(...)`](#loginmparticleuser)
-* [`logoutMparticleUser(...)`](#logoutmparticleuser)
-* [`logMparticleEvent(...)`](#logmparticleevent)
-* [`logMparticlePageView(...)`](#logmparticlepageview)
+* [`initConfig(...)`](#initconfig)
+* [`init(...)`](#init)
+* [`identifyUser(...)`](#identifyuser)
 * [`setUserAttribute(...)`](#setuserattribute)
-* [`setUserAttributeList(...)`](#setuserattributelist)
-* [`registerMparticleUser(...)`](#registermparticleuser)
+* [`setGDPRConsent(...)`](#setgdprconsent)
+* [`getGDPRConsent(...)`](#getgdprconsent)
+* [`getMPID()`](#getmpid)
+* [`logEvent(...)`](#logevent)
+* [`logPageView(...)`](#logpageview)
+* [`loginUser(...)`](#loginuser)
+* [`logoutUser(...)`](#logoutuser)
+* [`registerUser(...)`](#registeruser)
+* [`addListener('mParticleReady', ...)`](#addlistenermparticleready)
+* [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
 </docgen-index>
@@ -30,107 +34,45 @@ npx cap sync
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### echo(...)
+### initConfig(...)
 
 ```typescript
-echo(options: { value: string; }) => Promise<{ value: string; }>
+initConfig(options: MPConfiguration) => Promise<MPConfiguration>
 ```
 
-| Param         | Type                            |
-| ------------- | ------------------------------- |
-| **`options`** | <code>{ value: string; }</code> |
+| Param         | Type                                                        |
+| ------------- | ----------------------------------------------------------- |
+| **`options`** | <code><a href="#mpconfiguration">MPConfiguration</a></code> |
 
-**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#mpconfiguration">MPConfiguration</a>&gt;</code>
 
 --------------------
 
 
-### mParticleConfig(...)
+### init(...)
 
 ```typescript
-mParticleConfig(call: { isDevelopmentMode?: boolean; planID?: string; planVer?: number; logLevel?: string; identifyRequest?: any; identityCallback?: () => void; }) => Promise<MparticleConfigType>
+init(options: { key?: string; configs: MPConfiguration; }) => Promise<any>
 ```
 
-| Param      | Type                                                                                                                                                           |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`call`** | <code>{ isDevelopmentMode?: boolean; planID?: string; planVer?: number; logLevel?: string; identifyRequest?: any; identityCallback?: (() =&gt; void); }</code> |
-
-**Returns:** <code>Promise&lt;<a href="#mparticleconfigtype">MparticleConfigType</a>&gt;</code>
-
---------------------
-
-
-### mParticleInit(...)
-
-```typescript
-mParticleInit(call: { key: string; mParticleConfig: any; }) => Promise<any>
-```
-
-| Param      | Type                                                |
-| ---------- | --------------------------------------------------- |
-| **`call`** | <code>{ key: string; mParticleConfig: any; }</code> |
+| Param         | Type                                                                                    |
+| ------------- | --------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ key?: string; configs: <a href="#mpconfiguration">MPConfiguration</a>; }</code> |
 
 **Returns:** <code>Promise&lt;any&gt;</code>
 
 --------------------
 
 
-### loginMparticleUser(...)
+### identifyUser(...)
 
 ```typescript
-loginMparticleUser(call: { email: string; customerId: string; }) => Promise<any>
+identifyUser(options: { identifier: Identifier; }) => Promise<void>
 ```
 
-| Param      | Type                                                |
-| ---------- | --------------------------------------------------- |
-| **`call`** | <code>{ email: string; customerId: string; }</code> |
-
-**Returns:** <code>Promise&lt;any&gt;</code>
-
---------------------
-
-
-### logoutMparticleUser(...)
-
-```typescript
-logoutMparticleUser(call?: any) => Promise<any>
-```
-
-| Param      | Type             |
-| ---------- | ---------------- |
-| **`call`** | <code>any</code> |
-
-**Returns:** <code>Promise&lt;any&gt;</code>
-
---------------------
-
-
-### logMparticleEvent(...)
-
-```typescript
-logMparticleEvent(call: { eventName: string; eventType: any; eventProperties: any; }) => Promise<any>
-```
-
-| Param      | Type                                                                      |
-| ---------- | ------------------------------------------------------------------------- |
-| **`call`** | <code>{ eventName: string; eventType: any; eventProperties: any; }</code> |
-
-**Returns:** <code>Promise&lt;any&gt;</code>
-
---------------------
-
-
-### logMparticlePageView(...)
-
-```typescript
-logMparticlePageView(call: { pageName: string; pageLink: any; }) => Promise<any>
-```
-
-| Param      | Type                                              |
-| ---------- | ------------------------------------------------- |
-| **`call`** | <code>{ pageName: string; pageLink: any; }</code> |
-
-**Returns:** <code>Promise&lt;any&gt;</code>
+| Param         | Type                                                               |
+| ------------- | ------------------------------------------------------------------ |
+| **`options`** | <code>{ identifier: <a href="#identifier">Identifier</a>; }</code> |
 
 --------------------
 
@@ -138,53 +80,276 @@ logMparticlePageView(call: { pageName: string; pageLink: any; }) => Promise<any>
 ### setUserAttribute(...)
 
 ```typescript
-setUserAttribute(call: { attributeName: string; attributeValue: string; }) => Promise<any>
+setUserAttribute(options: { attributeName: string; attributeValue: string; }) => Promise<void>
 ```
 
-| Param      | Type                                                            |
-| ---------- | --------------------------------------------------------------- |
-| **`call`** | <code>{ attributeName: string; attributeValue: string; }</code> |
-
-**Returns:** <code>Promise&lt;any&gt;</code>
+| Param         | Type                                                            |
+| ------------- | --------------------------------------------------------------- |
+| **`options`** | <code>{ attributeName: string; attributeValue: string; }</code> |
 
 --------------------
 
 
-### setUserAttributeList(...)
+### setGDPRConsent(...)
 
 ```typescript
-setUserAttributeList(call: { attributeName: string; attributeValues: any; }) => Promise<any>
+setGDPRConsent(options: { consents: Record<string, PrivacyConsentState>; }) => void
 ```
 
-| Param      | Type                                                          |
-| ---------- | ------------------------------------------------------------- |
-| **`call`** | <code>{ attributeName: string; attributeValues: any; }</code> |
-
-**Returns:** <code>Promise&lt;any&gt;</code>
+| Param         | Type                                                                                                                           |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **`options`** | <code>{ consents: <a href="#record">Record</a>&lt;string, <a href="#privacyconsentstate">PrivacyConsentState</a>&gt;; }</code> |
 
 --------------------
 
 
-### registerMparticleUser(...)
+### getGDPRConsent(...)
 
 ```typescript
-registerMparticleUser(call: { email: string; customerId: string; userAttributes: any; }) => Promise<any>
+getGDPRConsent(options: { consents: string[]; }) => Record<string, boolean> | void
 ```
 
-| Param      | Type                                                                     |
-| ---------- | ------------------------------------------------------------------------ |
-| **`call`** | <code>{ email: string; customerId: string; userAttributes: any; }</code> |
+| Param         | Type                                 |
+| ------------- | ------------------------------------ |
+| **`options`** | <code>{ consents: string[]; }</code> |
+
+**Returns:** <code>void | <a href="#record">Record</a>&lt;string, boolean&gt;</code>
+
+--------------------
+
+
+### getMPID()
+
+```typescript
+getMPID() => Promise<string | void>
+```
+
+**Returns:** <code>Promise&lt;string | void&gt;</code>
+
+--------------------
+
+
+### logEvent(...)
+
+```typescript
+logEvent(options: { eventName: string; eventType: any; eventProperties: any; }) => Promise<any>
+```
+
+| Param         | Type                                                                      |
+| ------------- | ------------------------------------------------------------------------- |
+| **`options`** | <code>{ eventName: string; eventType: any; eventProperties: any; }</code> |
 
 **Returns:** <code>Promise&lt;any&gt;</code>
 
 --------------------
+
+
+### logPageView(...)
+
+```typescript
+logPageView(options: { pageName: string; pageLink: any; }) => Promise<any>
+```
+
+| Param         | Type                                              |
+| ------------- | ------------------------------------------------- |
+| **`options`** | <code>{ pageName: string; pageLink: any; }</code> |
+
+**Returns:** <code>Promise&lt;any&gt;</code>
+
+--------------------
+
+
+### loginUser(...)
+
+```typescript
+loginUser(options: { email: string; customerId: string; }) => Promise<any>
+```
+
+| Param         | Type                                                |
+| ------------- | --------------------------------------------------- |
+| **`options`** | <code>{ email: string; customerId: string; }</code> |
+
+**Returns:** <code>Promise&lt;any&gt;</code>
+
+--------------------
+
+
+### logoutUser(...)
+
+```typescript
+logoutUser(options?: any) => Promise<any>
+```
+
+| Param         | Type             |
+| ------------- | ---------------- |
+| **`options`** | <code>any</code> |
+
+**Returns:** <code>Promise&lt;any&gt;</code>
+
+--------------------
+
+
+### registerUser(...)
+
+```typescript
+registerUser(options: { email: string; customerId: string; userAttributes: any; }) => Promise<any>
+```
+
+| Param         | Type                                                                     |
+| ------------- | ------------------------------------------------------------------------ |
+| **`options`** | <code>{ email: string; customerId: string; userAttributes: any; }</code> |
+
+**Returns:** <code>Promise&lt;any&gt;</code>
+
+--------------------
+
+
+### addListener('mParticleReady', ...)
+
+```typescript
+addListener(eventName: 'mParticleReady', listenerFunc: mParticleReadyListener) => Promise<PluginListenerHandle> & PluginListenerHandle
+```
+
+| Param              | Type                                                                      |
+| ------------------ | ------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'mParticleReady'</code>                                             |
+| **`listenerFunc`** | <code><a href="#mparticlereadylistener">mParticleReadyListener</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+
+--------------------
+
+
+### Interfaces
+
+
+#### MPConfiguration
+
+| Prop                            | Type                                                                |
+| ------------------------------- | ------------------------------------------------------------------- |
+| **`isDevelopmentMode`**         | <code>boolean</code>                                                |
+| **`identifyRequest`**           | <code><a href="#identifyrequest">IdentifyRequest</a></code>         |
+| **`identityCallback`**          | <code><a href="#identitycallback">IdentityCallback</a></code>       |
+| **`dataPlan`**                  | <code><a href="#dataplanconfig">DataPlanConfig</a></code>           |
+| **`appVersion`**                | <code>string</code>                                                 |
+| **`appName`**                   | <code>string</code>                                                 |
+| **`package`**                   | <code>string</code>                                                 |
+| **`logLevel`**                  | <code>'none' \| 'verbose' \| 'warning'</code>                       |
+| **`logger`**                    | <code><a href="#logger">Logger</a></code>                           |
+| **`sessionTimeout`**            | <code>number</code>                                                 |
+| **`deviceId`**                  | <code>string</code>                                                 |
+| **`onCreateBatch`**             | <code><a href="#oncreatebatch">onCreateBatch</a></code>             |
+| **`useCookieStorage`**          | <code>boolean</code>                                                |
+| **`maxCookieSize`**             | <code>number</code>                                                 |
+| **`cookieDomain`**              | <code>string</code>                                                 |
+| **`customFlags`**               | <code><a href="#sdkeventcustomflags">SDKEventCustomFlags</a></code> |
+| **`workspaceToken`**            | <code>string</code>                                                 |
+| **`requiredWebviewBridgeName`** | <code>string</code>                                                 |
+| **`minWebviewBridgeVersion`**   | <code>1 \| 2</code>                                                 |
+
+
+#### IdentifyRequest
+
+| Prop                 | Type                                                      |
+| -------------------- | --------------------------------------------------------- |
+| **`userIdentities`** | <code><a href="#useridentities">UserIdentities</a></code> |
+
+
+#### UserIdentities
+
+| Prop                           | Type                |
+| ------------------------------ | ------------------- |
+| **`customerid`**               | <code>string</code> |
+| **`email`**                    | <code>string</code> |
+| **`other`**                    | <code>string</code> |
+| **`other2`**                   | <code>string</code> |
+| **`other3`**                   | <code>string</code> |
+| **`other4`**                   | <code>string</code> |
+| **`other5`**                   | <code>string</code> |
+| **`other6`**                   | <code>string</code> |
+| **`other7`**                   | <code>string</code> |
+| **`other8`**                   | <code>string</code> |
+| **`other9`**                   | <code>string</code> |
+| **`other10`**                  | <code>string</code> |
+| **`mobile_number`**            | <code>string</code> |
+| **`phone_number_2`**           | <code>string</code> |
+| **`phone_number_3`**           | <code>string</code> |
+| **`facebook`**                 | <code>string</code> |
+| **`facebookcustomaudienceid`** | <code>string</code> |
+| **`google`**                   | <code>string</code> |
+| **`twitter`**                  | <code>string</code> |
+| **`microsoft`**                | <code>string</code> |
+| **`yahoo`**                    | <code>string</code> |
+
+
+#### IdentityCallback
+
+
+#### DataPlanConfig
+
+| Prop              | Type                |
+| ----------------- | ------------------- |
+| **`planId`**      | <code>string</code> |
+| **`planVersion`** | <code>number</code> |
+
+
+#### Logger
+
+| Prop          | Type                                      |
+| ------------- | ----------------------------------------- |
+| **`error`**   | <code>((error: string) =&gt; void)</code> |
+| **`warning`** | <code>((error: string) =&gt; void)</code> |
+| **`verbose`** | <code>((error: string) =&gt; void)</code> |
+
+
+#### onCreateBatch
+
+
+#### SDKEventCustomFlags
+
+
+#### PrivacyConsentState
+
+| Prop                  | Type                 |
+| --------------------- | -------------------- |
+| **`Consented`**       | <code>boolean</code> |
+| **`Timestamp`**       | <code>number</code>  |
+| **`ConsentDocument`** | <code>string</code>  |
+| **`Location`**        | <code>string</code>  |
+| **`HardwareId`**      | <code>string</code>  |
+
+
+#### PluginListenerHandle
+
+| Prop         | Type                                      |
+| ------------ | ----------------------------------------- |
+| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
+
+
+#### MparticleReadyEvent
+
+| Prop        | Type                 |
+| ----------- | -------------------- |
+| **`ready`** | <code>boolean</code> |
 
 
 ### Type Aliases
 
 
-#### MparticleConfigType
+#### Identifier
 
-<code>{ isDevelopmentMode?: boolean; dataPlan?: { planId?: string; planVersion?: number; }; identifyRequest?: any; logLevel?: string; identityCallback?: () =&gt; void; }</code>
+<code>{ email?: string; customerId?: string; other?: string; }</code>
+
+
+#### Record
+
+Construct a type with a set of properties K of type T
+
+<code>{ [P in K]: T; }</code>
+
+
+#### mParticleReadyListener
+
+<code>(event: <a href="#mparticlereadyevent">MparticleReadyEvent</a>): void</code>
 
 </docgen-api>
