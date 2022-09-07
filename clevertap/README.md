@@ -13,6 +13,7 @@ npx cap sync
 
 <docgen-index>
 
+* [`init(...)`](#init)
 * [`cleverTap()`](#clevertap)
 * [`getClevertapId()`](#getclevertapid)
 * [`registerFBM()`](#registerfbm)
@@ -29,13 +30,28 @@ npx cap sync
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
+### init(...)
+
+```typescript
+init(options?: InitOptions | undefined) => Promise<any>
+```
+
+| Param         | Type                                                |
+| ------------- | --------------------------------------------------- |
+| **`options`** | <code><a href="#initoptions">InitOptions</a></code> |
+
+**Returns:** <code>Promise&lt;any&gt;</code>
+
+--------------------
+
+
 ### cleverTap()
 
 ```typescript
-cleverTap() => CleverTap
+cleverTap() => Promise<any>
 ```
 
-**Returns:** <code>CleverTap</code>
+**Returns:** <code>Promise&lt;any&gt;</code>
 
 --------------------
 
@@ -126,6 +142,15 @@ pushEvent(options: { event: PushEvent; }) => Promise<void>
 ### Interfaces
 
 
+#### InitOptions
+
+| Prop               | Type                                      |
+| ------------------ | ----------------------------------------- |
+| **`accountId`**    | <code>string</code>                       |
+| **`region`**       | <code><a href="#region">Region</a></code> |
+| **`targetDomain`** | <code>string</code>                       |
+
+
 #### DeliveredNotifications
 
 | Prop                | Type                                  |
@@ -186,6 +211,11 @@ pushEvent(options: { event: PushEvent; }) => Promise<void>
 ### Type Aliases
 
 
+#### Region
+
+<code>'eu1' | 'in1' | 'sg1' | 'us1' | 'sk1'</code>
+
+
 #### Importance
 
 <code>1 | 2 | 3 | 4 | 5</code>
@@ -198,6 +228,13 @@ pushEvent(options: { event: PushEvent; }) => Promise<void>
 
 #### EventData
 
-<code>object</code>
+<code><a href="#record">Record</a>&lt;string, unknown&gt;</code>
+
+
+#### Record
+
+Construct a type with a set of properties K of type T
+
+<code>{ [P in K]: T; }</code>
 
 </docgen-api>

@@ -1,5 +1,4 @@
 /// <reference types="@capacitor/cli" />
-import type CleverTap from 'clevertap-web-sdk/clevertap';
 
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
@@ -13,7 +12,8 @@ declare module '@capacitor/cli' {
 
 export type Region = 'eu1' | 'in1' | 'sg1' | 'us1' | 'sk1';
 export interface ClevertapPlugin {
-  cleverTap(): CleverTap;
+  init(options?: InitOptions): Promise<any>;
+  cleverTap(): Promise<any>;
   getClevertapId(): Promise<string | null>;
   registerFBM(): Promise<void>;
   getDeliveredNotifications(): Promise<DeliveredNotifications>;
@@ -23,6 +23,12 @@ export interface ClevertapPlugin {
   createChannel(options: { channel: Channel }): Promise<void>;
   onUserLogin(options: { profile: UserProfile }): Promise<void>;
   pushEvent(options: { event: PushEvent }): Promise<void>;
+}
+
+export interface InitOptions {
+  accountId: string;
+  region?: Region;
+  targetDomain?: string;
 }
 
 export interface UserProfile {

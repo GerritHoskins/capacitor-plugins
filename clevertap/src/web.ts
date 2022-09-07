@@ -1,15 +1,61 @@
+/// <reference types="@types/clevertap-web-sdk" />
 import { WebPlugin } from '@capacitor/core';
-import CleverTap from 'clevertap-web-sdk/clevertap';
+import type clevertap from 'clevertap-web-sdk/clevertap';
 
-import type { ClevertapPlugin, DeliveredNotifications } from './definitions';
+import type {
+  ClevertapPlugin,
+  DeliveredNotifications,
+  InitOptions,
+} from './definitions';
+
+declare let cleverTAP: clevertap;
 
 export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
+  private scriptUrl =
+    'https://d2r1yp2w7bby2u.cloudfront.net/js/clevertap.min.js';
+  private scriptLoaded = false;
+
   constructor() {
     super();
   }
 
-  cleverTap(): CleverTap {
-    return new CleverTap();
+  private async loadScript(): Promise<boolean> {
+    return new Promise(resolve => {
+      if (!this.scriptLoaded) {
+        if (typeof window !== undefined) {
+          const script = document.createElement('script');
+          script.src = this.scriptUrl;
+          script.type = 'text/javascript';
+          script.defer = true;
+          script.async = true;
+          script.id = 'clevertap_web_sdk';
+          script.onload = () => resolve(true);
+          const s = document.getElementsByTagName('script')[0];
+          s.parentNode && s
+            ? s.parentNode.insertBefore(script, s)
+            : document.head.appendChild(script);
+        } else {
+          resolve(false);
+        }
+      } else {
+        resolve(true);
+      }
+    });
+  }
+
+  async init(options: InitOptions): Promise<void> {
+    this.scriptLoaded = await this.loadScript();
+    if (this.scriptLoaded) {
+      cleverTAP = window.clevertap;
+      cleverTAP.init(options.accountId, options.region, options.targetDomain);
+    } else {
+      return Promise.reject('failed to init clevertap web sdk.');
+    }
+  }
+
+  async cleverTap(): Promise<any> {
+    if (this.scriptLoaded) return cleverTAP;
+    return undefined;
   }
 
   createChannel(): Promise<void> {
