@@ -22,7 +22,9 @@ npx cap sync
 * [`createChannel(...)`](#createchannel)
 * [`onUserLogin(...)`](#onuserlogin)
 * [`pushEvent(...)`](#pushevent)
-* [`push(...)`](#push)
+* [`pushNotification(...)`](#pushnotification)
+* [`pushPrivacy(...)`](#pushprivacy)
+* [`pushUser(...)`](#pushuser)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -130,25 +132,51 @@ onUserLogin(options: { profile: UserProfile; }) => Promise<void>
 ### pushEvent(...)
 
 ```typescript
-pushEvent(options: { event: PushEvent; }) => Promise<void>
+pushEvent(options: { evtName: string; evtNameOrData: EventNameOrData[]; }) => void
 ```
 
-| Param         | Type                                                        |
-| ------------- | ----------------------------------------------------------- |
-| **`options`** | <code>{ event: <a href="#pushevent">PushEvent</a>; }</code> |
+| Param         | Type                                                                |
+| ------------- | ------------------------------------------------------------------- |
+| **`options`** | <code>{ evtName: string; evtNameOrData: EventNameOrData[]; }</code> |
 
 --------------------
 
 
-### push(...)
+### pushNotification(...)
 
 ```typescript
-push(options: { pushType: PushType; data: any; }) => Promise<void>
+pushNotification(options: { notificationData: NotificationData; }) => void
 ```
 
-| Param         | Type                                                                    |
-| ------------- | ----------------------------------------------------------------------- |
-| **`options`** | <code>{ pushType: <a href="#pushtype">PushType</a>; data: any; }</code> |
+| Param         | Type                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------ |
+| **`options`** | <code>{ notificationData: <a href="#notificationdata">NotificationData</a>; }</code> |
+
+--------------------
+
+
+### pushPrivacy(...)
+
+```typescript
+pushPrivacy(options: { privacyArr: PrivacyData[]; }) => void
+```
+
+| Param         | Type                                        |
+| ------------- | ------------------------------------------- |
+| **`options`** | <code>{ privacyArr: PrivacyData[]; }</code> |
+
+--------------------
+
+
+### pushUser(...)
+
+```typescript
+pushUser(options: { profileData: any[]; }) => void
+```
+
+| Param         | Type                                 |
+| ------------- | ------------------------------------ |
+| **`options`** | <code>{ profileData: any[]; }</code> |
 
 --------------------
 
@@ -214,12 +242,34 @@ push(options: { pushType: PushType; data: any; }) => Promise<void>
 | **`clientProduct`** | <code>string</code> |
 
 
-#### PushEvent
+#### NotificationData
 
-| Prop        | Type                                            |
-| ----------- | ----------------------------------------------- |
-| **`name`**  | <code>string</code>                             |
-| **`value`** | <code><a href="#eventdata">EventData</a></code> |
+| Prop                        | Type                         |
+| --------------------------- | ---------------------------- |
+| **`titleText`**             | <code>string</code>          |
+| **`bodyText`**              | <code>string</code>          |
+| **`okButtonText`**          | <code>string</code>          |
+| **`rejectButtonText`**      | <code>string</code>          |
+| **`okButtonColor`**         | <code>string</code>          |
+| **`skipDialog`**            | <code>boolean</code>         |
+| **`askAgainTimeInSeconds`** | <code>number</code>          |
+| **`okCallback`**            | <code>(() =&gt; void)</code> |
+| **`rejectCallback`**        | <code>(() =&gt; void)</code> |
+| **`subscriptionCallback`**  | <code>(() =&gt; void)</code> |
+| **`hidePoweredByCT`**       | <code>boolean</code>         |
+| **`serviceWorkerPath`**     | <code>string</code>          |
+| **`httpsPopupPath`**        | <code>string</code>          |
+| **`httpsIframePath`**       | <code>string</code>          |
+| **`apnsWebPushId`**         | <code>string</code>          |
+| **`apnsWebPushServiceUrl`** | <code>string</code>          |
+
+
+#### PrivacyData
+
+| Prop         | Type                 |
+| ------------ | -------------------- |
+| **`optOut`** | <code>boolean</code> |
+| **`useIP`**  | <code>boolean</code> |
 
 
 ### Type Aliases
@@ -240,13 +290,18 @@ push(options: { pushType: PushType; data: any; }) => Promise<void>
 <code>-1 | 0 | 1</code>
 
 
+#### EventNameOrData
+
+<code><a href="#eventname">EventName</a> | <a href="#eventdata">EventData</a></code>
+
+
+#### EventName
+
+<code>string</code>
+
+
 #### EventData
 
 <code>object</code>
-
-
-#### PushType
-
-<code>'Privacy' | 'Event' | 'Profile' | 'Notifications'</code>
 
 </docgen-api>

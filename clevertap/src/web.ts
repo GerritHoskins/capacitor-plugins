@@ -59,31 +59,28 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
     return this.cleverTAP;
   }
 
-  pushEvent(options: {
-    evtName: string;
-    evtNameOrData: EventNameOrData[];
-  }): void {
-    this.cleverTAP.event.push(options.evtName, options.evtNameOrData);
+  pushEvent(evtName: string, evtNameOrData: EventNameOrData): void {
+    this.cleverTAP.event.push(evtName, evtNameOrData);
   }
 
-  pushNotification(options: { notificationData: NotificationData }): void {
-    this.cleverTAP.notifications.push(options.notificationData);
+  pushNotification(notificationData: NotificationData): void {
+    this.cleverTAP.notifications.push(notificationData);
   }
 
-  pushPrivacy(options: { privacyArr: PrivacyData[] }): void {
-    this.cleverTAP.privacy.push(...options.privacyArr);
+  pushPrivacy(privacyData: PrivacyData): void {
+    this.cleverTAP.privacy.push(privacyData);
   }
 
-  pushUser(options: { profileData: any[] }): void {
-    this.cleverTAP.profile.push(...options.profileData);
-  }
-
-  createChannel(): Promise<void> {
-    return Promise.reject(this.unavailable('not implemented on web'));
+  pushUser(profileData: any): void {
+    this.cleverTAP.profile.push(profileData);
   }
 
   getClevertapId(): Promise<string | null> {
     return Promise.resolve(this.cleverTAP.getCleverTapID());
+  }
+
+  createChannel(): Promise<void> {
+    return Promise.reject(this.unavailable('not implemented on web'));
   }
 
   getDeliveredNotifications(): Promise<DeliveredNotifications> {

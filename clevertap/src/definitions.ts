@@ -19,13 +19,10 @@ export interface ClevertapPlugin {
   }): Promise<void>;
   createChannel(options: { channel: Channel }): Promise<void>;
   onUserLogin(options: { profile: UserProfile }): Promise<void>;
-  pushEvent(options: {
-    evtName: string;
-    evtNameOrData: EventNameOrData[];
-  }): void;
-  pushNotification(options: { notificationData: NotificationData }): void;
-  pushPrivacy(options: { privacyArr: PrivacyData[] }): void;
-  pushUser(options: { profileData: any[] }): void;
+  pushEvent(evtName: string, evtNameOrData: EventNameOrData): void;
+  pushNotification(notificationData: NotificationData): void;
+  pushPrivacy(privacyArr: PrivacyData): void;
+  pushUser(profileData: any): void;
 }
 export type PushType = 'Privacy' | 'Event' | 'Profile' | 'Notifications';
 export type Region = 'eu1' | 'in1' | 'sg1' | 'us1' | 'sk1';
