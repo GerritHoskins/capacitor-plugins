@@ -1,13 +1,10 @@
 /// <reference types="@capacitor/cli" />
 import type { PluginListenerHandle } from '@capacitor/core';
-import type { PrivacyConsentState, MPConfiguration } from '@mparticle/web-sdk';
+import type { EventType, PrivacyConsentState } from '@mparticle/web-sdk';
 
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
-    MparticlePlugin: {
-      appId?: string;
-      config?: MPConfiguration;
-    };
+    MparticlePlugin?: any;
   }
 }
 
@@ -27,7 +24,7 @@ export interface MparticlePlugin {
   getMPID(): Promise<string | void>;
   logEvent(options: {
     eventName: string;
-    eventType: any;
+    eventType: EventType | number;
     eventProperties: any;
   }): Promise<any>;
   logPageView(options: { pageName: string; pageLink: any }): Promise<any>;

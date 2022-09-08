@@ -1,5 +1,6 @@
 import { WebPlugin } from '@capacitor/core';
 import type {
+  EventType,
   PrivacyConsentState,
   UserIdentities,
   MPConfiguration,
@@ -95,7 +96,7 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
   }
   async logEvent(options: {
     eventName: string;
-    eventType: any;
+    eventType: EventType | number;
     eventProperties: any;
   }): Promise<any> {
     if (!mParticle.isInitialized()) return;

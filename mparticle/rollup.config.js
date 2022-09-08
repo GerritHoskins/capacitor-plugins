@@ -7,8 +7,6 @@ export default {
       name: 'capacitorMparticle',
       globals: {
         '@capacitor/core': 'capacitorExports',
-        '@capacitor/cli': 'capacitorExports',
-        '@mparticle/web-sdk': 'capacitorExports',
       },
       sourcemap: true,
       inlineDynamicImports: true,

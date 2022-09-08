@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/mparticle",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "capacitor plugin for mparticle",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -44,8 +44,8 @@
   },
   "devDependencies": {
     "@capacitor/android": "^4.0.0",
+    "@capacitor/cli": "^4.1.0",
     "@capacitor/core": "^4.0.0",
-    "@capacitor/cli": "^4.0.0",
     "@capacitor/docgen": "^0.2.0",
     "@capacitor/ios": "^4.0.0",
     "@ionic/eslint-config": "^0.3.0",
@@ -61,8 +61,7 @@
     "typescript": "~4.1.5"
   },
   "peerDependencies": {
-    "@capacitor/core": "^4.0.0",
-    "@capacitor/cli": "^4.0.0"
+    "@capacitor/core": "^4.0.0"
   },
   "dependencies": {
     "@mparticle/web-sdk": "^2.16.2"

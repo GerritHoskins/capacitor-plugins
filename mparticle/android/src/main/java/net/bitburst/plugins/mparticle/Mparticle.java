@@ -1,25 +1,56 @@
 package net.bitburst.plugins.mparticle;
 
-import com.getcapacitor.JSArray;
-import com.getcapacitor.JSObject;
+import android.app.Application;
+import androidx.annotation.Nullable;
 import com.mparticle.MParticle;
 import com.mparticle.MParticle.EventType;
 import com.mparticle.MParticleOptions;
-import com.mparticle.commerce.Product;
-import com.mparticle.commerce.Product.Builder;
 import com.mparticle.identity.IdentityApiRequest;
 import com.mparticle.identity.MParticleUser;
-import java.util.*;
-import java.util.Dictionary;
-import org.json.JSONException;
+import java.util.Objects;
 
-public class Mparticle {
+public class Mparticle extends Application implements MparticleLoader {
 
-    public String echo(String value) {
-        return value;
+    public interface OnReadyListener {
+        void onReady();
     }
 
-    public EventType getEventType(int ord) {
+    private OnReadyListener onReadyListener;
+    private static MParticle instance = MParticle.getInstance();
+
+    public Mparticle(MparticlePlugin plugin, MParticleOptions options) {
+        this.onReadyListener =
+            () -> {
+                if (onReadyListener != null) {
+                    onReadyListener.onReady();
+                }
+            };
+        start(options);
+        instance = MParticle.getInstance();
+    }
+
+    public void setOnReadyListener(@Nullable OnReadyListener listener) {
+        this.onReadyListener = listener;
+    }
+
+    @Nullable
+    public OnReadyListener getAuthStateChangeListener() {
+        return onReadyListener;
+    }
+
+    public static MParticle getInstance() {
+        if (instance == null) {
+            instance = MParticle.getInstance();
+        }
+        return instance;
+    }
+
+    public void start(MParticleOptions options) {
+        MParticle.start(options);
+    }
+
+    public EventType getEventType(Integer eType) {
+        int ord = eType;
         for (EventType e : EventType.values()) {
             if (e.ordinal() == ord) {
                 return e;
@@ -28,12 +59,11 @@ public class Mparticle {
         return EventType.Other;
     }
 
-    public MparticleUser currentUser() {
-        return Mparticle.getInstance().Identity().getCurrentUser();
+    public MParticleUser currentUser() {
+        return Objects.requireNonNull(MParticle.getInstance()).Identity().getCurrentUser();
     }
 
     public IdentityApiRequest identityRequest(String email, String customerId) {
-        IdentityApiRequest identityRequest = IdentityApiRequest.withEmptyUser().email(email).customerId(customerId).build();
-        return identityRequest;
+        return IdentityApiRequest.withEmptyUser().email(email).customerId(customerId).build();
     }
 }
