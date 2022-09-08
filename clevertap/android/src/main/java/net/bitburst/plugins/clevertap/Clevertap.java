@@ -77,7 +77,7 @@ public class Clevertap extends Application implements CTPushNotificationListener
         return clevertapID;
     }
 
-    public static Boolean isReady() {
+    public Boolean isReady() {
         return ready;
     }
 
@@ -85,12 +85,24 @@ public class Clevertap extends Application implements CTPushNotificationListener
         clevertapAPI.onUserLogin(profileUpdate);
     }
 
-    public void pushEvent(String name, HashMap<String, Object> data) {
+    public void pushEvent(String name, @Nullable HashMap<String, Object> data) {
+        assert data != null;
+        if (data.get(name) == null) {
+            clevertapAPI.pushEvent(name);
+            return;
+        }
+
         clevertapAPI.pushEvent(name, data);
     }
 
-    public void pushEvent(String name) {
-        clevertapAPI.pushEvent(name);
+    public void pushNotification(@NonNull Bundle data) {
+        clevertapAPI.renderPushNotification(new ClevertapMessagingService(), getApplicationContext(), data);
+    }
+
+    public void pushPrivacy(@Nullable HashMap<String, Object> data) {}
+
+    public void pushUser(@NonNull HashMap<String, Object> data) {
+        clevertapAPI.pushProfile(data);
     }
 
     public void registerCleverTapActivityLifecycleCallbacks(Application application) {

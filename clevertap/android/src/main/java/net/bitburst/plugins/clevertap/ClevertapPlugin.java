@@ -2,6 +2,7 @@ package net.bitburst.plugins.clevertap;
 
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import com.getcapacitor.Bridge;
 import com.getcapacitor.JSObject;
@@ -10,10 +11,9 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
-import java.util.ArrayList;
 import java.util.HashMap;
+import org.json.JSONException;
 
 @CapacitorPlugin(name = "Clevertap", permissions = @Permission(strings = {}, alias = "receive"))
 public class ClevertapPlugin extends Plugin {
@@ -29,6 +29,7 @@ public class ClevertapPlugin extends Plugin {
     public Clevertap clevertap;
 
     public void load() {
+        super.load();
         // firebaseMessagingService = new ClevertapMessagingService();
         clevertap = new Clevertap(getActivity().getApplication());
     }
@@ -39,8 +40,20 @@ public class ClevertapPlugin extends Plugin {
     }
 
     @PluginMethod
-    public void isReady(PluginCall call) {
-        call.resolve(new JSObject().put("ready", Clevertap.isReady()));
+    public void init(PluginCall call) {
+        call.setKeepAlive(true);
+        if (!clevertap.isReady()) {
+            Log.d(LOG_TAG, " clevertap instance is not ready yet.");
+        } else {
+            Log.d(LOG_TAG, " clevertap instance is ready!");
+            call.resolve();
+            call.setKeepAlive(false);
+        }
+    }
+
+    @PluginMethod
+    public void cleverTap(PluginCall call) {
+        call.unimplemented();
     }
 
     @PluginMethod
@@ -69,20 +82,49 @@ public class ClevertapPlugin extends Plugin {
     public void pushEvent(PluginCall call) {
         JSObject pluginData = call.getData();
 
-        if (pluginData.getJSObject("value") == null) {
-            clevertap.pushEvent(pluginData.getString("name"));
-            return;
+        HashMap<String, Object> events = new HashMap<String, Object>();
+        String evtName = pluginData.getString("evtName");
+        try {
+            events.put(evtName, pluginData.getJSObject("evtNameOrData", new JSObject()));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        HashMap<String, Object> prodViewedAction = new HashMap<String, Object>();
-        prodViewedAction.put(pluginData.getString("name"), 1234);
+        clevertap.pushEvent(evtName, events);
+        call.resolve();
+    }
 
-        clevertap.pushEvent("Test event", prodViewedAction);
+    @PluginMethod
+    public void pushNotification(PluginCall call) {
+        JSObject data = call.getObject("notificationData");
+
+        Bundle notificationBundle = ClevertapHelper.convertJSObjectToBundle(data);
+
+        clevertap.pushNotification(notificationBundle);
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void pushPrivacy(PluginCall call) {
+        JSObject privacyData = call.getObject("privacyData");
+        clevertap.pushPrivacy(null);
+        call.unimplemented();
+    }
+
+    @PluginMethod
+    public void pushUser(PluginCall call) {
+        JSObject profileData = call.getObject("profileData");
+
+        HashMap<String, Object> data = ClevertapHelper.convertJSObjectToHashMap(profileData);
+
+        clevertap.pushUser(data);
+        call.resolve();
     }
 
     @PluginMethod
     public void registerFBM(PluginCall call) {
-        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+        call.unimplemented();
+        /*FirebaseMessaging.getInstance().setAutoInitEnabled(true);
         FirebaseMessaging
             .getInstance()
             .getToken()
@@ -94,7 +136,7 @@ public class ClevertapPlugin extends Plugin {
                     }
                     task.getResult();
                 }
-            );
+            );*/
         call.resolve();
     }
 
@@ -110,18 +152,7 @@ public class ClevertapPlugin extends Plugin {
 
     @PluginMethod
     public void createChannel(PluginCall call) {
-        call.resolve();
-    }
-
-    protected void handleOnStart() {
-        Log.d(LOG_TAG, "handleOnStart ");
-    }
-
-    protected void handleOnRestart() {
-        Log.d(LOG_TAG, "handleOnRestart ");
-    }
-
-    protected void handleOnResume() {
-        Log.d(LOG_TAG, "handleOnResume ");
+        JSObject channelSettings = call.getObject("channel");
+        new ClevertapChannelManager(getBridge().getActivity().getApplicationContext(), channelSettings);
     }
 }

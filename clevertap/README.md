@@ -132,12 +132,13 @@ onUserLogin(options: { profile: UserProfile; }) => Promise<void>
 ### pushEvent(...)
 
 ```typescript
-pushEvent(options: { evtName: string; evtNameOrData: EventNameOrData[]; }) => void
+pushEvent(evtName: string, evtNameOrData: EventNameOrData) => void
 ```
 
-| Param         | Type                                                                |
-| ------------- | ------------------------------------------------------------------- |
-| **`options`** | <code>{ evtName: string; evtNameOrData: EventNameOrData[]; }</code> |
+| Param               | Type                                                        |
+| ------------------- | ----------------------------------------------------------- |
+| **`evtName`**       | <code>string</code>                                         |
+| **`evtNameOrData`** | <code><a href="#eventnameordata">EventNameOrData</a></code> |
 
 --------------------
 
@@ -145,12 +146,12 @@ pushEvent(options: { evtName: string; evtNameOrData: EventNameOrData[]; }) => vo
 ### pushNotification(...)
 
 ```typescript
-pushNotification(options: { notificationData: NotificationData; }) => void
+pushNotification(notificationData: NotificationData) => void
 ```
 
-| Param         | Type                                                                                 |
-| ------------- | ------------------------------------------------------------------------------------ |
-| **`options`** | <code>{ notificationData: <a href="#notificationdata">NotificationData</a>; }</code> |
+| Param                  | Type                                                          |
+| ---------------------- | ------------------------------------------------------------- |
+| **`notificationData`** | <code><a href="#notificationdata">NotificationData</a></code> |
 
 --------------------
 
@@ -158,12 +159,12 @@ pushNotification(options: { notificationData: NotificationData; }) => void
 ### pushPrivacy(...)
 
 ```typescript
-pushPrivacy(options: { privacyArr: PrivacyData[]; }) => void
+pushPrivacy(privacyArr: PrivacyData) => void
 ```
 
-| Param         | Type                                        |
-| ------------- | ------------------------------------------- |
-| **`options`** | <code>{ privacyArr: PrivacyData[]; }</code> |
+| Param            | Type                                                |
+| ---------------- | --------------------------------------------------- |
+| **`privacyArr`** | <code><a href="#privacydata">PrivacyData</a></code> |
 
 --------------------
 
@@ -171,12 +172,12 @@ pushPrivacy(options: { privacyArr: PrivacyData[]; }) => void
 ### pushUser(...)
 
 ```typescript
-pushUser(options: { profileData: any[]; }) => void
+pushUser(profileData: any) => void
 ```
 
-| Param         | Type                                 |
-| ------------- | ------------------------------------ |
-| **`options`** | <code>{ profileData: any[]; }</code> |
+| Param             | Type             |
+| ----------------- | ---------------- |
+| **`profileData`** | <code>any</code> |
 
 --------------------
 
