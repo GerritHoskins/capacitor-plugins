@@ -343,6 +343,21 @@ Construct a type with a set of properties K of type T
 <code>(event: <a href="#mparticlereadyevent">MparticleReadyEvent</a>): void</code>
 
 
+#### Events
+
+<code><a href="#defaultevent">DefaultEvent</a></code>
+
+
+#### DefaultEvent
+
+<code>(name: string, data?: any): void</code>
+
+
+#### ScreenEvents
+
+<code><a href="#defaultevent">DefaultEvent</a></code>
+
+
 ### Enums
 
 

@@ -7,9 +7,17 @@ import type {
 } from '@mparticle/web-sdk';
 import mParticle from '@mparticle/web-sdk';
 
-import type { MparticlePlugin, Identifier } from './definitions';
+import type {
+  MparticlePlugin,
+  Identifier,
+  Events,
+  ScreenEvents,
+} from './definitions';
 
-export class MparticleWeb extends WebPlugin implements MparticlePlugin {
+export class MparticleWeb
+  extends WebPlugin
+  implements MparticlePlugin<Events, ScreenEvents>
+{
   async init(options: { key: string; config: MPConfiguration }): Promise<any> {
     return mParticle.init(options.key, options.config);
   }
@@ -96,22 +104,22 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
   }
   async logEvent(options: {
     eventName: string;
-    eventType: EventType | number;
-    eventProperties: any;
+    eventType?: EventType | number;
+    eventProperties?: any;
   }): Promise<any> {
     if (!mParticle.isInitialized()) return;
     return mParticle.logEvent(
       options.eventName,
-      options.eventType,
-      options.eventProperties,
+      options?.eventType,
+      options?.eventProperties,
     );
   }
   async logPageView(options: {
     pageName: string;
-    pageLink: string;
+    pageProperties?: any;
   }): Promise<any> {
     if (!mParticle.isInitialized()) return;
-    return mParticle.logPageView(options.pageName, { page: options.pageLink });
+    return mParticle.logPageView(options.pageName, options?.pageProperties);
   }
   async loginUser(options: {
     email: string;
@@ -137,7 +145,11 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
     userAttributes: any;
   }): Promise<any> {
     return mParticle.Identity.login(
-      this.identityRequest(options.email, options.customerId),
+      this.identityRequest(
+        options.email,
+        options.customerId,
+        options.userAttributes,
+      ),
       function (result: any) {
         if (!result) return;
         const currentUser = result.getUser();
@@ -147,15 +159,30 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
       },
     );
   }
-
+  async trackEvent(name: string, data?: any): Promise<void> {
+    if (!mParticle.isInitialized()) return;
+    await this.logEvent({
+      eventName: name,
+      eventType: mParticle.EventType.Other,
+      eventProperties: data,
+    });
+  }
+  async trackPageView(name: string, data?: any): Promise<void> {
+    if (!mParticle.isInitialized()) return;
+    await this.logPageView({
+      pageName: name,
+      pageProperties: data,
+    });
+  }
   public get currentUser(): mParticle.User {
     return mParticle.Identity.getCurrentUser();
   }
-  private identityRequest(email: string, customerId: string): any {
+  private identityRequest(email: string, customerId: string, other?: any): any {
     return {
       userIdentities: {
         email,
         customerid: customerId,
+        other,
       },
     };
   }

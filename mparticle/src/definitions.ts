@@ -15,8 +15,7 @@ declare module '@capacitor/cli' {
     };
   }
 }
-
-export interface MparticlePlugin {
+export interface MparticlePlugin<Events, ScreenEvents> {
   init(options: {
     key?: string;
     secret?: string;
@@ -51,6 +50,9 @@ export interface MparticlePlugin {
     eventName: 'mParticleReady',
     listenerFunc: mParticleReadyListener,
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
+
+  trackEvent?: Events;
+  trackPageView?: ScreenEvents;
 }
 export type Identifier = {
   email?: string;
@@ -61,3 +63,6 @@ export type mParticleReadyListener = (event: MparticleReadyEvent) => void;
 export interface MparticleReadyEvent {
   ready: boolean;
 }
+type DefaultEvent = (name: string, data?: any) => void;
+export type Events = DefaultEvent;
+export type ScreenEvents = DefaultEvent;

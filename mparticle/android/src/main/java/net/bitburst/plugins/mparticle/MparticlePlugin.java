@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.Map;
 import org.json.JSONException;
 
-@CapacitorPlugin(name = "MparticlePlugin")
+@CapacitorPlugin(name = "Mparticle")
 public class MparticlePlugin extends Plugin {
 
     public static final String LOG_TAG = "bitburst.mparticle ";
