@@ -190,6 +190,7 @@ pushUser(profileData: any) => void
 | Prop               | Type                                      |
 | ------------------ | ----------------------------------------- |
 | **`accountId`**    | <code>string</code>                       |
+| **`token`**        | <code>string</code>                       |
 | **`region`**       | <code><a href="#region">Region</a></code> |
 | **`targetDomain`** | <code>string</code>                       |
 

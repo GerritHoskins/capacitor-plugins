@@ -1,6 +1,5 @@
 package net.bitburst.plugins.clevertap;
 
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,17 +14,10 @@ import com.google.firebase.messaging.RemoteMessage;
 import java.util.HashMap;
 import org.json.JSONException;
 
-@CapacitorPlugin(name = "Clevertap", permissions = @Permission(strings = {}, alias = "receive"))
+@CapacitorPlugin(name = "Clevertap", permissions = { @Permission(strings = {}, alias = "receive") })
 public class ClevertapPlugin extends Plugin {
 
-    public static final String LOG_TAG = "bitburst.clevertap ";
-
-    public static Bridge staticBridge = null;
-    public static RemoteMessage lastMessage = null;
-
-    public NotificationManager notificationManager;
     public ClevertapMessagingService firebaseMessagingService;
-
     public Clevertap clevertap;
 
     public void load() {
@@ -34,21 +26,9 @@ public class ClevertapPlugin extends Plugin {
         clevertap = new Clevertap(getActivity().getApplication());
     }
 
-    @Override
-    protected void handleOnNewIntent(Intent intent) {
-        Log.d(LOG_TAG, "handleOnNewIntent " + intent.getAction());
-    }
-
     @PluginMethod
     public void init(PluginCall call) {
-        call.setKeepAlive(true);
-        if (!clevertap.isReady()) {
-            Log.d(LOG_TAG, " clevertap instance is not ready yet.");
-        } else {
-            Log.d(LOG_TAG, " clevertap instance is ready!");
-            call.resolve();
-            call.setKeepAlive(false);
-        }
+        call.resolve();
     }
 
     @PluginMethod
@@ -58,7 +38,7 @@ public class ClevertapPlugin extends Plugin {
 
     @PluginMethod
     public void getClevertapId(PluginCall call) {
-        call.resolve(new JSObject().put("id", Clevertap.getClevertapId()));
+        call.resolve(new JSObject().put("id", clevertap.getClevertapId()));
     }
 
     @PluginMethod
