@@ -28,6 +28,7 @@ export type PushType = 'Privacy' | 'Event' | 'Profile' | 'Notifications';
 export type Region = 'eu1' | 'in1' | 'sg1' | 'us1' | 'sk1';
 export interface InitOptions {
   accountId: string;
+  token?: string;
   region?: Region;
   targetDomain?: string;
 }
