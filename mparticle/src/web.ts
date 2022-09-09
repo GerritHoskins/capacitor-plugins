@@ -10,8 +10,8 @@ import mParticle from '@mparticle/web-sdk';
 import type { MparticlePlugin, Identifier } from './definitions';
 
 export class MparticleWeb extends WebPlugin implements MparticlePlugin {
-  async init(options: { key: string; config: any }): Promise<any> {
-    return mParticle.init(options.key, options.config as MPConfiguration);
+  async init(options: { key: string; config: MPConfiguration }): Promise<any> {
+    return mParticle.init(options.key, options.config);
   }
   async identifyUser(options: { identifier: Identifier }): Promise<void> {
     if (!mParticle.isInitialized()) return;

@@ -1,6 +1,6 @@
 package net.bitburst.plugins.mparticle;
 
-import android.app.Application;
+import android.annotation.SuppressLint;
 import androidx.annotation.Nullable;
 import com.mparticle.MParticle;
 import com.mparticle.MParticle.EventType;
@@ -9,7 +9,7 @@ import com.mparticle.identity.IdentityApiRequest;
 import com.mparticle.identity.MParticleUser;
 import java.util.Objects;
 
-public class Mparticle extends Application implements MparticleLoader {
+public class Mparticle {
 
     public interface OnReadyListener {
         void onReady();
@@ -26,7 +26,6 @@ public class Mparticle extends Application implements MparticleLoader {
                 }
             };
         start(options);
-        instance = MParticle.getInstance();
     }
 
     public void setOnReadyListener(@Nullable OnReadyListener listener) {
@@ -38,15 +37,16 @@ public class Mparticle extends Application implements MparticleLoader {
         return onReadyListener;
     }
 
+    @SuppressLint("MParticleInitialization")
+    public void start(MParticleOptions options) {
+        MParticle.start(options);
+    }
+
     public static MParticle getInstance() {
         if (instance == null) {
             instance = MParticle.getInstance();
         }
         return instance;
-    }
-
-    public void start(MParticleOptions options) {
-        MParticle.start(options);
     }
 
     public EventType getEventType(Integer eType) {

@@ -24,24 +24,73 @@ public class MparticlePlugin: CAPPlugin {
         // ])
     }
 
-    @objc func loginMparticleUser(_ call: CAPPluginCall) {
+    @objc func init(_ call: CAPPluginCall) {
+        call.resolve();
+    }
+
+    @objc func identifyUser(_ call: CAPPluginCall) {
+        let name = call.getString("email") ?? ""
+        let value = call.getString("customerId") ?? ""
+        MParticle.sharedInstance().Identity().identify(implementation.identityRequest(email,customerId);
+        call.resolve();
+    }
+
+     @objc func setUserAttribute(_ call: CAPPluginCall) {
+        let name = call.getString("attributeName") ?? ""
+        let value = call.getString("attributeValue") ?? ""
+
+        implementation.currentUser()?.setUserAttribute(name, value: value)
+        call.resolve()
+    }
+
+    @objc func setGDPRConsent(_ call: CAPPluginCall) {
+        call.unimplemented();
+    }
+
+    @objc func getGDPRConsent(_ call: CAPPluginCall) {
+        call.unimplemented();
+    }
+
+    @objc func getMPID(_ call: CAPPluginCall) {
+        let mpid = implementation.currentUser()?.getId();
+        call.resolve([
+            "MPID": mpid
+        ]);
+    }
+
+    @objc func logEvent(_ call: CAPPluginCall) {
+        let name = call.getString("eventName") ?? ""
+        let type =  UInt(call.getInt("eventType") ?? 0)
+        let props = call.getObject("eventProperties") ?? [:]
+        if let event = MPEvent(name: name, type: MPEventType.init(rawValue:type) ?? MPEventType.other) {
+            event.customAttributes = props
+            MParticle.sharedInstance().logEvent(event)
+        }
+        call.resolve()
+    }
+
+    @objc func logPageView(_ call: CAPPluginCall) {
+        let name = call.getString("pageName") ?? ""
+        let screenInfo = ["page": call.getString("pageLink") ?? ""];
+
+        MParticle.sharedInstance().logScreen(name, eventInfo: screenInfo)
+        call.resolve()
+    }
+
+    @objc func loginUser(_ call: CAPPluginCall) {
         let email = call.getString("email") ?? ""
         let customerId = call.getString("customerId") ?? ""
         MParticle.sharedInstance().identity.login(implementation.identityRequest(email,customerId)!, completion: implementation.identityCallback)
-        call.resolve([
-            "value":"success",
-        ])
+        call.resolve()
     }
 
-    @objc func logoutMparticleUser(_ call: CAPPluginCall) {
+    @objc func logoutUser(_ call: CAPPluginCall) {
         // call.unimplemented("Not implemented on iOS.")
         MParticle.sharedInstance().identity.logout(completion: implementation.identityCallback)
-        call.resolve([
-            "value":"success",
-        ])
+        call.resolve()
     }
 
-    @objc func registerMparticleUser(_ call: CAPPluginCall) {
+    @objc func registerUser(_ call: CAPPluginCall) {
         let email = call.getString("email") ?? ""
         let customerId = call.getString("customerId") ?? ""
         let userAttributes = call.getObject("userAttributes") ?? [:]
@@ -61,67 +110,17 @@ public class MparticlePlugin: CAPPlugin {
                     break;
                 case .requestInProgress,
                     .retry:
-                    //inspect your implementation if this occurs frequency
-                    //otherwise retry the IDSync request
                     break;
                 default:
-                    // inspect error.localizedDescription to determine why the request failed
                     // this typically means an implementation issue
                     break;
                 }
             }
         })
-        call.resolve([
-            "value":"success",
-        ])
+        call.resolve()
     }
 
-    @objc func logMparticleEvent(_ call: CAPPluginCall) {
-        let name = call.getString("eventName") ?? ""
-        let type =  UInt(call.getInt("eventType") ?? 0)
-        let props = call.getObject("eventProperties") ?? [:]
-        if let event = MPEvent(name: name, type: MPEventType.init(rawValue:type) ?? MPEventType.other) {
-            event.customAttributes = props
-            MParticle.sharedInstance().logEvent(event)
-        }
-        call.resolve([
-            "value":"success",
-        ])
-    }
-
-    @objc func logMparticlePageView(_ call: CAPPluginCall) {
-        let name = call.getString("pageName") ?? ""
-        let screenInfo = ["page": call.getString("pageLink") ?? ""];
-
-        MParticle.sharedInstance().logScreen(name, eventInfo: screenInfo)
-        call.resolve([
-            "value":"success",
-        ])
-    }
-
-    @objc func setUserAttribute(_ call: CAPPluginCall) {
-        let name = call.getString("attributeName") ?? ""
-        let value = call.getString("attributeValue") ?? ""
-
-        implementation.currentUser()?.setUserAttribute(name, value: value)
-        call.resolve([
-            "value":"success",
-        ])
-    }
-
-    @objc func setUserAttributeList(_ call: CAPPluginCall) {
-        let name:String = call.getString("attributeName") ?? ""
-        let list:[String] = call.getArray("attributeValues") as? [String] ?? []
-        implementation.currentUser()?.setUserAttributeList(name, values: list)
-        call.resolve([
-            "value":"success",
-        ])
-    }
-
-    @objc func echo(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
-        call.resolve([
-            "value": implementation.echo(value)
-        ])
+    @objc func addListener(_ call: CAPPluginCall) {
+         call.unimplemented();
     }
 }

@@ -1,5 +1,8 @@
 package net.bitburst.plugins.mparticle;
 
+import static com.getcapacitor.JSObject.fromJSONObject;
+
+import android.util.Log;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -9,14 +12,10 @@ import com.mparticle.MPEvent;
 import com.mparticle.MParticle;
 import com.mparticle.MParticleOptions;
 import com.mparticle.identity.IdentityApiRequest;
-import com.mparticle.identity.IdentityApiResult;
-import com.mparticle.identity.TaskSuccessListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 @CapacitorPlugin(name = "MparticlePlugin")
 public class MparticlePlugin extends Plugin {
@@ -27,21 +26,23 @@ public class MparticlePlugin extends Plugin {
     private String planId = "bitcode_frontend_plan";
     private int planVersion = 4;
 
-    String mParticleKey = getContext().getString(R.string.MPARTICLE_KEY);
-    String mParticleSecret = getContext().getString(R.string.MPARTICLE_SECRET);
+    String mParticleKey = ""; //this.getContext().getString(R.string.mparticle_key);
+    String mParticleSecret = ""; // this.getContext().getString(R.string.mparticle_secret);
 
     @Override
     public void load() {
-        String appId = getConfig().getString("appId");
-        JSONObject mParticleConfig = getConfig().getObject("config");
-
         try {
-            // Boolean isDevelopmentMode = mParticleConfig.getBoolean("isDevelopmentMode");
-            JSONObject dataPlan = mParticleConfig.getJSONObject("dataPlan");
+            JSObject mParticleConfig = fromJSONObject(getConfig().getObject("config"));
+            /* Boolean isDevelopmentMode = mParticleConfig.getBoolean("isDevelopmentMode"); */
+            mParticleKey = getConfig().getString("key");
+            mParticleSecret = getConfig().getString("secret");
+
+            JSObject dataPlan = mParticleConfig.getJSObject("dataPlan");
+            assert dataPlan != null;
             planId = dataPlan.getString("planId");
-            planVersion = (int) dataPlan.get("planVersion");
+            planVersion = dataPlan.getInt("planVersion");
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.d(LOG_TAG, "load failed ", e);
         }
 
         MParticleOptions options = MParticleOptions
@@ -53,13 +54,7 @@ public class MparticlePlugin extends Plugin {
         implementation = new Mparticle(this, options);
 
         super.load();
-
         notifyListeners("mParticleReady", new JSObject().put("ready", Mparticle.getInstance() != null), true);
-    }
-
-    @PluginMethod
-    public void echo(PluginCall call) {
-        call.resolve();
     }
 
     @PluginMethod
@@ -71,20 +66,22 @@ public class MparticlePlugin extends Plugin {
     public void identifyUser(PluginCall call) {
         String email = call.getString("email");
         String customerId = call.getString("customerId");
-        String other = call.getString("other");
         IdentityApiRequest request = implementation.identityRequest(email, customerId);
-        Objects.requireNonNull(MParticle.getInstance()).Identity().identify(request);
-        call.resolve(new JSObject());
+        Mparticle.getInstance().Identity().identify(request);
+        call.resolve();
     }
 
     @PluginMethod
     public void setUserAttribute(PluginCall call) {
         String name = call.getString("attributeName");
         String value = call.getString("attributeValue");
+        assert name != null;
+        assert value != null;
+
         if (implementation.currentUser() != null) {
             implementation.currentUser().setUserAttribute(name, value);
         }
-        call.resolve(new JSObject());
+        call.resolve();
     }
 
     @PluginMethod
@@ -99,10 +96,10 @@ public class MparticlePlugin extends Plugin {
 
     @PluginMethod
     public void getMPID(PluginCall call) {
-        //String mpid = implementation.getInstance().getMPID();
-        JSObject data = new JSObject();
-        data.put("MPID", "mpid");
-        call.resolve();
+        assert implementation.currentUser() != null;
+        long mpid = implementation.currentUser().getId();
+        JSObject ret = new JSObject().put("MPID", mpid);
+        call.resolve(ret);
     }
 
     @PluginMethod
@@ -110,7 +107,7 @@ public class MparticlePlugin extends Plugin {
         JSObject callData = call.getData();
         if (callData == null) return;
 
-        Map<String, String> customAttributes = new HashMap<String, String>();
+        Map<String, String> customAttributes = new HashMap<>();
         JSObject temp = callData.getJSObject("eventProperties");
         if (temp != null) {
             Iterator<String> iter = temp.keys();
@@ -120,19 +117,19 @@ public class MparticlePlugin extends Plugin {
                     Object value = temp.get(key);
                     customAttributes.put(key, value.toString());
                 } catch (JSONException e) {
-                    call.reject("failed to log event", e);
+                    call.reject(LOG_TAG, "failed to log event ", e);
                 }
             }
         }
 
         String name = callData.getString("eventName");
         Integer type = callData.getInteger("eventType");
+        assert name != null;
+        assert type != null;
 
-        MPEvent event = new MPEvent.Builder(Objects.requireNonNull(name), implementation.getEventType(type))
-            .customAttributes(customAttributes)
-            .build();
+        MPEvent event = new MPEvent.Builder(name, implementation.getEventType(type)).customAttributes(customAttributes).build();
 
-        Objects.requireNonNull(MParticle.getInstance()).logEvent(event);
+        Mparticle.getInstance().logEvent(event);
         call.resolve();
     }
 
@@ -140,10 +137,14 @@ public class MparticlePlugin extends Plugin {
     public void logPageView(PluginCall call) {
         String name = call.getString("pageName");
         String link = call.getString("pageLink");
-        Map<String, String> screenInfo = new HashMap<String, String>();
+        assert name != null;
+        assert link != null;
+
+        Map<String, String> screenInfo = new HashMap<>();
         screenInfo.put("page", link);
-        MParticle.getInstance().logScreen(name, screenInfo);
-        call.resolve(new JSObject());
+
+        Mparticle.getInstance().logScreen(name, screenInfo);
+        call.resolve();
     }
 
     @PluginMethod
@@ -169,30 +170,27 @@ public class MparticlePlugin extends Plugin {
             .Identity()
             .login(implementation.identityRequest(email, customerId))
             .addSuccessListener(
-                new TaskSuccessListener() {
-                    public void onSuccess(IdentityApiResult result) {
-                        JSObject temp = call.getObject("userAttributes");
-                        if (temp != null) {
-                            Iterator<String> iter = temp.keys();
-                            while (iter.hasNext()) {
-                                String key = iter.next();
-                                try {
-                                    Object value = temp.get(key);
-                                    result.getUser().setUserAttribute(key, value);
-                                } catch (JSONException e) {
-                                    call.reject("failed to register user", e);
-                                }
+                result -> {
+                    JSObject temp = call.getObject("userAttributes");
+                    if (temp != null) {
+                        Iterator<String> iter = temp.keys();
+                        while (iter.hasNext()) {
+                            String key = iter.next();
+                            try {
+                                Object value = temp.get(key);
+                                result.getUser().setUserAttribute(key, value);
+                            } catch (JSONException e) {
+                                call.reject(LOG_TAG, "failed to register user", e);
                             }
                         }
                     }
                 }
             );
-        call.resolve(new JSObject());
+        call.resolve();
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_NONE)
     public void addListener(PluginCall call) {
         super.addListener(call);
-        addListener(call);
     }
 }

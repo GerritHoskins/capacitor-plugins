@@ -1,15 +1,27 @@
 /// <reference types="@capacitor/cli" />
 import type { PluginListenerHandle } from '@capacitor/core';
-import type { EventType, PrivacyConsentState } from '@mparticle/web-sdk';
+import type {
+  EventType,
+  MPConfiguration,
+  PrivacyConsentState,
+} from '@mparticle/web-sdk';
 
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
-    MparticlePlugin?: any;
+    Mparticle: {
+      key?: string;
+      secret?: string;
+      config?: MPConfiguration;
+    };
   }
 }
 
 export interface MparticlePlugin {
-  init(options: { key?: string; config: any }): Promise<any>;
+  init(options: {
+    key?: string;
+    secret?: string;
+    config: MPConfiguration;
+  }): Promise<any>;
   identifyUser(options: { identifier: Identifier }): Promise<void>;
   setUserAttribute(options: {
     attributeName: string;

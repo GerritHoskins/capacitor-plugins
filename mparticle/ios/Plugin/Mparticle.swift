@@ -3,8 +3,8 @@ import mParticle_Apple_SDK;
 import Capacitor
 
 @objc public class Mparticle: NSObject {
-    @objc public func echo(_ value: String) -> String {
-        return value
+    @objc public func start(_ options: MParticleOptions) {
+        MParticle.start(options);
     }
 
     @objc public func currentUser() -> MParticleUser? {
@@ -20,8 +20,7 @@ import Capacitor
 
     let identityCallback = {(result: MPIdentityApiResult?, error: Error?) in
         if (result?.user != nil) {
-            //IDSync request succeeded, mutate attributes or query for the MPID as needed
-            // result?.user.setUserAttribute("example attribute key", value: "example attribute value")
+            //IDSync request succeeded, get MPID here
         } else {
             NSLog(error!.localizedDescription)
             let resultCode = MPIdentityErrorResponseCode(rawValue: UInt((error! as NSError).code))
@@ -32,12 +31,8 @@ import Capacitor
                 break;
             case .requestInProgress,
                 .retry:
-                //inspect your implementation if this occurs frequency
-                //otherwise retry the IDSync request
                 break;
             default:
-                // inspect error.localizedDescription to determine why the request failed
-                // this typically means an implementation issue
                 break;
             }
         }

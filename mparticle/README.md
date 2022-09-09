@@ -37,12 +37,12 @@ npx cap sync
 ### init(...)
 
 ```typescript
-init(options: { key?: string; config: any; }) => Promise<any>
+init(options: { key?: string; secret?: string; config: MPConfiguration; }) => Promise<any>
 ```
 
-| Param         | Type                                        |
-| ------------- | ------------------------------------------- |
-| **`options`** | <code>{ key?: string; config: any; }</code> |
+| Param         | Type                                                                                                    |
+| ------------- | ------------------------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ key?: string; secret?: string; config: <a href="#mpconfiguration">MPConfiguration</a>; }</code> |
 
 **Returns:** <code>Promise&lt;any&gt;</code>
 
@@ -206,6 +206,91 @@ addListener(eventName: 'mParticleReady', listenerFunc: mParticleReadyListener) =
 
 
 ### Interfaces
+
+
+#### MPConfiguration
+
+| Prop                            | Type                                                                |
+| ------------------------------- | ------------------------------------------------------------------- |
+| **`isDevelopmentMode`**         | <code>boolean</code>                                                |
+| **`identifyRequest`**           | <code><a href="#identifyrequest">IdentifyRequest</a></code>         |
+| **`identityCallback`**          | <code><a href="#identitycallback">IdentityCallback</a></code>       |
+| **`dataPlan`**                  | <code><a href="#dataplanconfig">DataPlanConfig</a></code>           |
+| **`appVersion`**                | <code>string</code>                                                 |
+| **`appName`**                   | <code>string</code>                                                 |
+| **`package`**                   | <code>string</code>                                                 |
+| **`logLevel`**                  | <code>'none' \| 'verbose' \| 'warning'</code>                       |
+| **`logger`**                    | <code><a href="#logger">Logger</a></code>                           |
+| **`sessionTimeout`**            | <code>number</code>                                                 |
+| **`deviceId`**                  | <code>string</code>                                                 |
+| **`onCreateBatch`**             | <code><a href="#oncreatebatch">onCreateBatch</a></code>             |
+| **`useCookieStorage`**          | <code>boolean</code>                                                |
+| **`maxCookieSize`**             | <code>number</code>                                                 |
+| **`cookieDomain`**              | <code>string</code>                                                 |
+| **`customFlags`**               | <code><a href="#sdkeventcustomflags">SDKEventCustomFlags</a></code> |
+| **`workspaceToken`**            | <code>string</code>                                                 |
+| **`requiredWebviewBridgeName`** | <code>string</code>                                                 |
+| **`minWebviewBridgeVersion`**   | <code>1 \| 2</code>                                                 |
+
+
+#### IdentifyRequest
+
+| Prop                 | Type                                                      |
+| -------------------- | --------------------------------------------------------- |
+| **`userIdentities`** | <code><a href="#useridentities">UserIdentities</a></code> |
+
+
+#### UserIdentities
+
+| Prop                           | Type                |
+| ------------------------------ | ------------------- |
+| **`customerid`**               | <code>string</code> |
+| **`email`**                    | <code>string</code> |
+| **`other`**                    | <code>string</code> |
+| **`other2`**                   | <code>string</code> |
+| **`other3`**                   | <code>string</code> |
+| **`other4`**                   | <code>string</code> |
+| **`other5`**                   | <code>string</code> |
+| **`other6`**                   | <code>string</code> |
+| **`other7`**                   | <code>string</code> |
+| **`other8`**                   | <code>string</code> |
+| **`other9`**                   | <code>string</code> |
+| **`other10`**                  | <code>string</code> |
+| **`mobile_number`**            | <code>string</code> |
+| **`phone_number_2`**           | <code>string</code> |
+| **`phone_number_3`**           | <code>string</code> |
+| **`facebook`**                 | <code>string</code> |
+| **`facebookcustomaudienceid`** | <code>string</code> |
+| **`google`**                   | <code>string</code> |
+| **`twitter`**                  | <code>string</code> |
+| **`microsoft`**                | <code>string</code> |
+| **`yahoo`**                    | <code>string</code> |
+
+
+#### IdentityCallback
+
+
+#### DataPlanConfig
+
+| Prop              | Type                |
+| ----------------- | ------------------- |
+| **`planId`**      | <code>string</code> |
+| **`planVersion`** | <code>number</code> |
+
+
+#### Logger
+
+| Prop          | Type                                      |
+| ------------- | ----------------------------------------- |
+| **`error`**   | <code>((error: string) =&gt; void)</code> |
+| **`warning`** | <code>((error: string) =&gt; void)</code> |
+| **`verbose`** | <code>((error: string) =&gt; void)</code> |
+
+
+#### onCreateBatch
+
+
+#### SDKEventCustomFlags
 
 
 #### PrivacyConsentState
