@@ -3,6 +3,7 @@ package net.bitburst.plugins.mparticle;
 import static com.getcapacitor.JSObject.fromJSONObject;
 
 import android.util.Log;
+
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -12,10 +13,12 @@ import com.mparticle.MPEvent;
 import com.mparticle.MParticle;
 import com.mparticle.MParticleOptions;
 import com.mparticle.identity.IdentityApiRequest;
+
+import org.json.JSONException;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import org.json.JSONException;
 
 @CapacitorPlugin(name = "Mparticle")
 public class MparticlePlugin extends Plugin {
@@ -26,7 +29,7 @@ public class MparticlePlugin extends Plugin {
     private String planId = "bitcode_frontend_plan";
     private int planVersion = 4;
 
-    String mParticleKey = ""; //this.getContext().getString(R.string.mparticle_key);
+    String mParticleKey = "eu1-f7ebd620020cce4e9672de46c1f443ac"; //this.getContext().getString(R.string.mparticle_key);
     String mParticleSecret = ""; // this.getContext().getString(R.string.mparticle_secret);
 
     @Override
@@ -34,7 +37,7 @@ public class MparticlePlugin extends Plugin {
         try {
             JSObject mParticleConfig = fromJSONObject(getConfig().getObject("config"));
             /* Boolean isDevelopmentMode = mParticleConfig.getBoolean("isDevelopmentMode"); */
-            mParticleKey = getConfig().getString("key");
+            //mParticleKey = getConfig().getString("key");
             mParticleSecret = getConfig().getString("secret");
 
             JSObject dataPlan = mParticleConfig.getJSObject("dataPlan");
@@ -103,12 +106,12 @@ public class MparticlePlugin extends Plugin {
     }
 
     @PluginMethod
-    public void logEvent(PluginCall call) {
+    public void trackEvent(PluginCall call) {
         JSObject callData = call.getData();
         if (callData == null) return;
 
         Map<String, String> customAttributes = new HashMap<>();
-        JSObject temp = callData.getJSObject("eventProperties");
+        JSObject temp = callData.getJSObject("data");
         if (temp != null) {
             Iterator<String> iter = temp.keys();
             while (iter.hasNext()) {
@@ -122,7 +125,7 @@ public class MparticlePlugin extends Plugin {
             }
         }
 
-        String name = callData.getString("eventName");
+        String name = callData.getString("name");
         Integer type = callData.getInteger("eventType");
         assert name != null;
         assert type != null;
@@ -134,16 +137,28 @@ public class MparticlePlugin extends Plugin {
     }
 
     @PluginMethod
-    public void logPageView(PluginCall call) {
-        String name = call.getString("pageName");
-        String link = call.getString("pageLink");
+    public void trackPageView(PluginCall call) {
+        String name = call.getString("name");
         assert name != null;
-        assert link != null;
 
-        Map<String, String> screenInfo = new HashMap<>();
-        screenInfo.put("page", link);
+        Map<String, String> pageData = new HashMap<>();
+        try {
+            JSObject temp = fromJSONObject(call.getObject("data"));
+            Iterator<String> iter = temp.keys();
+            while (iter.hasNext()) {
+                String key = iter.next();
+                try {
+                    Object value = temp.get(key);
+                    pageData.put(key, value.toString());
+                } catch (JSONException e) {
+                    call.reject(LOG_TAG, "failed to log page view ", e);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        Mparticle.getInstance().logScreen(name, screenInfo);
+        Mparticle.getInstance().logScreen(name, pageData);
         call.resolve();
     }
 
