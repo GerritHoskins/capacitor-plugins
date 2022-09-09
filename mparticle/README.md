@@ -19,8 +19,8 @@ npx cap sync
 * [`setGDPRConsent(...)`](#setgdprconsent)
 * [`getGDPRConsent(...)`](#getgdprconsent)
 * [`getMPID()`](#getmpid)
-* [`logEvent(...)`](#logevent)
-* [`logPageView(...)`](#logpageview)
+* [`trackEvent(...)`](#trackevent)
+* [`trackPageView(...)`](#trackpageview)
 * [`loginUser(...)`](#loginuser)
 * [`logoutUser(...)`](#logoutuser)
 * [`registerUser(...)`](#registeruser)
@@ -37,12 +37,12 @@ npx cap sync
 ### init(...)
 
 ```typescript
-init(options: { key?: string; secret?: string; config: MPConfiguration; }) => Promise<any>
+init(options: { key?: string; secret?: string; config?: MPConfiguration; }) => Promise<any>
 ```
 
-| Param         | Type                                                                                                    |
-| ------------- | ------------------------------------------------------------------------------------------------------- |
-| **`options`** | <code>{ key?: string; secret?: string; config: <a href="#mpconfiguration">MPConfiguration</a>; }</code> |
+| Param         | Type                                                                                                     |
+| ------------- | -------------------------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ key?: string; secret?: string; config?: <a href="#mpconfiguration">MPConfiguration</a>; }</code> |
 
 **Returns:** <code>Promise&lt;any&gt;</code>
 
@@ -114,30 +114,30 @@ getMPID() => Promise<string | void>
 --------------------
 
 
-### logEvent(...)
+### trackEvent(...)
 
 ```typescript
-logEvent(options: { eventName: string; eventType: EventType | number; eventProperties: any; }) => Promise<any>
+trackEvent(options: { name: string; eventType?: EventType.Unknown; data?: any; }) => Promise<any>
 ```
 
-| Param         | Type                                                                         |
-| ------------- | ---------------------------------------------------------------------------- |
-| **`options`** | <code>{ eventName: string; eventType: number; eventProperties: any; }</code> |
+| Param         | Type                                                                                               |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ name: string; eventType?: <a href="#eventtype">EventType.Unknown</a>; data?: any; }</code> |
 
 **Returns:** <code>Promise&lt;any&gt;</code>
 
 --------------------
 
 
-### logPageView(...)
+### trackPageView(...)
 
 ```typescript
-logPageView(options: { pageName: string; pageLink: any; }) => Promise<any>
+trackPageView(options: { name: string; data?: any; }) => Promise<any>
 ```
 
-| Param         | Type                                              |
-| ------------- | ------------------------------------------------- |
-| **`options`** | <code>{ pageName: string; pageLink: any; }</code> |
+| Param         | Type                                       |
+| ------------- | ------------------------------------------ |
+| **`options`** | <code>{ name: string; data?: any; }</code> |
 
 **Returns:** <code>Promise&lt;any&gt;</code>
 
@@ -341,21 +341,6 @@ Construct a type with a set of properties K of type T
 #### mParticleReadyListener
 
 <code>(event: <a href="#mparticlereadyevent">MparticleReadyEvent</a>): void</code>
-
-
-#### Events
-
-<code><a href="#defaultevent">DefaultEvent</a></code>
-
-
-#### DefaultEvent
-
-<code>(name: string, data?: any): void</code>
-
-
-#### ScreenEvents
-
-<code><a href="#defaultevent">DefaultEvent</a></code>
 
 
 ### Enums

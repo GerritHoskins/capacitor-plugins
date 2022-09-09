@@ -15,11 +15,11 @@ declare module '@capacitor/cli' {
     };
   }
 }
-export interface MparticlePlugin<Events, ScreenEvents> {
+export interface MparticlePlugin {
   init(options: {
     key?: string;
     secret?: string;
-    config: MPConfiguration;
+    config?: MPConfiguration;
   }): Promise<any>;
   identifyUser(options: { identifier: Identifier }): Promise<void>;
   setUserAttribute(options: {
@@ -33,12 +33,12 @@ export interface MparticlePlugin<Events, ScreenEvents> {
     consents: string[];
   }): Record<string, boolean> | void;
   getMPID(): Promise<string | void>;
-  logEvent(options: {
-    eventName: string;
-    eventType: EventType | number;
-    eventProperties: any;
+  trackEvent(options: {
+    name: string;
+    eventType?: EventType.Unknown;
+    data?: any;
   }): Promise<any>;
-  logPageView(options: { pageName: string; pageLink: any }): Promise<any>;
+  trackPageView(options: { name: string; data?: any }): Promise<any>;
   loginUser(options: { email: string; customerId: string }): Promise<any>;
   logoutUser(options?: any): Promise<any>;
   registerUser(options: {
@@ -50,9 +50,6 @@ export interface MparticlePlugin<Events, ScreenEvents> {
     eventName: 'mParticleReady',
     listenerFunc: mParticleReadyListener,
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
-
-  trackEvent?: Events;
-  trackPageView?: ScreenEvents;
 }
 export type Identifier = {
   email?: string;
@@ -63,6 +60,3 @@ export type mParticleReadyListener = (event: MparticleReadyEvent) => void;
 export interface MparticleReadyEvent {
   ready: boolean;
 }
-type DefaultEvent = (name: string, data?: any) => void;
-export type Events = DefaultEvent;
-export type ScreenEvents = DefaultEvent;

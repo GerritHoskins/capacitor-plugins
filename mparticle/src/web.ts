@@ -7,20 +7,15 @@ import type {
 } from '@mparticle/web-sdk';
 import mParticle from '@mparticle/web-sdk';
 
-import type {
-  MparticlePlugin,
-  Identifier,
-  Events,
-  ScreenEvents,
-} from './definitions';
+import type { MparticlePlugin, Identifier } from './definitions';
 
-export class MparticleWeb
-  extends WebPlugin
-  implements MparticlePlugin<Events, ScreenEvents>
-{
-  async init(options: { key: string; config: MPConfiguration }): Promise<any> {
-    return mParticle.init(options.key, options.config);
+export class MparticleWeb extends WebPlugin implements MparticlePlugin {
+  async init(options: { key: string; config?: MPConfiguration }): Promise<any> {
+    await mParticle.init(options.key, options.config || {});
+    if (!mParticle.isInitialized()) return Promise.resolve();
+    return Promise.resolve(mParticle.getInstance());
   }
+
   async identifyUser(options: { identifier: Identifier }): Promise<void> {
     if (!mParticle.isInitialized()) return;
     const { email, customerId, other } = options.identifier;
@@ -40,6 +35,7 @@ export class MparticleWeb
       );
     });
   }
+
   async setUserAttribute(options: {
     attributeName: string;
     attributeValue: string;
@@ -50,6 +46,7 @@ export class MparticleWeb
     user.setUserAttribute(options.attributeName, options.attributeValue);
     return Promise.resolve();
   }
+
   setGDPRConsent(options: {
     consents: Record<string, PrivacyConsentState>;
   }): void {
@@ -74,6 +71,7 @@ export class MparticleWeb
 
     user.setConsentState(consentState);
   }
+
   getGDPRConsent(options: {
     consents: string[];
   }): Record<string, boolean> | void {
@@ -95,6 +93,7 @@ export class MparticleWeb
       return consentsAcc;
     }, {});
   }
+
   async getMPID(): Promise<string | void> {
     if (!mParticle.isInitialized()) return Promise.resolve();
     const user = mParticle.Identity.getCurrentUser();
@@ -102,25 +101,22 @@ export class MparticleWeb
 
     return Promise.resolve(user.getMPID());
   }
-  async logEvent(options: {
-    eventName: string;
-    eventType?: EventType | number;
-    eventProperties?: any;
+
+  async trackEvent(options: {
+    name: string;
+    eventType?: EventType.Unknown;
+    data?: any;
   }): Promise<any> {
     if (!mParticle.isInitialized()) return;
-    return mParticle.logEvent(
-      options.eventName,
-      options?.eventType,
-      options?.eventProperties,
-    );
+
+    return mParticle.logEvent(options.name, options.eventType, options?.data);
   }
-  async logPageView(options: {
-    pageName: string;
-    pageProperties?: any;
-  }): Promise<any> {
+
+  async trackPageView(options: { name: string; data?: any }): Promise<any> {
     if (!mParticle.isInitialized()) return;
-    return mParticle.logPageView(options.pageName, options?.pageProperties);
+    return mParticle.logPageView(options.name, options?.data);
   }
+
   async loginUser(options: {
     email: string;
     customerId: string;
@@ -130,6 +126,7 @@ export class MparticleWeb
       this.identityRequest(options.email, options.customerId),
     );
   }
+
   async logoutUser(_options: any): Promise<any> {
     if (!mParticle.isInitialized()) return;
     const identityoptionsback = (result: any) => {
@@ -139,6 +136,7 @@ export class MparticleWeb
     };
     return mParticle.Identity.logout({} as any, identityoptionsback);
   }
+
   async registerUser(options: {
     email: string;
     customerId: string;
@@ -159,24 +157,11 @@ export class MparticleWeb
       },
     );
   }
-  async trackEvent(name: string, data?: any): Promise<void> {
-    if (!mParticle.isInitialized()) return;
-    await this.logEvent({
-      eventName: name,
-      eventType: mParticle.EventType.Other,
-      eventProperties: data,
-    });
-  }
-  async trackPageView(name: string, data?: any): Promise<void> {
-    if (!mParticle.isInitialized()) return;
-    await this.logPageView({
-      pageName: name,
-      pageProperties: data,
-    });
-  }
+
   public get currentUser(): mParticle.User {
     return mParticle.Identity.getCurrentUser();
   }
+
   private identityRequest(email: string, customerId: string, other?: any): any {
     return {
       userIdentities: {
