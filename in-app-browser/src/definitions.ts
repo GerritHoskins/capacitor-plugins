@@ -1,6 +1,19 @@
+import type { PluginListenerHandle } from '@capacitor/core';
+
 export interface InAppBrowserPlugin {
   echo(options: { value: string }): Promise<{ value: string }>;
   open(options: IabOptions): Promise<void>;
+  close(): Promise<void>;
+  show(): Promise<void>;
+  hide(): Promise<void>;
+  addListener(
+    eventName:
+      | 'pageLoaded'
+      | 'updateSnapshot'
+      | 'progress'
+      | 'navigationHandler',
+    listenerFunc: (...args: any[]) => void,
+  ): PluginListenerHandle;
 }
 export interface IabOptions {
   url?: string;

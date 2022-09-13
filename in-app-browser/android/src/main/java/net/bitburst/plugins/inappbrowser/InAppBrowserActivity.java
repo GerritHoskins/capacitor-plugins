@@ -8,7 +8,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
-import java.util.Objects;
 
 public class InAppBrowserActivity extends AppCompatActivity {
 
@@ -18,31 +17,18 @@ public class InAppBrowserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.iab_activity);
+        setContentView(R.layout.bridge_layout_main);
 
-        Objects.requireNonNull(getSupportActionBar()).hide();
-
+        //Objects.requireNonNull(getSupportActionBar()).hide();
         Intent intent = getIntent();
         String url = intent.getStringExtra(InAppBrowserPlugin.EXTRA_URL);
 
-        webView = (WebView) findViewById(R.id.iab_web_view);
-        WebViewClient webViewClient = new WebViewClient();
+        webView = (WebView) findViewById(R.id.webview);
+        WebViewClient webViewClient = InAppBrowser.iab;
         WebSettings webSettings = webView.getSettings();
 
         webSettings.setJavaScriptEnabled(true);
         webView.setWebViewClient(webViewClient);
         webView.loadUrl(url);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // Check if the key event was the Back button and if there's history
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && webView.canGoBack()) {
-            webView.goBack();
-            return true;
-        }
-        // If it wasn't the Back key or there's no web page history, bubble up to the default
-        // system behavior (probably exit the activity)
-        return super.onKeyDown(keyCode, event);
     }
 }
