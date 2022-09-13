@@ -8,6 +8,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
+import java.util.Objects;
 
 public class InAppBrowserActivity extends AppCompatActivity {
 
@@ -17,14 +18,14 @@ public class InAppBrowserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web);
+        setContentView(R.layout.iab_activity);
 
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         Intent intent = getIntent();
-        String url = intent.getStringExtra(WebViewCapacitorPlugin.EXTRA_URL);
+        String url = intent.getStringExtra(InAppBrowserPlugin.EXTRA_URL);
 
-        webView = (WebView) findViewById(R.id.web_view);
+        webView = (WebView) findViewById(R.id.iab_web_view);
         WebViewClient webViewClient = new WebViewClient();
         WebSettings webSettings = webView.getSettings();
 

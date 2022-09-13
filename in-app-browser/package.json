@@ -1,6 +1,6 @@
 {
-  "name": "@bitburst-gmbh/in-app-browser",
-  "version": "0.0.2",
+  "name": "@gerrithoskins/in-app-browser",
+  "version": "0.0.3",
   "description": "capacitor plugin for delegating native web views",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -16,7 +16,7 @@
   "author": "",
   "license": "MIT",
   "repository": {
-    "url": "https://github.com/BitBurst-GmbH/capacitor-plugins"
+    "url": "https://github.com/GerritHoskins/capacitor-plugins"
   },
   "bugs": {
     "url": "https://github.com/BitBurst-GmbH/capacitor-plugins/issues"

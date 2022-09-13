@@ -1,5 +1,6 @@
 package net.bitburst.plugins.inappbrowser;
 
+import android.content.Intent;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -11,15 +12,9 @@ public class InAppBrowserPlugin extends Plugin {
 
     public static final String EXTRA_URL = "extra_url";
 
-    private InAppBrowser implementation = new InAppBrowser();
-
     @PluginMethod
     public void echo(PluginCall call) {
-        String value = call.getString("value");
-
-        JSObject ret = new JSObject();
-        ret.put("value", implementation.echo(value));
-        call.resolve(ret);
+        call.resolve();
     }
 
     @PluginMethod
