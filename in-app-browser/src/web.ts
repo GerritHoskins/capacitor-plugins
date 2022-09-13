@@ -1,10 +1,12 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { InAppBrowserPlugin } from './definitions';
+import type { InAppBrowserPlugin, IabOptions } from './definitions';
 
 export class InAppBrowserWeb extends WebPlugin implements InAppBrowserPlugin {
   async echo(options: { value: string }): Promise<{ value: string }> {
-    console.log('ECHO', options);
     return options;
+  }
+  async open(options: IabOptions): Promise<void> {
+    window.open(options.url, options.target);
   }
 }
