@@ -21,4 +21,8 @@ export class InAppBrowserWeb extends WebPlugin implements InAppBrowserPlugin {
   async show(): Promise<void> {
     return Promise.resolve(undefined);
   }
+
+  handleNavigationEvent(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
 }

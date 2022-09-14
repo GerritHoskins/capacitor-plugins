@@ -18,6 +18,7 @@ npx cap sync
 * [`close()`](#close)
 * [`show()`](#show)
 * [`hide()`](#hide)
+* [`handleNavigationEvent(...)`](#handlenavigationevent)
 * [`addListener('pageLoaded' | 'updateSnapshot' | 'progress' | 'navigationHandler', ...)`](#addlistenerpageloaded--updatesnapshot--progress--navigationhandler)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
@@ -78,6 +79,19 @@ show() => Promise<void>
 ```typescript
 hide() => Promise<void>
 ```
+
+--------------------
+
+
+### handleNavigationEvent(...)
+
+```typescript
+handleNavigationEvent(options: { allow: boolean; }) => Promise<void>
+```
+
+| Param         | Type                             |
+| ------------- | -------------------------------- |
+| **`options`** | <code>{ allow: boolean; }</code> |
 
 --------------------
 
