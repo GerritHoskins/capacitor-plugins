@@ -13,6 +13,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.activity.result.ActivityResult;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -29,14 +31,9 @@ public class InAppBrowserPlugin extends Plugin {
     public static final String LOG_TAG = "bitburst.inAppBrowser ";
     public static final String EXTRA_URL = "extra_url";
 
-    private WebView webView;
-    private boolean hidden = false;
-    private String targetUrl;
-    private PluginCall loadUrlCall;
-    private int width;
-    private int height;
-    private float x;
-    private float y;
+    private InAppBrowser inAppBrowser = new InAppBrowser(this);
+    protected WebView webView;
+    protected boolean hidden = false;
 
     @PluginMethod
     public void echo(PluginCall call) {
@@ -51,7 +48,18 @@ public class InAppBrowserPlugin extends Plugin {
                     @SuppressLint("SetJavaScriptEnabled")
                     @Override
                     public void run() {
+                        JSObject callData = call.getData();
+                        assert callData != null;
+
+                        String urlString = callData.getString("url", "");
+                        assert urlString != null;
+                        if (urlString.isEmpty()) {
+                            call.reject(LOG_TAG, "url is missing");
+                            return;
+                        }
+
                         hidden = false;
+
                         webView = new WebView(getContext());
                         WebSettings settings = webView.getSettings();
                         settings.setAllowContentAccess(true);
@@ -59,133 +67,13 @@ public class InAppBrowserPlugin extends Plugin {
                         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
                         settings.setDomStorageEnabled(true);
                         settings.setSupportMultipleWindows(true);
-
-                        // Temp fix until this setting is on by default
+                        // setting is off by default
                         bridge.getWebView().getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
 
-                        JSObject callData = call.getData();
-                        assert callData != null;
-
-                        final String javascript = callData.getString("javascript", "");
-                        final int injectionTime = 0;
-
-                        webView.setWebChromeClient(
-                            new WebChromeClient() {
-                                @Override
-                                public void onProgressChanged(WebView view, int progress) {
-                                    JSObject progressValue = new JSObject();
-                                    progressValue.put("value", progress / 100.0);
-                                    notifyListeners("progress", progressValue);
-                                }
-
-                                @Override
-                                public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
-                                    final WebView targetWebView = new WebView(getActivity());
-                                    targetWebView.setWebViewClient(
-                                        new WebViewClient() {
-                                            @Override
-                                            public void onLoadResource(WebView view, String url) {
-                                                if (hasListeners("navigationHandler")) {
-                                                    handleNavigation(url, true);
-                                                    JSObject progressValue = new JSObject();
-                                                    progressValue.put("value", 0.1);
-                                                    notifyListeners("progress", progressValue);
-                                                } else {
-                                                    webView.loadUrl(url);
-                                                }
-                                                targetWebView.removeAllViews();
-                                                targetWebView.destroy();
-                                            }
-                                        }
-                                    );
-                                    WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
-                                    transport.setWebView(targetWebView);
-                                    resultMsg.sendToTarget();
-                                    return true;
-                                }
-                            }
-                        );
-
-                        webView.setWebViewClient(
-                            new WebViewClient() {
-                                @Override
-                                public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                                    super.onPageStarted(view, url, favicon);
-
-                                    assert javascript != null;
-                                    if (!javascript.isEmpty()) {
-                                        webView.evaluateJavascript(javascript, null);
-                                    }
-                                }
-
-                                @Override
-                                public void onPageFinished(WebView view, String url) {
-                                    super.onPageFinished(view, url);
-                                    if (webView != null) {
-                                        if (!hidden) {
-                                            webView.setVisibility(View.VISIBLE);
-                                        } else {
-                                            webView.setVisibility(View.INVISIBLE);
-                                            notifyListeners("updateSnapshot", new JSObject());
-                                        }
-                                    }
-
-                                    if (loadUrlCall != null) {
-                                        loadUrlCall.resolve();
-                                        loadUrlCall = null;
-                                    }
-                                    notifyListeners("pageLoaded", new JSObject());
-                                }
-
-                                @Override
-                                public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                                    if (hasListeners("navigationHandler")) {
-                                        handleNavigation(url, false);
-                                        return true;
-                                    } else {
-                                        targetUrl = null;
-                                        return false;
-                                    }
-                                }
-                            }
-                        );
-
+                        inAppBrowser.setupWebChromeClient();
+                        inAppBrowser.setupWebViewClient(callData);
                         //webView.setVisibility(View.INVISIBLE);
-                        String urlString = callData.getString("url", "");
-                        Integer callWidth = callData.getInteger("width", 100);
-                        Integer callHeight = callData.getInteger("height", 100);
-                        Integer callX = callData.getInteger("y", 0);
-                        Integer callY = callData.getInteger("x", 0);
-
-                        assert urlString != null;
-                        assert callWidth != null;
-                        assert callHeight != null;
-                        assert callX != null;
-                        assert callY != null;
-
-                        if (urlString.isEmpty()) {
-                            call.reject(LOG_TAG, "url is missing");
-                            return;
-                        }
-
-                        width = (int) getPixels(callWidth);
-                        height = (int) getPixels(callHeight);
-
-                        x = getPixels(callX);
-                        y = getPixels(callY);
-
-                        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
-                        );
-                        webView.setLayoutParams(params);
-                        params.width = width;
-                        params.height = height;
-                        webView.setX(x);
-                        webView.setY(y);
-                        webView.requestLayout();
-
-                        ((ViewGroup) getBridge().getWebView().getParent()).addView(webView);
+                        inAppBrowser.setupWebViewLayout(callData);
 
                         webView.loadUrl(urlString);
                         call.resolve();
@@ -194,25 +82,12 @@ public class InAppBrowserPlugin extends Plugin {
             );
     }
 
-    private float getPixels(int value) {
-        return value * getContext().getResources().getDisplayMetrics().density + 0.5f;
+    public boolean hasEventListeners(@NonNull String eventName) {
+        return hasListeners(eventName);
     }
 
-    private void handleNavigation(String url, Boolean newWindow) {
-        targetUrl = url;
-        boolean sameHost;
-        try {
-            URL currentUrl = new URL(webView.getUrl());
-            URL targetUrl = new URL(url);
-            sameHost = currentUrl.getHost().equals(targetUrl.getHost());
-
-            JSObject navigationHandlerValue = new JSObject();
-            navigationHandlerValue.put("url", url);
-            navigationHandlerValue.put("newWindow", newWindow);
-            navigationHandlerValue.put("sameHost", sameHost);
-
-            notifyListeners("navigationHandler", navigationHandlerValue);
-        } catch (MalformedURLException ignored) {}
+    public void notifyEventListeners(@NonNull String eventName, @Nullable JSObject eventValue) {
+        notifyListeners(eventName, eventValue);
     }
 
     @PluginMethod

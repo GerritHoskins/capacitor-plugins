@@ -23,6 +23,7 @@ export interface IabOptions {
     type: 'start' | 'stop' | 'error' | 'exit' | 'custom';
     action: (event: IabEvent) => void;
   };
+  webViewDimensions?: IabWebViewDimensions;
   platformOptions?: IabPlatformOptions;
 }
 export interface IabEvent extends Event {
@@ -32,7 +33,6 @@ export interface IabEvent extends Event {
   message: string;
 }
 export interface IabPlatformOptions {
-  dimensions: IabWebViewDimensions;
   hidden: boolean;
   showUrlBar: boolean;
   zoom: boolean;

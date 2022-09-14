@@ -24,11 +24,11 @@ public class InAppBrowserActivity extends AppCompatActivity {
         String url = intent.getStringExtra(InAppBrowserPlugin.EXTRA_URL);
 
         webView = (WebView) findViewById(R.id.webview);
-        WebViewClient webViewClient = InAppBrowser.iab;
+        //WebViewClient webViewClient = InAppBrowser.iab;
         WebSettings webSettings = webView.getSettings();
 
         webSettings.setJavaScriptEnabled(true);
-        webView.setWebViewClient(webViewClient);
+        //  webView.setWebViewClient(webViewClient);
         webView.loadUrl(url);
     }
 }
