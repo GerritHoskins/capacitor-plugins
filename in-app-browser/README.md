@@ -15,6 +15,10 @@ npx cap sync
 
 * [`echo(...)`](#echo)
 * [`open(...)`](#open)
+* [`close()`](#close)
+* [`show()`](#show)
+* [`hide()`](#hide)
+* [`addListener('pageLoaded' | 'updateSnapshot' | 'progress' | 'navigationHandler', ...)`](#addlistenerpageloaded--updatesnapshot--progress--navigationhandler)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -47,6 +51,49 @@ open(options: IabOptions) => Promise<void>
 | Param         | Type                                              |
 | ------------- | ------------------------------------------------- |
 | **`options`** | <code><a href="#iaboptions">IabOptions</a></code> |
+
+--------------------
+
+
+### close()
+
+```typescript
+close() => Promise<void>
+```
+
+--------------------
+
+
+### show()
+
+```typescript
+show() => Promise<void>
+```
+
+--------------------
+
+
+### hide()
+
+```typescript
+hide() => Promise<void>
+```
+
+--------------------
+
+
+### addListener('pageLoaded' | 'updateSnapshot' | 'progress' | 'navigationHandler', ...)
+
+```typescript
+addListener(eventName: 'pageLoaded' | 'updateSnapshot' | 'progress' | 'navigationHandler', listenerFunc: (...args: any[]) => void) => PluginListenerHandle
+```
+
+| Param              | Type                                                                               |
+| ------------------ | ---------------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'pageLoaded' \| 'updateSnapshot' \| 'progress' \| 'navigationHandler'</code> |
+| **`listenerFunc`** | <code>(...args: any[]) =&gt; void</code>                                           |
+
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -89,6 +136,13 @@ open(options: IabOptions) => Promise<void>
 | **`hideNavigationButtons`** | <code>boolean</code>                                             |
 | **`android`**               | <code><a href="#record">Record</a>&lt;string, unknown&gt;</code> |
 | **`ios`**                   | <code><a href="#record">Record</a>&lt;string, unknown&gt;</code> |
+
+
+#### PluginListenerHandle
+
+| Prop         | Type                                      |
+| ------------ | ----------------------------------------- |
+| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
 
 
 ### Type Aliases
