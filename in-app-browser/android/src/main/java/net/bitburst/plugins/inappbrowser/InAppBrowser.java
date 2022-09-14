@@ -18,10 +18,6 @@ public class InAppBrowser {
     protected InAppBrowserPlugin mPlugin;
     private String targetUrl;
     private PluginCall loadUrlCall;
-    private int width;
-    private int height;
-    private float x;
-    private float y;
 
     public InAppBrowser(InAppBrowserPlugin plugin) {
         mPlugin = plugin;
@@ -73,9 +69,7 @@ public class InAppBrowser {
 
     protected void setupWebViewClient(JSObject callData) {
         WebView webView = mPlugin.webView;
-
         final String javascript = callData.getString("javascript", "");
-        final int injectionTime = 0;
 
         webView.setWebViewClient(
             new WebViewClient() {
@@ -92,13 +86,11 @@ public class InAppBrowser {
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     super.onPageFinished(view, url);
-                    if (webView != null) {
-                        if (!mPlugin.hidden) {
-                            webView.setVisibility(View.VISIBLE);
-                        } else {
-                            webView.setVisibility(View.INVISIBLE);
-                            mPlugin.notifyEventListeners("updateSnapshot", new JSObject());
-                        }
+                    if (!mPlugin.hidden) {
+                        webView.setVisibility(View.VISIBLE);
+                    } else {
+                        webView.setVisibility(View.INVISIBLE);
+                        mPlugin.notifyEventListeners("updateSnapshot", new JSObject());
                     }
 
                     if (loadUrlCall != null) {
@@ -137,11 +129,11 @@ public class InAppBrowser {
         assert callX != null;
         assert callY != null;
 
-        width = (int) getPixels(callWidth);
-        height = (int) getPixels(callHeight);
+        int width = (int) getPixels(callWidth);
+        int height = (int) getPixels(callHeight);
 
-        x = getPixels(callX);
-        y = getPixels(callY);
+        float x = getPixels(callX);
+        float y = getPixels(callY);
 
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,

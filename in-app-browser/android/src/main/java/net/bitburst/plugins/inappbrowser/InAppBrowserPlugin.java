@@ -2,16 +2,12 @@ package net.bitburst.plugins.inappbrowser;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,9 +17,6 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
-import java.net.MalformedURLException;
-import java.net.URL;
-import org.json.JSONException;
 
 @CapacitorPlugin(name = "InAppBrowser")
 public class InAppBrowserPlugin extends Plugin {
@@ -31,7 +24,7 @@ public class InAppBrowserPlugin extends Plugin {
     public static final String LOG_TAG = "bitburst.inAppBrowser ";
     public static final String EXTRA_URL = "extra_url";
 
-    private InAppBrowser inAppBrowser = new InAppBrowser(this);
+    private final InAppBrowser inAppBrowser = new InAppBrowser(this);
     protected WebView webView;
     protected boolean hidden = false;
 
@@ -40,44 +33,41 @@ public class InAppBrowserPlugin extends Plugin {
         call.resolve();
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     @PluginMethod
     public void open(final PluginCall call) {
         getActivity()
             .runOnUiThread(
-                new Runnable() {
-                    @SuppressLint("SetJavaScriptEnabled")
-                    @Override
-                    public void run() {
-                        JSObject callData = call.getData();
-                        assert callData != null;
+                () -> {
+                    JSObject callData = call.getData();
+                    assert callData != null;
 
-                        String urlString = callData.getString("url", "");
-                        assert urlString != null;
-                        if (urlString.isEmpty()) {
-                            call.reject(LOG_TAG, "url is missing");
-                            return;
-                        }
-
-                        hidden = false;
-
-                        webView = new WebView(getContext());
-                        WebSettings settings = webView.getSettings();
-                        settings.setAllowContentAccess(true);
-                        settings.setJavaScriptEnabled(true);
-                        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-                        settings.setDomStorageEnabled(true);
-                        settings.setSupportMultipleWindows(true);
-                        // setting is off by default
-                        bridge.getWebView().getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-
-                        inAppBrowser.setupWebChromeClient();
-                        inAppBrowser.setupWebViewClient(callData);
-                        //webView.setVisibility(View.INVISIBLE);
-                        inAppBrowser.setupWebViewLayout(callData);
-
-                        webView.loadUrl(urlString);
-                        call.resolve();
+                    String urlString = callData.getString("url", "");
+                    assert urlString != null;
+                    if (urlString.isEmpty()) {
+                        call.reject(LOG_TAG, "url is missing");
+                        return;
                     }
+
+                    hidden = false;
+
+                    webView = new WebView(getContext());
+                    WebSettings settings = webView.getSettings();
+                    settings.setAllowContentAccess(true);
+                    settings.setJavaScriptEnabled(true);
+                    settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+                    settings.setDomStorageEnabled(true);
+                    settings.setSupportMultipleWindows(true);
+                    // setting is off by default
+                    bridge.getWebView().getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+
+                    inAppBrowser.setupWebChromeClient();
+                    inAppBrowser.setupWebViewClient(callData);
+                    //webView.setVisibility(View.INVISIBLE);
+                    inAppBrowser.setupWebViewLayout(callData);
+
+                    webView.loadUrl(urlString);
+                    call.resolve();
                 }
             );
     }

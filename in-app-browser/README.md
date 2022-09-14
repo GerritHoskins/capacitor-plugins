@@ -109,6 +109,7 @@ addListener(eventName: 'pageLoaded' | 'updateSnapshot' | 'progress' | 'navigatio
 | **`target`**                | <code>'_blank' \| '_parent' \| '_self'</code>                                                                                            |
 | **`browserType`**           | <code>'DEFAULT' \| 'SYSTEM' \| 'SURVEY'</code>                                                                                           |
 | **`browserEventCallbacks`** | <code>{ type: 'error' \| 'start' \| 'stop' \| 'exit' \| 'custom'; action: (event: <a href="#iabevent">IabEvent</a>) =&gt; void; }</code> |
+| **`webViewDimensions`**     | <code><a href="#iabwebviewdimensions">IabWebViewDimensions</a></code>                                                                    |
 | **`platformOptions`**       | <code><a href="#iabplatformoptions">IabPlatformOptions</a></code>                                                                        |
 
 
@@ -122,23 +123,6 @@ addListener(eventName: 'pageLoaded' | 'updateSnapshot' | 'progress' | 'navigatio
 | **`message`** | <code>string</code> |
 
 
-#### IabPlatformOptions
-
-| Prop                        | Type                                                                  |
-| --------------------------- | --------------------------------------------------------------------- |
-| **`dimensions`**            | <code><a href="#iabwebviewdimensions">IabWebViewDimensions</a></code> |
-| **`hidden`**                | <code>boolean</code>                                                  |
-| **`showUrlBar`**            | <code>boolean</code>                                                  |
-| **`zoom`**                  | <code>boolean</code>                                                  |
-| **`toolbarPosition`**       | <code>'TOP' \| 'BOTTOM'</code>                                        |
-| **`toolbarColor`**          | <code>string</code>                                                   |
-| **`closeButtonColor`**      | <code>string</code>                                                   |
-| **`hardwareBackButton`**    | <code>boolean</code>                                                  |
-| **`hideNavigationButtons`** | <code>boolean</code>                                                  |
-| **`android`**               | <code><a href="#record">Record</a>&lt;string, unknown&gt;</code>      |
-| **`ios`**                   | <code><a href="#record">Record</a>&lt;string, unknown&gt;</code>      |
-
-
 #### IabWebViewDimensions
 
 | Prop         | Type                |
@@ -147,6 +131,22 @@ addListener(eventName: 'pageLoaded' | 'updateSnapshot' | 'progress' | 'navigatio
 | **`height`** | <code>number</code> |
 | **`x`**      | <code>number</code> |
 | **`y`**      | <code>number</code> |
+
+
+#### IabPlatformOptions
+
+| Prop                        | Type                                                             |
+| --------------------------- | ---------------------------------------------------------------- |
+| **`hidden`**                | <code>boolean</code>                                             |
+| **`showUrlBar`**            | <code>boolean</code>                                             |
+| **`zoom`**                  | <code>boolean</code>                                             |
+| **`toolbarPosition`**       | <code>'TOP' \| 'BOTTOM'</code>                                   |
+| **`toolbarColor`**          | <code>string</code>                                              |
+| **`closeButtonColor`**      | <code>string</code>                                              |
+| **`hardwareBackButton`**    | <code>boolean</code>                                             |
+| **`hideNavigationButtons`** | <code>boolean</code>                                             |
+| **`android`**               | <code><a href="#record">Record</a>&lt;string, unknown&gt;</code> |
+| **`ios`**                   | <code><a href="#record">Record</a>&lt;string, unknown&gt;</code> |
 
 
 #### PluginListenerHandle

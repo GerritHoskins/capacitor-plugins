@@ -6,6 +6,7 @@ export interface InAppBrowserPlugin {
   close(): Promise<void>;
   show(): Promise<void>;
   hide(): Promise<void>;
+  handleNavigationEvent(options: { allow: boolean }): Promise<void>;
   addListener(
     eventName:
       | 'pageLoaded'
