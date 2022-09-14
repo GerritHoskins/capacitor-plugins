@@ -32,6 +32,7 @@ export interface IabEvent extends Event {
   message: string;
 }
 export interface IabPlatformOptions {
+  dimensions: IabWebViewDimensions;
   hidden: boolean;
   showUrlBar: boolean;
   zoom: boolean;
@@ -42,4 +43,10 @@ export interface IabPlatformOptions {
   hideNavigationButtons: boolean;
   android?: Record<string, unknown>;
   ios?: Record<string, unknown>;
+}
+interface IabWebViewDimensions {
+  width: number;
+  height: number;
+  x: number;
+  y: number;
 }
