@@ -21,13 +21,13 @@ public class TwitterLogin extends Application {
     public Activity activity;
     public Context context;
 
-    TwitterLogin(Context context, Activity activity, PluginConfig pluginConfig) {
-        this.consumerKey = pluginConfig.getString("consumerKey");
-        this.consumerSecret = pluginConfig.getString("consumerSecret");
-        this.context = context;
-        this.activity = activity;
+    TwitterLogin(TwitterLoginPlugin plugin) {
+        this.consumerKey = plugin.getConfig().getString("consumerKey");
+        this.consumerSecret = plugin.getConfig().getString("consumerSecret");
+        this.context = plugin.getContext();
+        this.activity = plugin.getActivity();
         this.config =
-            new TwitterConfig.Builder(activity)
+            new TwitterConfig.Builder(plugin.getActivity())
                 .logger(new DefaultLogger(Log.DEBUG))
                 .twitterAuthConfig(new TwitterAuthConfig(consumerKey, consumerSecret))
                 .debug(true)

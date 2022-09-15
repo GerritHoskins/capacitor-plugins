@@ -1,27 +1,18 @@
-/// <reference types="@capacitor/cli" />
-
-declare module '@capacitor/cli' {
-  export interface PluginsConfig {
-    TwitterLogin: TwitterPluginOptions;
+declare global {
+  interface PluginRegistry {
+    TwitterPlugin?: ITwitterPlugin;
   }
 }
 
-export interface TwitterLoginPlugin {
-  isLogged(): Promise<TwitterLoggedResponse>;
-  login(): Promise<TwitterLoginResponse>;
+export interface ITwitterPlugin {
+  isLogged(): Promise<{ in: boolean; out: boolean }>;
+
+  login(): Promise<{
+    authToken: string;
+    authTokenSecret: string;
+    userName: string;
+    userID: string;
+  }>;
+
   logout(): Promise<void>;
-}
-export interface TwitterLoginResponse {
-  authToken: string;
-  authTokenSecret: string;
-  userName: string;
-  userID: string;
-}
-export interface TwitterLoggedResponse {
-  in: boolean;
-  out: boolean;
-}
-export interface TwitterPluginOptions {
-  consumerKey?: string;
-  consumerSecret?: string;
 }

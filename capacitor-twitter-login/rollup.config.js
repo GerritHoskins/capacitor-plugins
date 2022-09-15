@@ -4,7 +4,7 @@ export default {
     {
       file: 'dist/plugin.js',
       format: 'iife',
-      name: 'capacitorTwitterLogin',
+      name: 'capacitorTwitter',
       globals: {
         '@capacitor/core': 'capacitorExports',
       },

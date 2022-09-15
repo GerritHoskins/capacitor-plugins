@@ -27,7 +27,7 @@ public class TwitterLoginPlugin extends Plugin {
 
     @Override
     public void load() {
-        twitterInstance = new TwitterLogin(getContext(), getActivity(), getConfig());
+        twitterInstance = new TwitterLogin(this);
         super.load();
     }
 
@@ -40,7 +40,7 @@ public class TwitterLoginPlugin extends Plugin {
                     getInstance()
                         .authClient.authorize(
                             getActivity(),
-                            new Callback<TwitterSession>() {
+                            new Callback<>() {
                                 @Override
                                 public void success(Result<TwitterSession> result) {
                                     JSObject ret = new JSObject();
@@ -95,6 +95,7 @@ public class TwitterLoginPlugin extends Plugin {
         call.resolve(ret);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE) {
@@ -106,7 +107,7 @@ public class TwitterLoginPlugin extends Plugin {
 
     private TwitterLogin getInstance() {
         if (twitterInstance == null) {
-            twitterInstance = new TwitterLogin(getContext(), getActivity(), getConfig());
+            twitterInstance = new TwitterLogin(this);
         }
 
         return twitterInstance;
