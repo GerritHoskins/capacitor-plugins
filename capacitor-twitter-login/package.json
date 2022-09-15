@@ -16,7 +16,7 @@
   "author": "",
   "license": "MIT",
   "repository": {
-    "url": "git+https://github.com/GerritHoskins/capacitor-plugins"
+    "url": "https://github.com/GerritHoskins/capacitor-plugins"
   },
   "bugs": {
     "url": "https://github.com/GerritHoskins/capacitor-plugins/issues"
