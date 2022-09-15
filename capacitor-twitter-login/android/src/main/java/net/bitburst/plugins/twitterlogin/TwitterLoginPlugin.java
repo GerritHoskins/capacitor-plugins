@@ -8,24 +8,18 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.twitter.sdk.android.core.Callback;
-import com.twitter.sdk.android.core.DefaultLogger;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.SessionManager;
-import com.twitter.sdk.android.core.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterAuthToken;
-import com.twitter.sdk.android.core.TwitterConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
-import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 
 @CapacitorPlugin(name="TwitterPlugin", requestCodes = { TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE })
 public class TwitterLoginPlugin extends Plugin {
 
     public static final String LOG_TAG = "bitburst.twitter ";
-
-    private TwitterAuthClient authClient;
 
     public TwitterInstance twitterInstance;
 
@@ -47,7 +41,7 @@ public class TwitterLoginPlugin extends Plugin {
     public void login(final PluginCall call) {
         getInstance().authClient.authorize(
             getActivity(),
-            new Callback<TwitterSession>() {
+            new Callback<>() {
                 @Override
                 public void success(Result<TwitterSession> result) {
                     JSObject ret = new JSObject();
