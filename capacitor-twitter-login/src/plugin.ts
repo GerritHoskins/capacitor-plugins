@@ -1,17 +1,12 @@
-import { registerPlugin } from '@capacitor/core';
+import { Plugins } from '@capacitor/core';
 
-import type { ITwitterLoginPlugin } from './definitions';
+import type { ITwitterPlugin } from './definitions';
 
-const TwitterLoginPlugin =
-  registerPlugin<ITwitterLoginPlugin>('TwitterLoginPlugin');
+const { TwitterPlugin } = Plugins;
 
-export class TwitterPlugin extends Plugin implements ITwitterLoginPlugin {
-  constructor() {
-    super();
-  }
-
+export class Twitter implements ITwitterPlugin {
   isLogged(): Promise<{ in: boolean; out: boolean }> {
-    return TwitterLoginPlugin.isLogged();
+    return TwitterPlugin.isLogged();
   }
   login(): Promise<{
     authToken: string;
@@ -19,11 +14,9 @@ export class TwitterPlugin extends Plugin implements ITwitterLoginPlugin {
     userName: string;
     userID: string;
   }> {
-    return TwitterLoginPlugin.login();
+    return TwitterPlugin.login();
   }
   logout(): Promise<void> {
-    return TwitterLoginPlugin.logout();
+    return TwitterPlugin.logout();
   }
 }
-
-export const Twitter = new TwitterPlugin();

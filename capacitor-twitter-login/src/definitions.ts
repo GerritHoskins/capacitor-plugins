@@ -1,11 +1,10 @@
-/// <reference types="@capacitor/cli" />
-declare module '@capacitor/cli' {
-  export interface PluginsConfig {
-    TwitterPlugin?: TwitterPluginOptions;
+declare global {
+  interface PluginRegistry {
+    TwitterPlugin?: ITwitterPlugin;
   }
 }
 
-export interface ITwitterLoginPlugin {
+export interface ITwitterPlugin {
   isLogged(): Promise<{ in: boolean; out: boolean }>;
 
   login(): Promise<{
@@ -16,8 +15,4 @@ export interface ITwitterLoginPlugin {
   }>;
 
   logout(): Promise<void>;
-}
-export interface TwitterPluginOptions {
-  consumerKey?: string;
-  consumerSecret?: string;
 }
