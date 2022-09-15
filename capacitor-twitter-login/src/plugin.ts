@@ -1,12 +1,22 @@
+import { Plugins } from '@capacitor/core';
+
 import type { ITwitterPlugin } from './definitions';
 
-export declare class ITwitter implements ITwitterPlugin {
-  isLogged(): Promise<{ in: boolean; out: boolean }>;
+const { TwitterPlugin } = Plugins;
+
+export class Twitter implements ITwitterPlugin {
+  isLogged(): Promise<{ in: boolean; out: boolean }> {
+    return TwitterPlugin.isLogged();
+  }
   login(): Promise<{
     authToken: string;
     authTokenSecret: string;
     userName: string;
     userID: string;
-  }>;
-  logout(): Promise<void>;
+  }> {
+    return TwitterPlugin.login();
+  }
+  logout(): Promise<void> {
+    return TwitterPlugin.logout();
+  }
 }

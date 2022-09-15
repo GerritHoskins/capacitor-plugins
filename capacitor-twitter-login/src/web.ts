@@ -1,4 +1,4 @@
-import { WebPlugin } from '@capacitor/core';
+/*import { WebPlugin } from '@capacitor/core';
 
 import type { ITwitterPlugin } from './definitions';
 
@@ -19,4 +19,4 @@ export class TwitterPluginWeb extends WebPlugin implements ITwitterPlugin {
   logout(): Promise<void> {
     return Promise.reject('unimplemented.');
   }
-}
+}*/
