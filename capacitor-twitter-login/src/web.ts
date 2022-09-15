@@ -1,20 +1,22 @@
-// import { WebPlugin } from "@capacitor/core";
-// import { ITwitterPlugin } from "./definitions";
+import { WebPlugin } from '@capacitor/core';
 
-// export class TwitterWeb extends WebPlugin implements ITwitterPlugin {
-//   constructor() {
-//     super({
-//       name: "TwitterPlugin",
-//       platforms: ["web"]
-//     });
-//   }
+import type { ITwitterPlugin } from './definitions';
 
-//   async echo(options: { value: string }): Promise<{ value: string }> {
-//     console.log("ECHO", options);
-//     return Promise.resolve({ value: options.value });
-//   }
-// }
+export class TwitterPluginWeb extends WebPlugin implements ITwitterPlugin {
+  isLogged(): Promise<{ in: boolean; out: boolean }> {
+    return Promise.reject('unimplemented.');
+  }
 
-// const TwitterPlugin = new TwitterWeb();
+  login(): Promise<{
+    authToken: string;
+    authTokenSecret: string;
+    userName: string;
+    userID: string;
+  }> {
+    return Promise.reject('unimplemented.');
+  }
 
-// export { TwitterPlugin };
+  logout(): Promise<void> {
+    return Promise.reject('unimplemented.');
+  }
+}
