@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/capacitor-twitter-login",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "capacitor plugin for twitter user authentication",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -11,7 +11,7 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "CapacitorTwitterLogin.podspec"
+    "GerrithoskinsCapacitorTwitterLogin.podspec"
   ],
   "author": "",
   "license": "MIT",
