@@ -86,7 +86,7 @@ hide() => Promise<void>
 ### handleNavigationEvent(...)
 
 ```typescript
-handleNavigationEvent(options: { allow: boolean; }) => Promise<void>
+handleNavigationEvent(options?: { allow: boolean; } | undefined) => Promise<void>
 ```
 
 | Param         | Type                             |

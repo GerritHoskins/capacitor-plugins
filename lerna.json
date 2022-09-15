@@ -5,7 +5,8 @@
     "in-app-browser",
     "login-provider",
     "mparticle",
-    "native-market"
+    "native-market",
+    "capacitor-twitter-login"
   ],
   "command": {
     "bootstrap": {
