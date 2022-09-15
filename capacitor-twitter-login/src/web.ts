@@ -1,11 +1,11 @@
-import { registerPlugin } from '@capacitor/core';
+import { registerPlugin, WebPlugin } from '@capacitor/core';
 
 import type { ITwitterLoginPlugin } from './definitions';
 
 const TwitterLoginPlugin =
   registerPlugin<ITwitterLoginPlugin>('TwitterLoginPlugin');
 
-export class TwitterPlugin extends Plugin implements ITwitterLoginPlugin {
+export class TwitterWeb extends WebPlugin implements ITwitterLoginPlugin {
   constructor() {
     super();
   }
@@ -25,5 +25,3 @@ export class TwitterPlugin extends Plugin implements ITwitterLoginPlugin {
     return TwitterLoginPlugin.logout();
   }
 }
-
-export const Twitter = new TwitterPlugin();
