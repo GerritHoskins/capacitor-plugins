@@ -2,9 +2,9 @@ import { registerPlugin } from '@capacitor/core';
 
 import type { TwitterLoginPlugin } from './definitions';
 
-const TwitterLogin = registerPlugin<TwitterLoginPlugin>('TwitterLogin', {
+const Twitter = registerPlugin<TwitterLoginPlugin>('Twitter', {
   web: () => import('./web').then(m => new m.TwitterLoginWeb()),
 });
 
 export * from './definitions';
-export { TwitterLogin };
+export { Twitter };
