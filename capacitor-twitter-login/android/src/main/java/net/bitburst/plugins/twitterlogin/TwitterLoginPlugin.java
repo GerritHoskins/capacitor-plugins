@@ -27,24 +27,25 @@ public class TwitterLoginPlugin extends Plugin {
 
     private TwitterAuthClient authClient;
 
+    public TwitterInstance twitterInstance;
+
     @Override
     public void load() {
-        String consumerKey = getConfig().getString("consumerKey");
-        String consumerSecret = getConfig().getString("consumerSecret");
-        TwitterConfig config = new TwitterConfig.Builder(getActivity())
-            .logger(new DefaultLogger(Log.DEBUG))
-            .twitterAuthConfig(new TwitterAuthConfig(consumerKey, consumerSecret))
-            .debug(true)
-            .build();
-
-        Twitter.initialize(config);
-        authClient = new TwitterAuthClient();
+        getInstance();
         super.load();
+    }
+
+    private TwitterInstance getInstance() {
+        if(twitterInstance == null) {
+            twitterInstance = new TwitterInstance(this);
+        }
+
+        return twitterInstance;
     }
 
     @PluginMethod
     public void login(final PluginCall call) {
-        authClient.authorize(
+        getInstance().authClient.authorize(
             getActivity(),
             new Callback<TwitterSession>() {
                 @Override
@@ -68,7 +69,7 @@ public class TwitterLoginPlugin extends Plugin {
 
     @PluginMethod
     public void logout(PluginCall call) {
-        authClient.cancelAuthorize();
+        getInstance().authClient.cancelAuthorize();
         SessionManager<TwitterSession> sessionManager = TwitterCore.getInstance().getSessionManager();
         sessionManager.clearActiveSession();
         call.resolve();
@@ -99,7 +100,7 @@ public class TwitterLoginPlugin extends Plugin {
     @Override
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 140) {
-            authClient.onActivityResult(requestCode, resultCode, data);
+            getInstance().authClient.onActivityResult(requestCode, resultCode, data);
         } else {
             super.handleOnActivityResult(requestCode, resultCode, data);
         }
