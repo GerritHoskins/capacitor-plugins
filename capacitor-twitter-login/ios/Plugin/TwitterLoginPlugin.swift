@@ -66,7 +66,7 @@ public class TwitterLoginPlugin: CAPPlugin
 
             if let userId = store.session()?.userID {
                 store.logOutUserID(userId)
-                call.success();
+                call.resolve();
             }
         }
     }
