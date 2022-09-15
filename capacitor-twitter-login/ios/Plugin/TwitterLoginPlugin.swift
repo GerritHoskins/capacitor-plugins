@@ -15,7 +15,7 @@ public class TwitterLoginPlugin: CAPPlugin
 
         TWTRTwitter.sharedInstance().start(withConsumerKey: consumerKey, consumerSecret: consumerSecret)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(self.didTwitterRespond(notification:)), name: Notification.Name(CAPNotifications.URLOpen.name()), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.didTwitterRespond(notification:)), name: Notification.Name(Notification.Name.capacitorOpenURL.rawValue), object: nil)
     }
 
 
@@ -33,9 +33,9 @@ public class TwitterLoginPlugin: CAPPlugin
     @objc func isLogged(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             if (TWTRTwitter.sharedInstance().sessionStore.hasLoggedInUsers()) {
-                call.success(["in": true, "out": false])
+                call.resolve(["in": true, "out": false])
             } else {
-                call.success(["in": false, "out": true])
+                call.resolve(["in": false, "out": true])
             }
         }
     }
@@ -46,7 +46,7 @@ public class TwitterLoginPlugin: CAPPlugin
                 if session != nil { // Log in succeeded
                     TWTRTwitter.sharedInstance().sessionStore.saveSession(withAuthToken: session!.authToken, authTokenSecret: session!.authTokenSecret) { session, error in
                     }
-                    call.success([
+                    call.resolve([
                         "authToken": session?.authToken as Any,
                         "authTokenSecret": session?.authTokenSecret as Any,
                         "userName":session?.userName as Any,
@@ -54,7 +54,7 @@ public class TwitterLoginPlugin: CAPPlugin
                         ])
                 } else {
                     print("logIn ERROR: \(String(describing: error))")
-                    call.error("error");
+                    call.reject("error");
                 }
             })
         }
