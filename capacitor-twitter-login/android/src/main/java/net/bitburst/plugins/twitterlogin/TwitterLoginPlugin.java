@@ -16,7 +16,7 @@ import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 
-@CapacitorPlugin(name="TwitterLoginPlugin", requestCodes = { TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE })
+@CapacitorPlugin(name="TwitterPlugin", requestCodes = { TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE })
 public class TwitterLoginPlugin extends Plugin {
 
     public static final String LOG_TAG = "bitburst.twitter ";
