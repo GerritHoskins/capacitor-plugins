@@ -4,8 +4,8 @@ import Capacitor
 import TwitterKit
 import TwitterCore
 
-@objc(TwitterLoginPlugin)
-public class TwitterLoginPlugin: CAPPlugin
+@objc(TwitterPlugin)
+public class TwitterPlugin: CAPPlugin
 {
     var window: UIWindow?
 

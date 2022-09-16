@@ -1,17 +1,16 @@
 platform :ios, '13.0'
 
-def capacitor_pods
+target 'Plugin' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
-  pod 'Capacitor', :path => '../node_modules/@capacitor/ios'
-  pod 'CapacitorCordova', :path => '../node_modules/@capacitor/ios'
-  pod 'TwitterKit'
-end
 
-target 'Plugin' do
-  capacitor_pods
+  # Pods
+  pod 'TwitterKit'
+  pod 'Capacitor'
 end
 
 target 'PluginTests' do
-  capacitor_pods
+  use_frameworks!
+  pod 'TwitterKit'
+  pod 'Capacitor'
 end
