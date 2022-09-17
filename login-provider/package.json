@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/login-provider",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "capacitor plugin for managing authentication for multiple login providers",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -11,7 +11,7 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "GHLoginProvider.podspec"
+    "GerrithoskinsLoginProvider.podspec"
   ],
   "author": "",
   "license": "MIT",
