@@ -15,8 +15,8 @@ Pod::Spec.new do |s|
   s.swift_version = '5.1'
   s.static_framework = true
   s.dependency 'Capacitor'
-  s.dependency 'GoogleSignIn',
-  s.dependency 'FBSDKCoreKit',
-  s.dependency 'FBSDKLoginKit',
+  s.dependency 'GoogleSignIn'
+  s.dependency 'FBSDKCoreKit'
+  s.dependency 'FBSDKLoginKit'
   s.dependency 'TwitterKit'
 end
