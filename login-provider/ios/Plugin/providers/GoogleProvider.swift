@@ -26,12 +26,12 @@ class GoogleProvider: NSObject {
         signInCall = call
         DispatchQueue.main.async {
             if self.googleSignIn.hasPreviousSignIn() && !self.forceAuthCode {
-                self.googleSignIn.restorePreviousSignIn() { user, error in
-                if let error = error {
-                    self.signInCall?.reject(error.localizedDescription)
-                    return
-                }
-                self.resolveSignInCallWith(user: user!)
+                self.googleSignIn.restorePreviousSignIn { user, error in
+                    if let error = error {
+                        self.signInCall?.reject(error.localizedDescription)
+                        return
+                    }
+                    self.resolveSignInCallWith(user: user!)
                 }
             } else {
                 let presentingVc = self.bridge!.viewController!
@@ -103,13 +103,11 @@ class GoogleProvider: NSObject {
     func getClientIdValue() -> String? {
         if let clientId = getConfigValue("iosClientId") as? String {
             return clientId
-        }
-        else if let clientId = getConfigValue("clientId") as? String {
+        } else if let clientId = getConfigValue("clientId") as? String {
             return clientId
-        }
-        else if let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
-                let dict = NSDictionary(contentsOfFile: path) as? [String: AnyObject],
-                let clientId = dict["CLIENT_ID"] as? String {
+        } else if let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
+                  let dict = NSDictionary(contentsOfFile: path) as? [String: AnyObject],
+                  let clientId = dict["CLIENT_ID"] as? String {
             return clientId
         }
         return nil
@@ -141,12 +139,12 @@ class GoogleProvider: NSObject {
         }
 
         let result = LoginProviderHelper.createLoginProviderResponsePayload(
-           "GOOGLE",
-           userData.authentication.idToken,
-           null,
-           userData.email,
-           userData.imageUrl,
-           call.getData().getString("inviteCode")
+            "GOOGLE",
+            userData.authentication.idToken,
+            null,
+            userData.email,
+            userData.imageUrl,
+            call.getData().getString("inviteCode")
         )
 
         signInCall?.resolve([result])
