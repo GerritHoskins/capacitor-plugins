@@ -1,6 +1,9 @@
 import Foundation
 import Capacitor
-import AppleProvider
+
+typealias JSObject = [String: Any]
+typealias JSArray = [JSObject]
+typealias ProvidersMap = [String: ProviderHandler]
 
 @objc(LoginProviderPlugin)
 public class LoginProviderPlugin: CAPPlugin {
@@ -11,30 +14,39 @@ public class LoginProviderPlugin: CAPPlugin {
     var twitterProvider: TwitterProvider?
 
     var providers: ProvidersMap = [:]
+    var callbackId: String?
 
     override public func load() {
-        let appleOptions = getConfigValue("apple") as? JSObject ?? "CHECK CAPACITOR CONFIG TS"
-        let facebookOptions = getConfigValue("facebook") as? JSObject ?? "CHECK CAPACITOR CONFIG TS"
-        let googleOptions = getConfigValue("google") as? JSObject ?? "CHECK CAPACITOR CONFIG TS"
-        let twitterOptions = getConfigValue("twitter") as? JSObject ?? "CHECK CAPACITOR CONFIG TS"
+        let appleOptions = self.convertOptions(options: getConfigValue("apple"))
+        let facebookOptions = getConfigValue("facebook")
+        let googleOptions = getConfigValue("google")
+        let twitterOptions =  self.convertOptions(options: getConfigValue("twitter"))
 
         self.providers["APPLE"] = AppleProvider()
         self.providers["APPLE"]?.initialize(plugin: self, options: appleOptions)
 
         self.providers["FACEBOOK"] = FacebookProvider()
-        self.providers["FACEBOOK"]?.initialize(plugin: self, options: appleOptions)
+        self.providers["FACEBOOK"]?.initialize(plugin: self, options: facebookOptions as! JSObject)
 
         self.providers["GOOGLE"] = GoogleProvider()
-        self.providers["GOOGLE"]?.initialize(plugin: self, options: appleOptions)
+        self.providers["GOOGLE"]?.initialize(plugin: self, options: googleOptions as! JSObject)
 
         self.providers["TWITTER"] = TwitterProvider()
-        self.providers["TWITTER"]?.initialize(plugin: self, options: appleOptions)
+        self.providers["TWITTER"]?.initialize(plugin: self, options: twitterOptions)
 
         // self.implementation?.appStateObserver = { [weak self] in
     }
 
+    @objc func convertOptions(options: Any?) -> JSObject {
+        var resultOptions: JSObject
+        if let res = options as? [String: Any] {
+            resultOptions = res
+        }
+        return resultOptions
+    }
+
     @objc func loginWithProvider(_ call: CAPPluginCall) {
-        guard let theProvider: ProviderHandler = self.getProvider(call: call) else {
+        guard let providerInstance: ProviderHandler = self.getProvider(call: call) else {
             // call.reject inside getProvider
             return
         }
@@ -47,33 +59,25 @@ public class LoginProviderPlugin: CAPPlugin {
         self.callbackId = callbackId
         call.save()
 
-        let providerName = call.getString("provider")
-        switch providerName {
-        case "APPLE":
-            self.providers["APPLE"]?.login(call)
-        case "GOOGLE":
-            self.providers["GOOGLE"]?.login(call)
-        case "FACEBOOK":
-            self.providers["FACEBOOK"]?.login(call)
-        case "TWITTER":
-            self.providers["TWITTER"]?.login(call)
-        }
+        DispatchQueue.main.async {
+            if providerInstance.isAuthenticated() {
+                return
+            }
 
+            providerInstance.login(call: call)
+        }
     }
 
-    @objc func logoutFromProvider(_ call: CAPPluginCall) {
-        let providerName = call.getString("provider")
-        switch providerName {
-        case "APPLE":
-            self.providers["APPLE"]?.logout(call)
-        case "GOOGLE":
-            self.providers["GOOGLE"]?.logout(call)
-        case "FACEBOOK":
-            self.providers["FACEBOOK"]?.logout(call)
-        case "TWITTER":
-            self.providers["TWITTER"]?.logout(call)
+    @objc func logoutFromProvider(call: CAPPluginCall) {
+        do {
+            for provider in self.providers.values {
+                try provider.logout(call: call)
+            }
+            call.resolve()
+        } catch let logoutError as NSError {
+            print("logout error: %@", logoutError)
+            call.reject("logout error: \(logoutError)")
         }
-
     }
 
     func getProvider(call: CAPPluginCall) -> ProviderHandler? {
@@ -106,11 +110,11 @@ public class LoginProviderPlugin: CAPPlugin {
         call.unimplemented()
     }
 
-    @objc func addListener(_ call: CAPPluginCall) {
+    @objc override public func addListener(_ call: CAPPluginCall) {
         call.unimplemented()
     }
 
-    @objc func removeAllListeners(_ call: CAPPluginCall) {
+    @objc override public func removeAllListeners(_ call: CAPPluginCall) {
         call.unimplemented()
     }
 }

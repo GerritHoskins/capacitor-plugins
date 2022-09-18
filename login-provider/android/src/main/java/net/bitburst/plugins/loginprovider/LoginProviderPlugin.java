@@ -1,10 +1,8 @@
 package net.bitburst.plugins.loginprovider;
 
 import android.content.Intent;
-
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -13,12 +11,10 @@ import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
-
+import java.util.Objects;
 import net.bitburst.plugins.loginprovider.providers.FacebookProvider;
 import net.bitburst.plugins.loginprovider.providers.GoogleProvider;
 import net.bitburst.plugins.loginprovider.providers.TwitterProvider;
-
-import java.util.Objects;
 
 @CapacitorPlugin(
     name = "LoginProvider",

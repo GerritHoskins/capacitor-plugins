@@ -4,10 +4,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.NonNull;
-
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -20,14 +18,11 @@ import com.facebook.login.LoginResult;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
-
+import java.util.Collection;
 import net.bitburst.plugins.loginprovider.LoginProviderHelper;
 import net.bitburst.plugins.loginprovider.LoginProviderPlugin;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Collection;
 
 public class FacebookProvider {
 
@@ -96,7 +91,7 @@ public class FacebookProvider {
 
         JSArray permissionStrings = new JSArray();
         try {
-            permissionStrings.put(0,  configSettings.getString("permissions"));
+            permissionStrings.put(0, configSettings.getString("permissions"));
             permissions = permissionStrings.toList();
         } catch (JSONException e) {
             call.reject(LoginProviderPlugin.LOG_TAG, "invalid permissions argument", e);

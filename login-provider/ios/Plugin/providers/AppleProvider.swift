@@ -2,16 +2,16 @@ import Foundation
 import Capacitor
 import AuthenticationServices
 
-class AppleProvider: NSObject {
-    var plugin: LoginProviderPlugin
-    var options: JSObject
+class AppleProvider: NSObject, ProviderHandler {
+    var plugin: LoginProviderPlugin?
+    var options: JSObject = [:]
 
     func initialize(plugin: LoginProviderPlugin, options: JSObject) {
         self.plugin = plugin
         self.options = options
     }
 
-    @objc func login(_ call: CAPPluginCall) {
+    @objc func login(call: CAPPluginCall) {
         if #available(iOS 13.0, *) {
             let appleIDProvider = ASAuthorizationAppleIDProvider()
             let request = appleIDProvider.createRequest()
@@ -22,7 +22,7 @@ class AppleProvider: NSObject {
             let defaults = UserDefaults()
             defaults.setValue(call.callbackId, forKey: "callbackId")
 
-            self.bridge?.saveCall(call)
+            self.plugin?.bridge?.saveCall(call)
 
             let authorizationController = ASAuthorizationController(authorizationRequests: [request])
             authorizationController.delegate = self
@@ -32,8 +32,12 @@ class AppleProvider: NSObject {
         }
     }
 
-    @objc func logout(_ call: CAPPluginCall) {
+    @objc func logout(all call: CAPPluginCall) {
         call.resolve()
+    }
+
+    func isAuthenticated() -> Bool {
+        return false
     }
 
     @available(iOS 13.0, *)
@@ -59,36 +63,34 @@ class AppleProvider: NSObject {
 }
 
 @available(iOS 13.0, *)
-extension SignInWithApple: ASAuthorizationControllerDelegate {
+extension AppleProvider: ASAuthorizationControllerDelegate {
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else { return }
 
         let defaults = UserDefaults()
         let id = defaults.string(forKey: "callbackId") ?? ""
-        guard let call = self.bridge?.savedCall(withID: id) else {
+        guard let call = self.plugin?.bridge?.savedCall(withID: id) else {
             return
         }
+        call.resolve(LoginProviderHelper.createLoginProviderResponsePayload(
+            provider: "APPLE",
+            token: String(data: appleIDCredential.identityToken!, encoding: .utf8),
+            secret: String(data: appleIDCredential.authorizationCode!, encoding: .utf8),
+            email: appleIDCredential.email,
+            avatarUrl: "",
+            inviteCode: call.getString("inviteCode")
+        ))
 
-        let result = LoginProviderHelper.createLoginProviderResponsePayload(
-            "APPLE",
-            String(data: appleIDCredential.identityToken!, encoding: .utf8),
-            String(data: appleIDCredential.authorizationCode!, encoding: .utf8),
-            appleIDCredential.email,
-            null,
-            call.getData().getString("inviteCode")
-        )
-
-        call.resolve(result)
-        self.bridge?.releaseCall(call)
+        self.plugin?.bridge?.releaseCall(call)
     }
 
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         let defaults = UserDefaults()
         let id = defaults.string(forKey: "callbackId") ?? ""
-        guard let call = self.bridge?.savedCall(withID: id) else {
+        guard let call = self.plugin?.bridge?.savedCall(withID: id) else {
             return
         }
         call.reject(error.localizedDescription)
-        self.bridge?.releaseCall(call)
+        self.plugin?.bridge?.releaseCall(call)
     }
 }

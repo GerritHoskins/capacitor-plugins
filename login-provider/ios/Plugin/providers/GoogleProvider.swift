@@ -2,9 +2,10 @@ import Foundation
 import Capacitor
 import GoogleSignIn
 
-class GoogleProvider: NSObject {
-    var plugin: LoginProviderPlugin
-    var options: JSObject
+class GoogleProvider: NSObject, ProviderHandler {
+
+    var plugin: LoginProviderPlugin?
+    var options: JSObject = [:]
 
     var googleSignIn: GIDSignIn!
     var googleSignInConfiguration: GIDConfiguration!
@@ -31,7 +32,7 @@ class GoogleProvider: NSObject {
                         self.signInCall?.reject(error.localizedDescription)
                         return
                     }
-                    self.resolveSignInCallWith(user: user!)
+                    self.resolveSignInCallWith(call: call, user: user!)
                 }
             } else {
                 let presentingVc = self.bridge!.viewController!
@@ -49,10 +50,10 @@ class GoogleProvider: NSObject {
                                 self.signInCall?.reject(error.localizedDescription)
                                 return
                             }
-                            self.resolveSignInCallWith(user: user!)
+                            self.resolveSignInCallWith(call: call, user: user!)
                         }
                     } else {
-                        self.resolveSignInCallWith(user: user!)
+                        self.resolveSignInCallWith(call: call, user: user!)
                     }
                 }
             }
@@ -88,6 +89,10 @@ class GoogleProvider: NSObject {
         call.resolve()
     }
 
+    func isAuthenticated() -> Bool {
+        return self.googleSignIn.currentUser != nil
+    }
+
     func handleOpenUrl(notification: Notification) {
         guard let object = notification.object as? [String: Any] else {
             print("There is no object on handleOpenUrl")
@@ -101,9 +106,9 @@ class GoogleProvider: NSObject {
     }
 
     func getClientIdValue() -> String? {
-        if let clientId = getConfigValue("iosClientId") as? String {
+        if let clientId = self.options["iosClientId"] as? String {
             return clientId
-        } else if let clientId = getConfigValue("clientId") as? String {
+        } else if let clientId = self.options["clientId"] as? String {
             return clientId
         } else if let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
                   let dict = NSDictionary(contentsOfFile: path) as? [String: AnyObject],
@@ -114,39 +119,20 @@ class GoogleProvider: NSObject {
     }
 
     func getServerClientIdValue() -> String? {
-        if let serverClientId = getConfigValue("serverClientId") as? String {
+        if let serverClientId = self.options["serverClientId"] as? String {
             return serverClientId
         }
         return nil
     }
 
-    func resolveSignInCallWith(user: GIDGoogleUser) {
-        var userData: [String: Any] = [
-            "authentication": [
-                "accessToken": user.authentication.accessToken,
-                "idToken": user.authentication.idToken,
-                "refreshToken": user.authentication.refreshToken
-            ],
-            "serverAuthCode": user.serverAuthCode ?? NSNull(),
-            "email": user.profile?.email ?? NSNull(),
-            "familyName": user.profile?.familyName ?? NSNull(),
-            "givenName": user.profile?.givenName ?? NSNull(),
-            "id": user.userID ?? NSNull(),
-            "name": user.profile?.name ?? NSNull()
-        ]
-        if let imageUrl = user.profile?.imageURL(withDimension: 100)?.absoluteString {
-            userData["imageUrl"] = imageUrl
-        }
-
-        let result = LoginProviderHelper.createLoginProviderResponsePayload(
-            "GOOGLE",
-            userData.authentication.idToken,
-            null,
-            userData.email,
-            userData.imageUrl,
-            call.getData().getString("inviteCode")
-        )
-
-        signInCall?.resolve([result])
+    func resolveSignInCallWith(call: CAPPluginCall, user: GIDGoogleUser) {
+        call.resolve(LoginProviderHelper.createLoginProviderResponsePayload(
+            provider: "GOOGLE",
+            token: user.authentication.idToken,
+            secret: "",
+            email: user.profile?.email ?? "",
+            avatarUrl: user.profile?.imageURL(withDimension: 100)?.absoluteString,
+            inviteCode: call.getString("inviteCode")
+        ))
     }
 }
