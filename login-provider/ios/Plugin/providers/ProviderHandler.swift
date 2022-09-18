@@ -2,9 +2,9 @@ import Foundation
 import Capacitor
 
 protocol ProviderHandler {
-    func initialize(plugin: CapacitorFirebaseAuth)
+    func initialize(plugin: LoginProviderPlugin, options: JSObject)
     func login(call: CAPPluginCall)
-    func logout() throws
+    func logout(call: CAPPluginCall) throws
     func isAuthenticated() -> Bool
     // func fillResult(credential: AuthCredential?, data: PluginResultData) -> PluginResultData
 }

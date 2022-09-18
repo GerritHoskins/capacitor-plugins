@@ -4,6 +4,7 @@ import GoogleSignIn
 
 class GoogleProvider: NSObject, ProviderHandler {
 
+    var signInCall: CAPPluginCall!
     var plugin: LoginProviderPlugin?
     var options: JSObject = [:]
 
@@ -15,15 +16,38 @@ class GoogleProvider: NSObject, ProviderHandler {
     func initialize(plugin: LoginProviderPlugin, options: JSObject) {
         self.plugin = plugin
         self.options = options
+        googleSignIn = GIDSignIn.sharedInstance
+
+        let serverClientId = options["serverClientId"] as? String
+        guard let clientId = getClientIdValue() else {
+            NSLog("no client id found in config")
+            return
+        }
+
+        googleSignInConfiguration = GIDConfiguration.init(clientID: clientId, serverClientID: serverClientId)
+        let defaultGrantedScopes = [self.options["scopes"]]
+        additionalScopes = (defaultGrantedScopes as? [String] ?? [])
+
+        if let forceAuthCodeConfig = self.options["forceCodeForRefreshToken"] as? Bool {
+            forceAuthCode = forceAuthCodeConfig
+        }
+
+        NotificationCenter.default.addObserver(self, selector: #selector(self.didGoogleRespond(notification:)), name: Notification.Name(Notification.Name.capacitorOpenURL.rawValue), object: nil)
+    }
+
+    @objc func didGoogleRespond(notification: Notification) {
+        guard let object = notification.object as? [String: Any] else {
+            NSLog("There is no object on handleOpenUrl")
+            return
+        }
+        guard let url = object["url"] as? URL else {
+            NSLog("There is no url on handleOpenUrl")
+            return
+        }
+        googleSignIn.handle(url)
     }
 
     func login(call: CAPPluginCall) {
-        #if RGCFA_INCLUDE_GOOGLE
-        guard let clientId = FirebaseApp.app()?.options.clientID else { return }
-        let config = GIDConfiguration(clientID: clientId)
-        guard let controller = self.pluginImplementation.getPlugin().bridge?.viewController else { return }
-        let scopes = self.options.getString("scopes", String.self) ?? []
-
         signInCall = call
         DispatchQueue.main.async {
             if self.googleSignIn.hasPreviousSignIn() && !self.forceAuthCode {
@@ -35,7 +59,7 @@ class GoogleProvider: NSObject, ProviderHandler {
                     self.resolveSignInCallWith(call: call, user: user!)
                 }
             } else {
-                let presentingVc = self.bridge!.viewController!
+                let presentingVc = self.plugin!.bridge!.viewController!
 
                 self.googleSignIn.signIn(with: self.googleSignInConfiguration, presenting: presentingVc) { user, error in
                     if let error = error {
@@ -58,7 +82,6 @@ class GoogleProvider: NSObject, ProviderHandler {
                 }
             }
         }
-        #endif
     }
 
     func refresh(call: CAPPluginCall) {
@@ -90,19 +113,11 @@ class GoogleProvider: NSObject, ProviderHandler {
     }
 
     func isAuthenticated() -> Bool {
-        return self.googleSignIn.currentUser != nil
-    }
-
-    func handleOpenUrl(notification: Notification) {
-        guard let object = notification.object as? [String: Any] else {
-            print("There is no object on handleOpenUrl")
-            return
+        var authenticated = false
+        if self.googleSignIn?.currentUser != nil {
+            authenticated = true
         }
-        guard let url = object["url"] as? URL else {
-            print("There is no url on handleOpenUrl")
-            return
-        }
-        googleSignIn.handle(url)
+        return authenticated
     }
 
     func getClientIdValue() -> String? {
@@ -114,13 +129,6 @@ class GoogleProvider: NSObject, ProviderHandler {
                   let dict = NSDictionary(contentsOfFile: path) as? [String: AnyObject],
                   let clientId = dict["CLIENT_ID"] as? String {
             return clientId
-        }
-        return nil
-    }
-
-    func getServerClientIdValue() -> String? {
-        if let serverClientId = self.options["serverClientId"] as? String {
-            return serverClientId
         }
         return nil
     }

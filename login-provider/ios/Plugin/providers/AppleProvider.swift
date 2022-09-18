@@ -11,13 +11,13 @@ class AppleProvider: NSObject, ProviderHandler {
         self.options = options
     }
 
-    @objc func login(call: CAPPluginCall) {
+    func login(call: CAPPluginCall) {
         if #available(iOS 13.0, *) {
             let appleIDProvider = ASAuthorizationAppleIDProvider()
             let request = appleIDProvider.createRequest()
-            request.requestedScopes = getRequestedScopes(from: call)
-            request.state = call.getString("state")
-            request.nonce = call.getString("nonce")
+            request.requestedScopes = getRequestedScopes(from: call, configScopes: self.options["scopes"] as! String)
+            request.state = self.options["state"] as? String
+            request.nonce = self.options["nonce"] as? String
 
             let defaults = UserDefaults()
             defaults.setValue(call.callbackId, forKey: "callbackId")
@@ -32,7 +32,7 @@ class AppleProvider: NSObject, ProviderHandler {
         }
     }
 
-    @objc func logout(all call: CAPPluginCall) {
+    func logout(call: CAPPluginCall) {
         call.resolve()
     }
 
@@ -41,24 +41,12 @@ class AppleProvider: NSObject, ProviderHandler {
     }
 
     @available(iOS 13.0, *)
-    func getRequestedScopes(from call: CAPPluginCall) -> [ASAuthorization.Scope]? {
+    func getRequestedScopes(from call: CAPPluginCall, configScopes: String) -> [ASAuthorization.Scope]? {
         var requestedScopes: [ASAuthorization.Scope] = []
+        requestedScopes.append(.fullName)
+        requestedScopes.append(.email)
 
-        if let scopesStr = call.getString("scopes") {
-            if scopesStr.contains("name") {
-                requestedScopes.append(.fullName)
-            }
-
-            if scopesStr.contains("email") {
-                requestedScopes.append(.email)
-            }
-        }
-
-        if requestedScopes.count > 0 {
-            return requestedScopes
-        }
-
-        return nil
+        return requestedScopes
     }
 }
 

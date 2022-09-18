@@ -16,6 +16,8 @@ public class LoginProviderPlugin: CAPPlugin {
     var providers: ProvidersMap = [:]
     var callbackId: String?
 
+    var mOptions: JSObject?
+
     override public func load() {
         let appleOptions = self.convertOptions(options: getConfigValue("apple"))
         let facebookOptions = getConfigValue("facebook")
@@ -37,12 +39,11 @@ public class LoginProviderPlugin: CAPPlugin {
         // self.implementation?.appStateObserver = { [weak self] in
     }
 
-    @objc func convertOptions(options: Any?) -> JSObject {
-        var resultOptions: JSObject
+    func convertOptions(options: Any?) -> JSObject {
         if let res = options as? [String: Any] {
-            resultOptions = res
+            mOptions = res
         }
-        return resultOptions
+        return mOptions!
     }
 
     @objc func loginWithProvider(_ call: CAPPluginCall) {
@@ -75,13 +76,13 @@ public class LoginProviderPlugin: CAPPlugin {
             }
             call.resolve()
         } catch let logoutError as NSError {
-            print("logout error: %@", logoutError)
+            NSLog("logout error: %@", logoutError)
             call.reject("logout error: \(logoutError)")
         }
     }
 
     func getProvider(call: CAPPluginCall) -> ProviderHandler? {
-        guard let providerId = call.getString("providerName") else {
+        guard let providerId = call.getString("provider") else {
             call.reject("The provider name is required")
             return nil
         }

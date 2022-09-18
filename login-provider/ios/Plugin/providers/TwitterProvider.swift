@@ -21,7 +21,7 @@ class TwitterProvider: NSObject, ProviderHandler {
     }
 
     func isAuthenticated() -> Bool {
-        return TWTRTwitter.sharedInstance().sessionStore.hasLoggedInUsers()
+        return false
     }
 
     @objc func didTwitterRespond(notification: NSNotification) {
@@ -34,7 +34,7 @@ class TwitterProvider: NSObject, ProviderHandler {
         TWTRTwitter.sharedInstance().application(app, open: object["url"] as! URL, options: object["options"] as! [AnyHashable: Any])
     }
 
-    @objc func isLogged(call: CAPPluginCall) {
+    func isLogged(call: CAPPluginCall) {
         DispatchQueue.main.async {
             if TWTRTwitter.sharedInstance().sessionStore.hasLoggedInUsers() {
                 call.resolve(["in": true, "out": false])
@@ -44,7 +44,7 @@ class TwitterProvider: NSObject, ProviderHandler {
         }
     }
 
-    @objc func login(call: CAPPluginCall) {
+    func login(call: CAPPluginCall) {
         DispatchQueue.main.async {
             TWTRTwitter.sharedInstance().logIn(completion: { (session, error) in
                 if session != nil { // Log in succeeded
@@ -59,14 +59,14 @@ class TwitterProvider: NSObject, ProviderHandler {
                         inviteCode: call.getString("inviteCode")
                     ))
                 } else {
-                    print("logIn ERROR: \(String(describing: error))")
+                    NSLog("logIn ERROR: \(String(describing: error))")
                     call.reject("error")
                 }
             })
         }
     }
 
-    @objc func logout(call: CAPPluginCall) {
+    func logout(call: CAPPluginCall) {
         DispatchQueue.main.async {
             let store = TWTRTwitter.sharedInstance().sessionStore
 

@@ -22,15 +22,11 @@ class FacebookProvider: NSObject, ProviderHandler {
         }
     }
 
-    private func dateToJS(_ date: Date) -> String {
-        return dateFormatter.string(from: date)
-    }
-
     func isAuthenticated() -> Bool {
         return AccessToken.current != nil
     }
 
-    @objc func login(call: CAPPluginCall) {
+    func login(call: CAPPluginCall) {
         guard let permissions = call.getArray("permissions", String.self) else {
             call.reject("missing permissions argument")
             return
@@ -43,7 +39,7 @@ class FacebookProvider: NSObject, ProviderHandler {
                 ( loginResult: LoginManagerLoginResult?, error: Error?) in
 
                 if let error = error {
-                    print(error.localizedDescription)
+                    NSLog(error.localizedDescription)
                     return
                 }
 
@@ -70,12 +66,12 @@ class FacebookProvider: NSObject, ProviderHandler {
         }
     }
 
-    @objc func logout(call: CAPPluginCall) {
+    func logout(call: CAPPluginCall) {
         loginManager.logOut()
         call.resolve()
     }
 
-    @objc func reauthorize(call: CAPPluginCall) {
+    func reauthorize(call: CAPPluginCall) {
         DispatchQueue.main.async {
             if let token = AccessToken.current, !token.isDataAccessExpired {
                 return self.getCurrentAccessToken(call: call)
@@ -84,7 +80,7 @@ class FacebookProvider: NSObject, ProviderHandler {
                     if (loginResult?.token) != nil {
                         return self.getCurrentAccessToken(call: call)
                     } else {
-                        print(error!)
+                        NSLog(error?.localizedDescription ?? "reauthorization error")
                         call.reject("LoginManager.reauthorize failed")
                     }
                 }
@@ -92,24 +88,14 @@ class FacebookProvider: NSObject, ProviderHandler {
         }
     }
 
-    private func accessTokenToJson(_ accessToken: AccessToken) -> [String: Any?] {
-        return [
-            "applicationId": accessToken.appID,
-            "expires": dateToJS(accessToken.expirationDate),
-            "lastRefresh": dateToJS(accessToken.refreshDate),
-            "token": accessToken.tokenString,
-            "userId": accessToken.userID
-        ]
-    }
-
-    @objc func getCurrentAccessToken(call: CAPPluginCall) {
+    func getCurrentAccessToken(call: CAPPluginCall) {
         guard AccessToken.current != nil else {
             call.resolve()
             return
         }
     }
 
-    @objc func getUserEmailAndPicture() -> [String: Any] {
+    func getUserEmailAndPicture() -> [String: Any] {
         var userProfile: [String: Any] = [:]
 
         guard let accessToken = AccessToken.current else { return userProfile }
@@ -118,7 +104,7 @@ class FacebookProvider: NSObject, ProviderHandler {
         let request = GraphRequest(graphPath: "me", parameters: ["fields": "email, picture.type(small)"])
         request.start { (_ connection, result, error) in
             if let result = result, error == nil {
-                print("fetched user: \(result)")
+                NSLog("fetched user: \(result)")
                 if let dic = result as? [String: Any] {
                     // let picture = dic["picture.type(small)"] as? String,
                     // let email = dic["email"] as? String {
@@ -129,7 +115,7 @@ class FacebookProvider: NSObject, ProviderHandler {
         return userProfile
     }
 
-    @objc func getProfile(call: CAPPluginCall) {
+    func getProfile(call: CAPPluginCall) {
         guard let accessToken = AccessToken.current else {
             call.reject("login first to obtain an access token.")
             return
@@ -150,5 +136,19 @@ class FacebookProvider: NSObject, ProviderHandler {
 
             call.resolve(result as! [String: Any])
         }
+    }
+
+    private func accessTokenToJson(_ accessToken: AccessToken) -> [String: Any?] {
+        return [
+            "applicationId": accessToken.appID,
+            "expires": dateToJS(accessToken.expirationDate),
+            "lastRefresh": dateToJS(accessToken.refreshDate),
+            "token": accessToken.tokenString,
+            "userId": accessToken.userID
+        ]
+    }
+
+    private func dateToJS(_ date: Date) -> String {
+        return dateFormatter.string(from: date)
     }
 }
