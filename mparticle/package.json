@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/mparticle",
-  "version": "0.0.10",
+  "version": "4.0.10",
   "description": "capacitor plugin for mparticle",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -11,7 +11,7 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "BitburstGmbhMparticle.podspec"
+    "GerrithoskinsMparticle.podspec"
   ],
   "author": "",
   "license": "MIT",

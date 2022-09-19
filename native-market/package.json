@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/native-market",
-  "version": "0.0.1",
+  "version": "4.0.1",
   "description": "capacitor plugin for linking to google play or app store.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -11,16 +11,15 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "BitburstGmbhNativeMarket.podspec"
+    "GerrithoskinsNativeMarket.podspec"
   ],
   "author": "",
   "license": "MIT",
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/GerritHoskins/capacitor-plugins.git"
+    "url": "https://github.com/GerritHoskins/capacitor-plugins"
   },
   "bugs": {
-    "url": "https://github.com/GerritHoskins/capacitor-plugins.git/issues"
+    "url": "https://github.com/GerritHoskins/capacitor-plugins/issues"
   },
   "keywords": [
     "capacitor",

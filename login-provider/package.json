@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/login-provider",
-  "version": "0.0.26",
+  "version": "4.0.26",
   "description": "capacitor plugin for managing authentication for multiple login providers",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
