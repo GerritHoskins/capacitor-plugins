@@ -1,7 +1,4 @@
 /// <reference types="@capacitor/cli" />
-
-import type CleverTap from 'clevertap-web-sdk/clevertap';
-
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
     Clevertap?: InitOptions;
@@ -10,9 +7,10 @@ declare module '@capacitor/cli' {
 
 export interface ClevertapPlugin {
   init(options?: InitOptions): Promise<any>;
-  cleverTap(): CleverTap;
-  getClevertapId(): Promise<string | null>;
-  registerFBM(): Promise<void>;
+  getCleverTapID(): Promise<string | null>;
+}
+
+export interface ClevertapNativePlugin {
   getDeliveredNotifications(): Promise<DeliveredNotifications>;
   removeDeliveredNotifications(options: {
     delivered: DeliveredNotifications;
@@ -24,7 +22,7 @@ export interface ClevertapPlugin {
   pushPrivacy(privacyArr: PrivacyData): void;
   pushUser(profileData: any): void;
 }
-export type PushType = 'Privacy' | 'Event' | 'Profile' | 'Notifications';
+
 export type Region = 'eu1' | 'in1' | 'sg1' | 'us1' | 'sk1';
 export interface InitOptions {
   accountId: string;
@@ -37,10 +35,6 @@ export interface UserProfile {
   internalId: string;
   email: string;
   clientProduct?: string;
-}
-export interface PushEvent {
-  name: string;
-  value?: EventData;
 }
 export interface PushNotificationSchema {
   title?: string;

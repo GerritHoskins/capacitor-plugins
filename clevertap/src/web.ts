@@ -1,23 +1,26 @@
 import { WebPlugin } from '@capacitor/core';
-import type CleverTap from 'clevertap-web-sdk/clevertap';
+import clevertap from 'clevertap-web-sdk';
 
-import type {
-  ClevertapPlugin,
-  DeliveredNotifications,
-  InitOptions,
-  NotificationData,
-  PrivacyData,
-  EventNameOrData,
-} from './definitions';
+import type { ClevertapPlugin, InitOptions } from './definitions';
 
 export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
   private scriptUrl =
     'https://d2r1yp2w7bby2u.cloudfront.net/js/clevertap.min.js';
   private scriptLoaded = false;
-  cleverTAP: CleverTap = {} as CleverTap;
+
+  protected privacy = {};
+  protected event = {};
+  protected profile = {};
+  protected onUserLogin = {};
+  protected notifications = {};
 
   constructor() {
     super();
+    this.privacy = clevertap.privacy;
+    this.event = clevertap.event;
+    this.profile = clevertap.profile;
+    this.onUserLogin = clevertap.user;
+    this.notifications = clevertap.notifications;
   }
 
   private async loadScript(options: InitOptions): Promise<boolean> {
@@ -31,12 +34,7 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
       script.async = true;
       script.id = 'clevertap_web_sdk';
       script.onload = () => {
-        this.cleverTAP = window.clevertap;
-        this.cleverTAP.init(
-          options.accountId,
-          options.region,
-          options.targetDomain,
-        );
+        clevertap.init(options.accountId, options.region, options.targetDomain);
         resolve(true);
       };
       const s = document.getElementsByTagName('script')[0];
@@ -45,57 +43,31 @@ export class ClevertapWeb extends WebPlugin implements ClevertapPlugin {
         : document.head.appendChild(script);
     });
   }
-
   async init(options: InitOptions): Promise<any> {
     this.scriptLoaded = await this.loadScript(options);
     if (this.scriptLoaded) {
-      return this.cleverTap();
+      return Promise.resolve();
     } else {
-      return Promise.reject('failed to init clevertap web sdk.');
+      return Promise.reject('failed to load clevertap web sdk.');
     }
   }
-
-  cleverTap(): CleverTap {
-    return this.cleverTAP;
+  async getCleverTapID(): Promise<string | null> {
+    return clevertap.getCleverTapID();
   }
-
-  pushEvent(evtName: string, evtNameOrData: EventNameOrData): void {
-    this.cleverTAP.event.push(evtName, evtNameOrData);
+  async setLogLevel(logLevel: 0 | 1 | 2 | 3): Promise<void> {
+    return clevertap.setLogLevel(logLevel);
   }
-
-  pushNotification(notificationData: NotificationData): void {
-    this.cleverTAP.notifications.push(notificationData);
+  async logout(): Promise<void> {
+    return clevertap.logout();
+    // cleverTap(): CleverTap;
   }
-
-  pushPrivacy(privacyData: PrivacyData): void {
-    this.cleverTAP.privacy.push(privacyData);
+  async clear(): Promise<void> {
+    return clevertap.clear();
   }
-
-  pushUser(profileData: any): void {
-    this.cleverTAP.profile.push(profileData);
+  async pageChanged(): Promise<void> {
+    return clevertap.pageChanged();
   }
-
-  getClevertapId(): Promise<string | null> {
-    return Promise.resolve(this.cleverTAP.getCleverTapID());
-  }
-
-  createChannel(): Promise<void> {
-    return Promise.reject(this.unavailable('not implemented on web'));
-  }
-
-  getDeliveredNotifications(): Promise<DeliveredNotifications> {
-    return Promise.reject(this.unavailable('not implemented on web'));
-  }
-
-  onUserLogin(): Promise<void> {
-    return Promise.reject(this.unavailable('not implemented on web'));
-  }
-
-  registerFBM(): Promise<void> {
-    return Promise.reject(this.unavailable('not implemented on web'));
-  }
-
-  removeDeliveredNotifications(): Promise<void> {
-    return Promise.reject(this.unavailable('not implemented on web'));
+  async raiseNotificationClicked(): Promise<void> {
+    return clevertap.raiseNotificationClicked();
   }
 }
