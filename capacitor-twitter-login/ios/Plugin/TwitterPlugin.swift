@@ -6,15 +6,15 @@ import TwitterLoginKit
 @objc(TwitterPlugin)
 public class TwitterPlugin: CAPPlugin {
     var window: UIWindow?
-    var viewControl: UIViewController?
+
+    private let viewController: TwitterPluginViewController?
 
     override public func load() {
         let consumerKey =  "oDIRqTkT1NaNjwXxqzFrxSWFh" // getConfig("consumerKey") as? String ?? "ADD_IN_CAPACITOR_CONFIG_JSON"
         let consumerSecret = "B2L4Oc4bdSbS9YMdqdI192oSj542meqSbNGZS9vzQQgdCAHwyR" // getConfig("consumerSecret") as? String ?? "ADD_IN_CAPACITOR_CONFIG_JSON"
-
         // TwitterLoginKit.shared.start(withConsumerKey: consumerKey, consumerSecret: consumerSecret)
-
         //  NotificationCenter.default.addObserver(self, selector: #selector(self.didTwitterRespond(notification:)), name: //Notification.Name(Notification.Name.capacitorOpenURL.rawValue), object: nil)
+       self.viewController = TwitterPluginViewController()
     }
 
     @objc func didTwitterRespond(notification: NSNotification) {
