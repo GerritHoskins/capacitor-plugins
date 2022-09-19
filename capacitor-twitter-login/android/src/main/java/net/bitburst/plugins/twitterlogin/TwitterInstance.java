@@ -2,12 +2,11 @@ package net.bitburst.plugins.twitterlogin;
 
 import android.app.Application;
 import android.util.Log;
-
 import com.twitter.sdk.android.core.DefaultLogger;
+import com.twitter.sdk.android.core.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterConfig;
 import com.twitter.sdk.android.core.identity.TwitterAuthClient;
-import  com.twitter.sdk.android.core.Twitter;
 
 public class TwitterInstance extends Application {
 

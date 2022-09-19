@@ -16,7 +16,7 @@ import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 
-@CapacitorPlugin(name="TwitterPlugin", requestCodes = { TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE })
+@CapacitorPlugin(name = "TwitterPlugin", requestCodes = { TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE })
 public class TwitterLoginPlugin extends Plugin {
 
     public static final String LOG_TAG = "bitburst.twitter ";
@@ -30,7 +30,7 @@ public class TwitterLoginPlugin extends Plugin {
     }
 
     private TwitterInstance getInstance() {
-        if(twitterInstance == null) {
+        if (twitterInstance == null) {
             twitterInstance = new TwitterInstance(this);
         }
 
@@ -39,26 +39,27 @@ public class TwitterLoginPlugin extends Plugin {
 
     @PluginMethod
     public void login(final PluginCall call) {
-        getInstance().authClient.authorize(
-            getActivity(),
-            new Callback<>() {
-                @Override
-                public void success(Result<TwitterSession> result) {
-                    JSObject ret = new JSObject();
-                    ret.put("authToken", result.data.getAuthToken().token);
-                    ret.put("authTokenSecret", result.data.getAuthToken().secret);
-                    ret.put("userName", result.data.getUserName());
-                    ret.put("userID", result.data.getUserId());
-                    call.resolve(ret);
-                }
+        getInstance()
+            .authClient.authorize(
+                getActivity(),
+                new Callback<>() {
+                    @Override
+                    public void success(Result<TwitterSession> result) {
+                        JSObject ret = new JSObject();
+                        ret.put("authToken", result.data.getAuthToken().token);
+                        ret.put("authTokenSecret", result.data.getAuthToken().secret);
+                        ret.put("userName", result.data.getUserName());
+                        ret.put("userID", result.data.getUserId());
+                        call.resolve(ret);
+                    }
 
-                @Override
-                public void failure(TwitterException exception) {
-                    Log.d(LOG_TAG, exception.getLocalizedMessage());
-                    call.reject(LOG_TAG + "login error ", exception);
+                    @Override
+                    public void failure(TwitterException exception) {
+                        Log.d(LOG_TAG, exception.getLocalizedMessage());
+                        call.reject(LOG_TAG + "login error ", exception);
+                    }
                 }
-            }
-        );
+            );
     }
 
     @PluginMethod

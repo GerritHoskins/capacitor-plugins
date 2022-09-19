@@ -15,5 +15,5 @@ Pod::Spec.new do |s|
   s.dependency 'Capacitor'
   s.swift_version = '5.1'
   s.static_framework = true
-  s.dependency 'TwitterKit5'
+  s.dependency 'TwitterLoginKit'
 end
