@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/clevertap",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "capacitor plugin for clevertap",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -11,7 +11,7 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "BitburstGmbhClevertap.podspec"
+    "GerrithoskinsClevertap.podspec"
   ],
   "author": "",
   "license": "MIT",
