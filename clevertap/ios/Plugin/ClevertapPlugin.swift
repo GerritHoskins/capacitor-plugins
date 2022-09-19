@@ -1,5 +1,6 @@
 import Foundation
 import Capacitor
+import CleverTapSDK
 
 /**
  * Please read the Capacitor iOS Plugin Development Guide
@@ -7,12 +8,7 @@ import Capacitor
  */
 @objc(ClevertapPlugin)
 public class ClevertapPlugin: CAPPlugin {
-    private let implementation = Clevertap()
-
-    @objc func echo(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
-        call.resolve([
-            "value": implementation.echo(value)
-        ])
+    override public func load() {
+        NSLog("clevertap plugin loaded")
     }
 }

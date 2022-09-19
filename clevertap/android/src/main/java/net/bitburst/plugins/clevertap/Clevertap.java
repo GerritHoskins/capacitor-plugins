@@ -8,14 +8,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.clevertap.android.sdk.ActivityLifecycleCallback;
 import com.clevertap.android.sdk.CleverTapAPI;
 import com.clevertap.android.sdk.pushnotification.CTPushNotificationListener;
-
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -49,15 +46,14 @@ public class Clevertap extends Application implements CTPushNotificationListener
     }
 
     public void setClevertapId() {
-        clevertapAPI
-            .getCleverTapID(
-                cleverTapID -> {
-                    // Callback on main thread
-                    // ClevertapPlugin.setCleverTapId(cleverTapID)
-                    Log.d(LOG_TAG, "cleverTapID " + cleverTapID);
-                    clevertapID = cleverTapID;
-                }
-            );
+        clevertapAPI.getCleverTapID(
+            cleverTapID -> {
+                // Callback on main thread
+                // ClevertapPlugin.setCleverTapId(cleverTapID)
+                Log.d(LOG_TAG, "cleverTapID " + cleverTapID);
+                clevertapID = cleverTapID;
+            }
+        );
     }
 
     public static String getClevertapId() {
@@ -103,8 +99,8 @@ public class Clevertap extends Application implements CTPushNotificationListener
                     setClevertapId();
 
                     try {
-                        Objects.requireNonNull(CleverTapAPI
-                                .getDefaultInstance(activity.getApplicationContext()))
+                        Objects
+                            .requireNonNull(CleverTapAPI.getDefaultInstance(activity.getApplicationContext()))
                             .pushNotificationClickedEvent(activity.getIntent().getExtras());
                     } catch (Throwable t) {
                         Log.d(LOG_TAG, "pushNotificationClickedEvent failed");
@@ -120,8 +116,7 @@ public class Clevertap extends Application implements CTPushNotificationListener
                 }
 
                 @Override
-                public void onActivityStarted(Activity activity) {
-                }
+                public void onActivityStarted(Activity activity) {}
 
                 @Override
                 public void onActivityResumed(Activity activity) {
@@ -142,16 +137,13 @@ public class Clevertap extends Application implements CTPushNotificationListener
                 }
 
                 @Override
-                public void onActivityStopped(Activity activity) {
-                }
+                public void onActivityStopped(Activity activity) {}
 
                 @Override
-                public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
-                }
+                public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {}
 
                 @Override
-                public void onActivityDestroyed(Activity activity) {
-                }
+                public void onActivityDestroyed(Activity activity) {}
             }
         );
     }
