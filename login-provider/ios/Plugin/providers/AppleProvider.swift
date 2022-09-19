@@ -1,6 +1,7 @@
 import Foundation
 import Capacitor
 import AuthenticationServices
+import CryptoKit
 
 class AppleProvider: NSObject, ProviderHandler {
     var plugin: LoginProviderPlugin?
@@ -40,6 +41,16 @@ class AppleProvider: NSObject, ProviderHandler {
         return false
     }
 
+    func fillResult(data: PluginCallResultData) -> PluginCallResultData {
+        var jsResult: PluginCallResultData = [:]
+
+        data.forEach { (key, value) in
+            jsResult[key] = value
+        }
+
+        return jsResult
+    }
+
     @available(iOS 13.0, *)
     func getRequestedScopes(from call: CAPPluginCall, configScopes: String) -> [ASAuthorization.Scope]? {
         var requestedScopes: [ASAuthorization.Scope] = []
@@ -67,7 +78,8 @@ extension AppleProvider: ASAuthorizationControllerDelegate {
             email: appleIDCredential.email,
             avatarUrl: "",
             inviteCode: call.getString("inviteCode")
-        ))
+        )
+        )
 
         self.plugin?.bridge?.releaseCall(call)
     }

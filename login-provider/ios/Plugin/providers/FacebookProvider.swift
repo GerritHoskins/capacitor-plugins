@@ -10,6 +10,7 @@ class FacebookProvider: NSObject, ProviderHandler {
 
     var plugin: LoginProviderPlugin?
     var options: JSObject = [:]
+    var additionalScopes: [String]!
 
     func initialize(plugin: LoginProviderPlugin, options: JSObject) {
         self.plugin = plugin
@@ -23,19 +24,23 @@ class FacebookProvider: NSObject, ProviderHandler {
     }
 
     func isAuthenticated() -> Bool {
-        return AccessToken.current != nil
+        return false
     }
 
     func login(call: CAPPluginCall) {
-        guard let permissions = call.getArray("permissions", String.self) else {
+
+        guard let permissions = self.options["permissions"] as? String else {
             call.reject("missing permissions argument")
             return
         }
 
-        let perm = permissions.map { Permission.custom($0) }
+        let defaultGrantedScopes = ["public_profile", "email"]
+        additionalScopes = (permissions.components(separatedBy: ", ")).filter {
+            return !defaultGrantedScopes.contains($0)
+        }
 
         DispatchQueue.main.async {
-            self.loginManager.logIn(permissions: ["public_profile", "email"], from: self.plugin!.bridge?.viewController) {
+            self.loginManager.logIn(permissions: defaultGrantedScopes, from: self.plugin!.bridge?.viewController) {
                 ( loginResult: LoginManagerLoginResult?, error: Error?) in
 
                 if let error = error {
@@ -53,15 +58,18 @@ class FacebookProvider: NSObject, ProviderHandler {
                     return
                 }
 
-                call.resolve(LoginProviderHelper.createLoginProviderResponsePayload(
+                self.getProfile()
+
+                let loginPayload = LoginProviderHelper.createLoginProviderResponsePayload(
                     provider: "FACEBOOK",
                     token: loginResult?.token?.tokenString,
                     secret: "",
-                    email: self.getUserEmailAndPicture()["email"] as? String,
-                    // avatarUrl: self.getUserEmailAndPicture()["picture.type(small)"] as? String,
+                    email: Profile.current?.email,
                     avatarUrl: Profile.current?.imageURL(forMode: Profile.PictureMode.small, size: CGSize(width: 200, height: 200))?.absoluteString,
                     inviteCode: call.getString("inviteCode")
-                ))
+                )
+
+                call.resolve(loginPayload)
             }
         }
     }
@@ -95,47 +103,41 @@ class FacebookProvider: NSObject, ProviderHandler {
         }
     }
 
-    func getUserEmailAndPicture() -> [String: Any] {
-        var userProfile: [String: Any] = [:]
-
-        guard let accessToken = AccessToken.current else { return userProfile }
-        if accessToken.isExpired { return userProfile }
-
-        let request = GraphRequest(graphPath: "me", parameters: ["fields": "email, picture.type(small)"])
-        request.start { (_ connection, result, error) in
-            if let result = result, error == nil {
-                NSLog("fetched user: \(result)")
-                if let dic = result as? [String: Any] {
-                    // let picture = dic["picture.type(small)"] as? String,
-                    // let email = dic["email"] as? String {
-                    userProfile = dic
-                }
-            }
-        }
-        return userProfile
-    }
-
-    func getProfile(call: CAPPluginCall) {
+    func getProfile() {
         guard let accessToken = AccessToken.current else {
-            call.reject("login first to obtain an access token.")
+            NSLog("accessToken is expired or invalid.")
             return
         }
 
         if accessToken.isExpired {
-            call.reject("accessToken is expired.")
+            NSLog("accessToken is expired or invalid.")
             return
         }
 
         let graphRequest = GraphRequest.init(graphPath: "me", parameters: ["fields": "email, picture.type(large)"])
-
         graphRequest.start { (_ connection, _ result, _ error) in
             if error != nil {
-                call.reject("An error has occured.")
+                NSLog("failed to fetch profile info.")
                 return
             }
 
-            call.resolve(result as! [String: Any])
+            // let response = result as! [String: Any]
         }
+    }
+
+    func fillResult(data: PluginCallResultData) -> PluginCallResultData {
+        guard let accessToken = AccessToken.current else {
+            return data
+        }
+
+        var jsResult: PluginCallResultData = [:]
+        data.forEach { (key, value) in
+            jsResult[key] = value
+        }
+
+        jsResult["idToken"] = accessToken.tokenString
+
+        return jsResult
     }
 
     private func accessTokenToJson(_ accessToken: AccessToken) -> [String: Any?] {

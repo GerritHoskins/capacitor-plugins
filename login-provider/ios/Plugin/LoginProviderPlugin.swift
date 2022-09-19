@@ -19,13 +19,13 @@ public class LoginProviderPlugin: CAPPlugin {
     var mOptions: JSObject?
 
     override public func load() {
-        let appleOptions = self.convertOptions(options: getConfigValue("apple"))
+        let appleOptions = getConfigValue("apple")
         let facebookOptions = getConfigValue("facebook")
         let googleOptions = getConfigValue("google")
-        let twitterOptions =  self.convertOptions(options: getConfigValue("twitter"))
+        let twitterOptions = getConfigValue("twitter")
 
         self.providers["APPLE"] = AppleProvider()
-        self.providers["APPLE"]?.initialize(plugin: self, options: appleOptions)
+        self.providers["APPLE"]?.initialize(plugin: self, options: appleOptions as! JSObject)
 
         self.providers["FACEBOOK"] = FacebookProvider()
         self.providers["FACEBOOK"]?.initialize(plugin: self, options: facebookOptions as! JSObject)
@@ -34,16 +34,7 @@ public class LoginProviderPlugin: CAPPlugin {
         self.providers["GOOGLE"]?.initialize(plugin: self, options: googleOptions as! JSObject)
 
         self.providers["TWITTER"] = TwitterProvider()
-        self.providers["TWITTER"]?.initialize(plugin: self, options: twitterOptions)
-
-        // self.implementation?.appStateObserver = { [weak self] in
-    }
-
-    func convertOptions(options: Any?) -> JSObject {
-        if let res = options as? [String: Any] {
-            mOptions = res
-        }
-        return mOptions!
+        self.providers["TWITTER"]?.initialize(plugin: self, options: twitterOptions as! JSObject)
     }
 
     @objc func loginWithProvider(_ call: CAPPluginCall) {
@@ -58,10 +49,11 @@ public class LoginProviderPlugin: CAPPlugin {
         }
 
         self.callbackId = callbackId
-        call.save()
+        call.keepAlive = true
 
         DispatchQueue.main.async {
             if providerInstance.isAuthenticated() {
+                self.buildResult(credential: nil)
                 return
             }
 
@@ -83,16 +75,39 @@ public class LoginProviderPlugin: CAPPlugin {
 
     func getProvider(call: CAPPluginCall) -> ProviderHandler? {
         guard let providerId = call.getString("provider") else {
-            call.reject("The provider name is required")
+            call.reject("provider name is required")
             return nil
         }
 
         guard let theProvider = self.providers[providerId] else {
-            call.reject("The provider is disable or unsupported")
+            call.reject("provider not supported")
             return nil
         }
 
         return theProvider
+    }
+
+    func buildResult(credential: ProviderResponsePayload?) {
+        guard let callbackId = self.callbackId else {
+            NSLog("missing plugin callback id")
+            return
+        }
+
+        guard let call = self.bridge?.savedCall(withID: callbackId) else {
+            NSLog("missing plugin callback id")
+            return
+        }
+
+        let jsResult: PluginCallResultData = [
+            "callbackId": callbackId,
+            "providerId": call.getString("providerId") ?? ""
+        ]
+
+        guard let provider: ProviderHandler = self.getProvider(call: call) else {
+            return
+        }
+
+        call.resolve(provider.fillResult(data: jsResult))
     }
 
     @objc func loginWithApple(_ call: CAPPluginCall) {

@@ -76,4 +76,19 @@ class TwitterProvider: NSObject, ProviderHandler {
             }
         }
     }
+
+    func fillResult(data: PluginCallResultData) -> PluginCallResultData {
+        var jsResult: PluginCallResultData = [:]
+
+        data.forEach { (key, value) in
+            jsResult[key] = value
+        }
+
+        let twitterCredential = TWTRTwitter.sharedInstance().sessionStore.session()
+
+        jsResult["idToken"] = twitterCredential?.authToken
+        jsResult["secret"] = twitterCredential?.authTokenSecret
+
+        return jsResult
+    }
 }

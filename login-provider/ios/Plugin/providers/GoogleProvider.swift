@@ -25,8 +25,12 @@ class GoogleProvider: NSObject, ProviderHandler {
         }
 
         googleSignInConfiguration = GIDConfiguration.init(clientID: clientId, serverClientID: serverClientId)
-        let defaultGrantedScopes = [self.options["scopes"]]
-        additionalScopes = (defaultGrantedScopes as? [String] ?? [])
+        let defaultGrantedScopes = ["email", "profile", "openid"]
+
+        let scopeComponent = self.options["scopes"] as? String
+        additionalScopes = (scopeComponent!.components(separatedBy: ", ")).filter {
+            return !defaultGrantedScopes.contains($0)
+        }
 
         if let forceAuthCodeConfig = self.options["forceCodeForRefreshToken"] as? Bool {
             forceAuthCode = forceAuthCodeConfig
@@ -118,6 +122,21 @@ class GoogleProvider: NSObject, ProviderHandler {
             authenticated = true
         }
         return authenticated
+    }
+
+    func fillResult(data: PluginCallResultData) -> PluginCallResultData {
+        guard let currentUser = self.googleSignIn?.currentUser else {
+            return data
+        }
+
+        var jsResult: PluginCallResultData = [:]
+        data.forEach { (key, value) in
+            jsResult[key] = value
+        }
+
+        jsResult["idToken"] = currentUser.authentication.idToken
+
+        return jsResult
     }
 
     func getClientIdValue() -> String? {
