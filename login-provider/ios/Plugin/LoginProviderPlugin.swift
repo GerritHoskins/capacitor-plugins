@@ -100,7 +100,7 @@ public class LoginProviderPlugin: CAPPlugin {
 
         let jsResult: PluginCallResultData = [
             "callbackId": callbackId,
-            "providerId": call.getString("providerId") ?? ""
+            "providerId": call.getString("provider") ?? ""
         ]
 
         guard let provider: ProviderHandler = self.getProvider(call: call) else {
