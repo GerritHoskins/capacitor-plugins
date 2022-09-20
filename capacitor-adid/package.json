@@ -1,7 +1,7 @@
 {
-  "name": "@gerrithoskins/mparticle",
-  "version": "4.0.10",
-  "description": "capacitor plugin for mparticle",
+  "name": "@gerrithoskins/capacitor-adid",
+  "version": "0.0.1",
+  "description": "capacitor plugin for fetching the advertisement id",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -11,15 +11,16 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "GerrithoskinsMparticle.podspec"
+    "GerrithoskinsCapacitorAdid.podspec"
   ],
   "author": "",
   "license": "MIT",
   "repository": {
-    "url": "https://github.com/GerritHoskins/capacitor-plugins"
+    "type": "git",
+    "url": "git+https://github.com/GerritHoskins/capacitor-plugins.git"
   },
   "bugs": {
-    "url": "https://github.com/BitBurst-GmbH/capacitor-plugins/issues"
+    "url": "https://github.com/GerritHoskins/capacitor-plugins/issues"
   },
   "keywords": [
     "capacitor",
@@ -36,7 +37,7 @@
     "eslint": "eslint . --ext ts",
     "prettier": "prettier \"**/*.{css,html,ts,js,java}\"",
     "swiftlint": "node-swiftlint",
-    "docgen": "docgen --api MparticlePlugin --output-readme README.md --output-json dist/docs.json",
+    "docgen": "docgen --api AdidPlugin --output-readme README.md --output-json dist/docs.json",
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
@@ -44,14 +45,12 @@
   },
   "devDependencies": {
     "@capacitor/android": "^4.0.0",
-    "@capacitor/cli": "^4.1.0",
     "@capacitor/core": "^4.0.0",
-    "@capacitor/docgen": "^0.2.0",
+    "@capacitor/docgen": "^0.0.18",
     "@capacitor/ios": "^4.0.0",
     "@ionic/eslint-config": "^0.3.0",
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
-    "@types/mparticle__web-sdk": "^2.14.0",
     "eslint": "^7.11.0",
     "prettier": "~2.3.0",
     "prettier-plugin-java": "~1.0.2",
@@ -62,9 +61,6 @@
   },
   "peerDependencies": {
     "@capacitor/core": "^4.0.0"
-  },
-  "dependencies": {
-    "@mparticle/web-sdk": "^2.16.2"
   },
   "prettier": "@ionic/prettier-config",
   "swiftlint": "@ionic/swiftlint-config",
