@@ -11,9 +11,23 @@ npx cap sync
 
 ## API
 
-<docgen-index></docgen-index>
+<docgen-index>
+
+* [`getId()`](#getid)
+
+</docgen-index>
 
 <docgen-api>
-<!-- run docgen to generate docs from the source -->
-<!-- More info: https://github.com/ionic-team/capacitor-docgen -->
+<!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
+
+### getId()
+
+```typescript
+getId() => Promise<{ id: string; isDummy: boolean; }>
+```
+
+**Returns:** <code>Promise&lt;{ id: string; isDummy: boolean; }&gt;</code>
+
+--------------------
+
 </docgen-api>
