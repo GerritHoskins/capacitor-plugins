@@ -11,7 +11,7 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "BitburstGmbhInAppBrowser.podspec"
+    "GerrithoskinsInAppBrowser.podspec"
   ],
   "author": "",
   "license": "MIT",

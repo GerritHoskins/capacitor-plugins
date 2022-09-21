@@ -1,60 +1,41 @@
 import Foundation
 import Capacitor
-import AdSupport
-import AppTrackingTransparency
 
-/**
- * Please read the Capacitor iOS Plugin Development Guide
- * here: https://capacitorjs.com/docs/plugins/ios
- */
 @objc(AdidPlugin)
 public class AdidPlugin: CAPPlugin {
+    private let adid = Adid()
 
     @objc func getId(_ call: CAPPluginCall) {
-        if #available(iOS 15.0, *) {
-            let delayInSeconds: TimeInterval = 1.0
-            DispatchQueue.main.asyncAfter(deadline: .now() + delayInSeconds) {
-                ATTrackingManager.requestTrackingAuthorization { status in
-                    switch status {
-                    case .authorized:
-                        call.resolve([
-                            "id": ASIdentifierManager.shared().advertisingIdentifier.uuidString,
-                            "isDummy": false
-                        ])
-                    case .denied:
-                        call.reject("denied")
-                    case .notDetermined:
-                        call.reject("not determined")
-                    case .restricted:
-                        call.reject("restricted")
-                    @unknown default:
-                        call.reject("unknown")
-                    }
-                }
-            }
-        } else if #available(iOS 14, *) {
-            ATTrackingManager.requestTrackingAuthorization { status in
-                switch status {
-                case .authorized:
-                    call.resolve([
-                        "id": ASIdentifierManager.shared().advertisingIdentifier.uuidString,
-                        "isDummy": false
-                    ])
-                case .denied:
-                    call.reject("denied")
-                case .notDetermined:
-                    call.reject("not determined")
-                case .restricted:
-                    call.reject("restricted")
-                @unknown default:
-                    call.reject("unknown")
-                }
-            }
-        } else {
-            call.resolve([
-                "id": 11111111111,
-                "isDummy": true
-            ])
+        call.keepAlive = true
+
+        var delay = 0
+        if (call.getString("delay")) != nil {
+            delay = Int(call.getString("delay")!)!
         }
+
+        adid.requestTrackingAuth(delay: delay as NSNumber) { (id) in
+            DispatchQueue.main.async {
+                if id != "" {
+                    call.resolve([
+                        "id": id
+                    ])
+                } else {
+                    call.reject(self.adid.status)
+                }
+            }
+        }
+    }
+
+    @objc func getStatus(_ call: CAPPluginCall) {
+        call.keepAlive = true
+        adid.getStatus { (status) in
+            DispatchQueue.main.async {
+                call.resolve([
+                    "status": self.adid.status,
+                    "statusId": status
+                ])
+            }
+        }
+
     }
 }

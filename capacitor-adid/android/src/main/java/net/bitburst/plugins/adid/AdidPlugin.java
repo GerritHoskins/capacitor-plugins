@@ -9,14 +9,25 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 @CapacitorPlugin(name = "Adid")
 public class AdidPlugin extends Plugin {
 
-    private Adid implementation = new Adid();
+    public static final String LOG_TAG = "adid-plugin ";
+
+    private Adid adid = new Adid();
 
     @PluginMethod
-    public void echo(PluginCall call) {
-        String value = call.getString("value");
-
+    public void getId(PluginCall call) {
+        call.setKeepAlive(true);
         JSObject ret = new JSObject();
-        ret.put("value", implementation.echo(value));
+        try {
+            ret.put("id", adid.getId());
+            ret.put("limitedAdTracking", adid.isLimitAdTrackingEnabled());
+        } catch (Exception e) {
+            call.reject(LOG_TAG, "error getting advertising id.", e);
+        }
         call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void getStatus(PluginCall call) {
+        call.unimplemented();
     }
 }

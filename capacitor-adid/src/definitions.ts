@@ -1,3 +1,6 @@
 export interface AdidPlugin {
-  getId(): Promise<{ id: string; isDummy: boolean }>;
+  getId(
+    delay?: string | number,
+  ): Promise<{ id: string; limitedAdTracking?: boolean }>;
+  getStatus(): Promise<{ status: string; statusId: number }>;
 }
