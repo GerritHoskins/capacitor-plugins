@@ -9,7 +9,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        // maven { url 'https://developer.huawei.com/repo/' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.1'
@@ -45,7 +44,6 @@ android {
 repositories {
     google()
     mavenCentral()
-    // maven { url 'https://developer.huawei.com/repo/' }
 }
 
 
@@ -57,5 +55,4 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation "com.google.android.gms:play-services-ads-identifier:17.0.1"
-    // implementation "com.huawei.hms:ads-identifier:3.4.39"
 }

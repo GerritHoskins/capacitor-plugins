@@ -13,20 +13,36 @@ npx cap sync
 
 <docgen-index>
 
-* [`getId()`](#getid)
+* [`getId(...)`](#getid)
+* [`getStatus()`](#getstatus)
 
 </docgen-index>
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### getId()
+### getId(...)
 
 ```typescript
-getId() => Promise<{ id: string; isDummy: boolean; }>
+getId(delay?: string | number | undefined) => Promise<{ id: string; limitedAdTracking?: boolean; }>
 ```
 
-**Returns:** <code>Promise&lt;{ id: string; isDummy: boolean; }&gt;</code>
+| Param       | Type                          |
+| ----------- | ----------------------------- |
+| **`delay`** | <code>string \| number</code> |
+
+**Returns:** <code>Promise&lt;{ id: string; limitedAdTracking?: boolean; }&gt;</code>
+
+--------------------
+
+
+### getStatus()
+
+```typescript
+getStatus() => Promise<{ status: string; statusId: number; }>
+```
+
+**Returns:** <code>Promise&lt;{ status: string; statusId: number; }&gt;</code>
 
 --------------------
 

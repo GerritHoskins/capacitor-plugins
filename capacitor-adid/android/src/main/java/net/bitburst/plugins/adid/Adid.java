@@ -1,38 +1,46 @@
 package net.bitburst.plugins.adid;
 
+import androidx.annotation.NonNull;
+import android.content.Context;
 import android.util.Log;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailabilityLight;
-import com.huawei.hms.ads.identifier.AdvertisingIdClient;
-import com.huawei.hms.api.HuaweiApiAvailability;
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+
+import java.io.IOException;
 
 public class Adid {
+    public static final String LOG_TAG = "adid-plugin ";
 
-    public int getId() {
-        int advertisingId = 0;
+    private final Context pluginContext;
+    private AdvertisingIdClient.Info adInfo = null;
 
-        if (isAvailable("com.google.android.gms.common.GoogleApiAvailabilityLight")) {
-            int result = GoogleApiAvailabilityLight.getInstance().isGooglePlayServicesAvailable(context);
-            if (ConnectionResult.SUCCESS == result) {
-                AdvertisingIdClient.Info info = AdvertisingIdClient.getAdvertisingIdInfo(getContext());
-                if (null != info) advertisingId = info.getId();
-            }
-        }
-
-        if (isAvailable("com.huawei.hms.api.HuaweiApiAvailability")) {
-            int result = HuaweiApiAvailability.getInstance().isHuaweiMobileServicesAvailable(context);
-            if (ConnectionResult.SUCCESS == result) {
-                AdvertisingIdClient.Info info = AdvertisingIdClient.getAdvertisingIdInfo(getContext());
-                if (null != info) advertisingId = info.getId();
-            }
-        }
-
-        return advertisingId;
+    public Adid(Context context) {
+        this.pluginContext = context;
     }
 
-    private boolean isAvailable(@NonNull String className) {
+    public AdvertisingIdClient.Info getAdIdInfo() {
+        if (isAvailable("com.google.android.gms.common.GoogleApiAvailabilityLight")) {
+            if (ConnectionResult.SUCCESS == GoogleApiAvailabilityLight.getInstance().isGooglePlayServicesAvailable(pluginContext)) {
+                try {
+                    adInfo = AdvertisingIdClient.getAdvertisingIdInfo(pluginContext);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d(LOG_TAG, e.getLocalizedMessage());
+                } catch (GooglePlayServicesNotAvailableException | GooglePlayServicesRepairableException e) {
+                    Log.d(LOG_TAG, e.getLocalizedMessage());
+                }
+            }
+        }
+        return adInfo;
+    }
+
+    private boolean isAvailable(@NonNull String packageName) {
         try {
-            Class.forName(className);
+            Class.forName(packageName);
             return true;
         } catch (ClassNotFoundException e) {
             return false;
