@@ -1,7 +1,7 @@
 import { registerPlugin } from '@capacitor/core';
 
 import type { MparticlePlugin } from './definitions';
-import { Tracking as MpTracking} from './plugin';
+import { MpTracking } from './plugin';
 
 const Mparticle = registerPlugin<MparticlePlugin>(
   'Mparticle',
@@ -13,8 +13,8 @@ const Mparticle = registerPlugin<MparticlePlugin>(
 const Tracking = registerPlugin<MpTracking>(
   'Tracking',
   {
-    web: () => import('./plugin').then(m => new m.Tracking()),
+    web: () => import('./plugin').then(m => new m.MpTracking()),
   },
 );
 export * from './definitions';
-export { Mparticle, Tracking};
+export { Mparticle, Tracking };
