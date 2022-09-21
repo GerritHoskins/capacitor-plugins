@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/capacitor-adid",
-  "version": "4.0.4",
+  "version": "4.0.5",
   "description": "capacitor plugin for fetching the advertisement id",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
