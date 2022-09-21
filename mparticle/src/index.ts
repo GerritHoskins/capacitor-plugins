@@ -6,17 +6,9 @@ const Mparticle = registerPlugin<MparticlePlugin<DefaultEvent, DefaultEvent>>(
   'Mparticle',
   {
     web: () => import('./web').then(m => new m.MparticleWeb()),
+    plugin: () => import('./plugin').then(m => new m.Tracking()),
   },
 );
 
-declare const _default: {
-  getInstance<
-    Events = DefaultEvent,
-    ScreenEvents = DefaultEvent,
-  >(): MparticlePlugin<Events, ScreenEvents>;
-};
-
 export * from './definitions';
 export { Mparticle };
-
-export default _default;
