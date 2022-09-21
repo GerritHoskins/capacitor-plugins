@@ -5,13 +5,12 @@ import mParticle from '@mparticle/web-sdk';
 import type {
   Consent,
   Identifier,
-  DefaultEvent,
   MparticlePlugin,
 } from './definitions';
 
 export class MparticleWeb
   extends WebPlugin
-  implements MparticlePlugin<DefaultEvent, DefaultEvent>
+  implements MparticlePlugin
 {
   init(key: string, config: Record<string, unknown>): Promise<void> {
     return new Promise(resolve => {
@@ -23,6 +22,9 @@ export class MparticleWeb
       mParticle.init(key, mParticleConfig);
     });
   }
+  getInstance(instanceName?: string): any {
+    return mParticle.getInstance(instanceName);
+  };
   identifyUser(identifier: Identifier): Promise<void> {
     if (!identifier) return Promise.resolve();
     const { email, customerId, other } = identifier;

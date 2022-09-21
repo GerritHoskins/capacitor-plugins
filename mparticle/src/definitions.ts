@@ -12,7 +12,7 @@ declare module '@capacitor/cli' {
   }
 }
 
-export interface MparticlePlugin<Events, ScreenEvents> {
+export interface MparticlePlugin<Events = DefaultEvent, ScreenEvents = DefaultEvent> {
   init(
     key: string,
     config: Record<string, unknown>,
