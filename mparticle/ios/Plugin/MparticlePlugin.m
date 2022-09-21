@@ -10,8 +10,8 @@ CAP_PLUGIN(MparticlePlugin, "Mparticle",
            CAP_PLUGIN_METHOD(setGDPRConsent, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getGDPRConsent, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getMPID, CAPPluginReturnPromise);
-           CAP_PLUGIN_METHOD(logEvent, CAPPluginReturnPromise);
-           CAP_PLUGIN_METHOD(logPageView, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(trackEvent, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(trackPageView, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(loginUser, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(logoutUser, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(registerUser, CAPPluginReturnPromise);

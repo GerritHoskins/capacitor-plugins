@@ -3,7 +3,6 @@ package net.bitburst.plugins.mparticle;
 import static com.getcapacitor.JSObject.fromJSONObject;
 
 import android.util.Log;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -13,12 +12,10 @@ import com.mparticle.MPEvent;
 import com.mparticle.MParticle;
 import com.mparticle.MParticleOptions;
 import com.mparticle.identity.IdentityApiRequest;
-
-import org.json.JSONException;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.json.JSONException;
 
 @CapacitorPlugin(name = "Mparticle")
 public class MparticlePlugin extends Plugin {

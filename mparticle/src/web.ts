@@ -1,28 +1,35 @@
 import { WebPlugin } from '@capacitor/core';
-import type {
-  EventType,
-  PrivacyConsentState,
-  UserIdentities,
-  MPConfiguration,
-} from '@mparticle/web-sdk';
+import type { UserIdentities, GDPRConsentState } from '@mparticle/web-sdk';
 import mParticle from '@mparticle/web-sdk';
 
-import type { MparticlePlugin, Identifier } from './definitions';
+import type {
+  Consent,
+  Identifier,
+  DefaultEvent,
+  MparticlePlugin,
+} from './definitions';
 
-export class MparticleWeb extends WebPlugin implements MparticlePlugin {
-  async init(options: { key: string; config?: MPConfiguration }): Promise<any> {
-    await mParticle.init(options.key, options.config || {});
-    if (!mParticle.isInitialized()) return Promise.resolve();
-    return Promise.resolve(mParticle.getInstance());
+export class MparticleWeb
+  extends WebPlugin
+  implements MparticlePlugin<DefaultEvent, DefaultEvent>
+{
+  init(key: string, config: Record<string, unknown>): Promise<void> {
+    return new Promise(resolve => {
+      const mParticleConfig = {
+        ...config,
+        identityCallback: () => resolve(),
+      };
+
+      mParticle.init(key, mParticleConfig);
+    });
   }
-
-  async identifyUser(options: { identifier: Identifier }): Promise<void> {
-    if (!mParticle.isInitialized()) return;
-    const { email, customerId, other } = options.identifier;
+  identifyUser(identifier: Identifier): Promise<void> {
+    if (!identifier) return Promise.resolve();
+    const { email, customerId, other } = identifier;
 
     return new Promise(resolve => {
       if (!mParticle.isInitialized()) return resolve();
-      const userIdentities = {} as UserIdentities;
+      const userIdentities: UserIdentities = {};
       if (email) userIdentities.email = email;
       if (customerId) userIdentities.customerid = customerId;
       if (other) userIdentities.other = other;
@@ -35,65 +42,57 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
       );
     });
   }
+  setUserAttribute(key: string, value: string): Promise<void> {
+    if (!mParticle.isInitialized()) return Promise.resolve();
 
-  async setUserAttribute(options: {
-    attributeName: string;
-    attributeValue: string;
-  }): Promise<void> {
     const user = mParticle.Identity.getCurrentUser();
     if (!user) return Promise.resolve();
 
-    user.setUserAttribute(options.attributeName, options.attributeValue);
+    user.setUserAttribute(key, value);
     return Promise.resolve();
   }
-
-  setGDPRConsent(options: {
-    consents: Record<string, PrivacyConsentState>;
-  }): void {
+  setGDPRConsent(consents: Record<string, Consent>): void {
     if (!mParticle.isInitialized()) return;
+
     const user = mParticle.Identity.getCurrentUser();
     if (!user) return;
 
     const consentState = mParticle.Consent.createConsentState();
 
-    for (const [key, value] of Object.entries(options.consents)) {
+    for (const [key, value] of Object.entries(consents)) {
       consentState.addGDPRConsentState(
         key,
         mParticle.Consent.createGDPRConsent(
-          value.Consented || false,
-          value.Timestamp || Date.now(),
-          value.ConsentDocument || '',
-          value.Location || '',
-          value.HardwareId || '',
+          value.consented || false,
+          value.timestamp || Date.now(),
+          value.consentDocument || '',
+          value.location || '',
+          value.hardwareId || '',
         ),
       );
     }
 
     user.setConsentState(consentState);
   }
-
-  getGDPRConsent(options: {
-    consents: string[];
-  }): Record<string, boolean> | void {
+  getGDPRConsent(consents: string[]): Record<string, boolean> | void {
     if (!mParticle.isInitialized()) return;
+
     const user = mParticle.Identity.getCurrentUser();
     if (!user) return;
 
     const consentState = user.getConsentState();
     if (!consentState) return;
 
-    const gdprConsentState = consentState.getGDPRConsentState();
+    const gdprConsentState: GDPRConsentState =
+      consentState.getGDPRConsentState();
 
-    return options.consents.reduce((consentsAcc, consent) => {
+    return consents.reduce((consentsAcc: any, consent) => {
       const state = gdprConsentState[consent];
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       consentsAcc[consent] = state ? state.Consented : false;
 
       return consentsAcc;
     }, {});
   }
-
   async getMPID(): Promise<string | void> {
     if (!mParticle.isInitialized()) return Promise.resolve();
     const user = mParticle.Identity.getCurrentUser();
@@ -101,74 +100,23 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
 
     return Promise.resolve(user.getMPID());
   }
-
-  async trackEvent(options: {
-    name: string;
-    eventType?: EventType.Unknown;
-    data?: any;
-  }): Promise<any> {
+  trackEvent(name: string, data = {}): void {
     if (!mParticle.isInitialized()) return;
 
-    return mParticle.logEvent(options.name, options.eventType, options?.data);
+    mParticle.logEvent(name, mParticle.EventType.Other, data);
   }
-
-  async trackPageView(options: { name: string; data?: any }): Promise<any> {
+  trackPageView(name: string, data = {}): void {
     if (!mParticle.isInitialized()) return;
-    return mParticle.logPageView(options.name, options?.data);
-  }
 
-  async loginUser(options: {
-    email: string;
-    customerId: string;
-  }): Promise<any> {
-    if (!mParticle.isInitialized()) return;
-    return mParticle.Identity.login(
-      this.identityRequest(options.email, options.customerId),
-    );
+    mParticle.logPageView(name, data);
   }
-
-  async logoutUser(_options: any): Promise<any> {
-    if (!mParticle.isInitialized()) return;
-    const identityoptionsback = (result: any) => {
-      if (result.getUser()) {
-        console.log('logging out of mParticle', _options);
-      }
-    };
-    return mParticle.Identity.logout({} as any, identityoptionsback);
+  loginUser(): Promise<any> {
+    return Promise.reject('not implemented on web.');
   }
-
-  async registerUser(options: {
-    email: string;
-    customerId: string;
-    userAttributes: any;
-  }): Promise<any> {
-    return mParticle.Identity.login(
-      this.identityRequest(
-        options.email,
-        options.customerId,
-        options.userAttributes,
-      ),
-      function (result: any) {
-        if (!result) return;
-        const currentUser = result.getUser();
-        for (const [key, value] of Object.entries(options.userAttributes)) {
-          if (key && value) currentUser.setUserAttribute(key, value);
-        }
-      },
-    );
+  logoutUser(): Promise<any> {
+    return Promise.reject('not implemented on web.');
   }
-
-  public get currentUser(): mParticle.User {
-    return mParticle.Identity.getCurrentUser();
-  }
-
-  private identityRequest(email: string, customerId: string, other?: any): any {
-    return {
-      userIdentities: {
-        email,
-        customerid: customerId,
-        other,
-      },
-    };
+  registerUser(): Promise<any> {
+    return Promise.reject('not implemented on web.');
   }
 }
