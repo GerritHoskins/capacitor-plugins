@@ -19,7 +19,6 @@ npx cap sync
 * [`setGDPRConsent(...)`](#setgdprconsent)
 * [`getGDPRConsent(...)`](#getgdprconsent)
 * [`getMPID()`](#getmpid)
-* [`getInstance()`](#getinstance)
 * [`loginUser(...)`](#loginuser)
 * [`logoutUser(...)`](#logoutuser)
 * [`registerUser(...)`](#registeruser)
@@ -77,12 +76,12 @@ setUserAttribute(attributeName: string, attributeValue: string) => Promise<void>
 ### setGDPRConsent(...)
 
 ```typescript
-setGDPRConsent(options: { consents: Record<string, PrivacyConsentState>; }) => void
+setGDPRConsent(consents: Record<string, Consent>) => void
 ```
 
-| Param         | Type                                                                                                                           |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **`options`** | <code>{ consents: <a href="#record">Record</a>&lt;string, <a href="#privacyconsentstate">PrivacyConsentState</a>&gt;; }</code> |
+| Param          | Type                                                                                    |
+| -------------- | --------------------------------------------------------------------------------------- |
+| **`consents`** | <code><a href="#record">Record</a>&lt;string, <a href="#consent">Consent</a>&gt;</code> |
 
 --------------------
 
@@ -109,17 +108,6 @@ getMPID() => Promise<string | void>
 ```
 
 **Returns:** <code>Promise&lt;string | void&gt;</code>
-
---------------------
-
-
-### getInstance()
-
-```typescript
-getInstance() => mParticleInstance
-```
-
-**Returns:** <code>mParticleInstance</code>
 
 --------------------
 
@@ -188,17 +176,6 @@ addListener(eventName: 'mParticleReady', listenerFunc: mParticleReadyListener) =
 ### Interfaces
 
 
-#### PrivacyConsentState
-
-| Prop                  | Type                 |
-| --------------------- | -------------------- |
-| **`Consented`**       | <code>boolean</code> |
-| **`Timestamp`**       | <code>number</code>  |
-| **`ConsentDocument`** | <code>string</code>  |
-| **`Location`**        | <code>string</code>  |
-| **`HardwareId`**      | <code>string</code>  |
-
-
 #### PluginListenerHandle
 
 | Prop         | Type                                      |
@@ -226,6 +203,11 @@ Construct a type with a set of properties K of type T
 #### Identifier
 
 <code>{ email?: string; customerId?: string; other?: string; }</code>
+
+
+#### Consent
+
+<code>{ consented?: boolean; timestamp?: number; consentDocument?: string; location?: string; hardwareId?: string; }</code>
 
 
 #### mParticleReadyListener

@@ -1,4 +1,4 @@
-import { registerPlugin } from '@capacitor/core';
+/*import { registerPlugin } from '@capacitor/core';
 
 import type { MparticlePlugin } from './definitions';
 
@@ -8,3 +8,8 @@ const Mparticle = registerPlugin<MparticlePlugin>('Mparticle', {
 
 export * from './definitions';
 export { Mparticle };
+*/
+
+export * from './definitions';
+export * from './plugin';
+export * from './web';

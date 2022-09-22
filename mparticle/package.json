@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/mparticle",
-  "version": "4.0.20",
+  "version": "4.0.21",
   "description": "capacitor plugin for mparticle",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",

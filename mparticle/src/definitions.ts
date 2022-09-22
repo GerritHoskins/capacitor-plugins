@@ -1,6 +1,6 @@
 /// <reference types="@capacitor/cli" />
 import type { PluginListenerHandle } from '@capacitor/core';
-import type { MPConfiguration, PrivacyConsentState } from '@mparticle/web-sdk';
+import type { MPConfiguration } from '@mparticle/web-sdk';
 
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
@@ -23,14 +23,11 @@ export interface MparticlePlugin {
     attributeName: string,
     attributeValue: string,
   ): Promise<void>;
-  setGDPRConsent(options: {
-    consents: Record<string, PrivacyConsentState>;
-  }): void;
+  setGDPRConsent(consents: Record<string, Consent>): void;
   getGDPRConsent(consents: string[]): Record<string, boolean> | void;
   getMPID(): Promise<string | void>;
   trackEvent: Events;
   trackPageView: ScreenEvents;
-  getInstance(): mParticleInstance;
   loginUser(options?: { email: string; customerId: string }): Promise<any>;
   logoutUser(options?: any): Promise<any>;
   registerUser(options?: {
@@ -63,10 +60,6 @@ export type ScreenEvents = DefaultEvent;
 export type mParticleReadyListener = (event: MparticleReadyEvent) => void;
 export type DefaultEvent = (name: string, data?: any) => void;
 
-export interface mParticle<Events, ScreenEvents> {
-  trackEvent: Events;
-  trackPageView: ScreenEvents;
-}
 export declare class mParticleInstance {
   constructor(instanceName?: string);
 }
