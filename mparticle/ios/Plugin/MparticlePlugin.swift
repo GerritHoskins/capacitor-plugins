@@ -10,29 +10,14 @@ import mParticle_Apple_SDK
 public class MparticlePlugin: CAPPlugin {
     private let implementation = Mparticle()
 
-    @objc func mParticleInit(_ call: CAPPluginCall) {
-        call.unimplemented("Moved compatability")
-        // let key = call.getString("key") ?? ""
-        // let secret = call.getString("secret") ?? ""
-        // let options = MParticleOptions(key: key,
-        //                             secret: secret)
-        // options.logLevel = MPILogLevel.verbose
-        // options.proxyAppDelegate = false
-        // MParticle.sharedInstance().start(with: options)
-        // call.resolve([
-        //     "value": "ios mparticle initialized"
-        // ])
-    }
-
-    @objc func init(_ call: CAPPluginCall) {
-        call.resolve();
+    override public func load() {
+        implementation.start(MParticleOptions(key: "eu1-f4d0f1212b62a64589e30e1d9d852e17", secret: "kl_hrnSPIlQeMobS3ZV_BlywiiNnNJLpxokrdSfv3siwQ0yctPIdtYHr9MNEXEq7"))
     }
 
     @objc func identifyUser(_ call: CAPPluginCall) {
-        let name = call.getString("email") ?? ""
-        let value = call.getString("customerId") ?? ""
-        MParticle.sharedInstance().Identity().identify(implementation.identityRequest(email,customerId);
-            call.resolve();
+        let email = call.getString("email") ?? ""
+        let customerId = call.getString("customerId") ?? ""
+        MParticle.sharedInstance().identity.login(implementation.identityRequest(email, customerId)!, completion: implementation.identityCallback)
     }
 
     @objc func setUserAttribute(_ call: CAPPluginCall) {
@@ -44,25 +29,25 @@ public class MparticlePlugin: CAPPlugin {
     }
 
     @objc func setGDPRConsent(_ call: CAPPluginCall) {
-        call.unimplemented();
+        call.unimplemented()
     }
 
     @objc func getGDPRConsent(_ call: CAPPluginCall) {
-        call.unimplemented();
+        call.unimplemented()
     }
 
     @objc func getMPID(_ call: CAPPluginCall) {
-        let mpid = implementation.currentUser()?.getId();
+        let mpid = implementation.currentUser()!.userId.stringValue
         call.resolve([
             "MPID": mpid
-        ]);
+        ])
     }
 
     @objc func logEvent(_ call: CAPPluginCall) {
         let name = call.getString("eventName") ?? ""
         let type =  UInt(call.getInt("eventType") ?? 0)
         let props = call.getObject("eventProperties") ?? [:]
-        if let event = MPEvent(name: name, type: MPEventType.init(rawValue:type) ?? MPEventType.other) {
+        if let event = MPEvent(name: name, type: MPEventType.init(rawValue: type) ?? MPEventType.other) {
             event.customAttributes = props
             MParticle.sharedInstance().logEvent(event)
         }
@@ -71,21 +56,17 @@ public class MparticlePlugin: CAPPlugin {
 
     @objc func logPageView(_ call: CAPPluginCall) {
         let name = call.getString("pageName") ?? ""
-        let screenInfo = ["page": call.getString("pageLink") ?? ""];
+        let screenInfo = ["page": call.getString("pageLink") ?? ""]
 
         MParticle.sharedInstance().logScreen(name, eventInfo: screenInfo)
         call.resolve()
     }
 
     @objc func loginUser(_ call: CAPPluginCall) {
-        let email = call.getString("email") ?? ""
-        let customerId = call.getString("customerId") ?? ""
-        MParticle.sharedInstance().identity.login(implementation.identityRequest(email,customerId)!, completion: implementation.identityCallback)
         call.resolve()
     }
 
     @objc func logoutUser(_ call: CAPPluginCall) {
-        // call.unimplemented("Not implemented on iOS.")
         MParticle.sharedInstance().identity.logout(completion: implementation.identityCallback)
         call.resolve()
     }
@@ -95,32 +76,32 @@ public class MparticlePlugin: CAPPlugin {
         let customerId = call.getString("customerId") ?? ""
         let userAttributes = call.getObject("userAttributes") ?? [:]
 
-        MParticle.sharedInstance().identity.login(implementation.identityRequest(email,customerId)!, completion: { (result: MPIdentityApiResult?, error: Error?) -> () in
-            if (result?.user != nil) {
-                for (key,value) in userAttributes {
+        MParticle.sharedInstance().identity.login(implementation.identityRequest(email, customerId)!, completion: { (result: MPIdentityApiResult?, error: Error?) -> Void in
+            if result?.user != nil {
+                for (key, value) in userAttributes {
                     result?.user.setUserAttribute(key, value: value)
                 }
             } else {
                 NSLog(error!.localizedDescription)
                 let resultCode = MPIdentityErrorResponseCode(rawValue: UInt((error! as NSError).code))
-                switch (resultCode!) {
+                switch resultCode! {
                 case .clientNoConnection,
                      .clientSideTimeout:
-                    //retry the IDSync request
-                    break;
+                    // retry the IDSync request
+                    break
                 case .requestInProgress,
                      .retry:
-                    break;
+                    break
                 default:
                     // this typically means an implementation issue
-                    break;
+                    break
                 }
             }
         })
         call.resolve()
     }
 
-    @objc func addListener(_ call: CAPPluginCall) {
-        call.unimplemented();
+    @objc override public func addListener(_ call: CAPPluginCall) {
+        call.unimplemented()
     }
 }
