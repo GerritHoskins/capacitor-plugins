@@ -116,10 +116,10 @@ getMPID() => Promise<string | void>
 ### getInstance()
 
 ```typescript
-getInstance() => mParticleInstanceType
+getInstance() => mParticleInstance
 ```
 
-**Returns:** <code>typeof import("/Users/gerrithoskins/BitBurst/gh-capacitor-plugins/mparticle/node_modules/@types/mparticle__web-sdk/index")</code>
+**Returns:** <code>mParticleInstance</code>
 
 --------------------
 
@@ -228,13 +228,23 @@ Construct a type with a set of properties K of type T
 <code>{ email?: string; customerId?: string; other?: string; }</code>
 
 
-#### mParticleInstanceType
-
-<code>typeof mParticle</code>
-
-
 #### mParticleReadyListener
 
 <code>(event: <a href="#mparticlereadyevent">MparticleReadyEvent</a>): void</code>
+
+
+#### Events
+
+<code><a href="#defaultevent">DefaultEvent</a></code>
+
+
+#### DefaultEvent
+
+<code>(name: string, data?: any): void</code>
+
+
+#### ScreenEvents
+
+<code><a href="#defaultevent">DefaultEvent</a></code>
 
 </docgen-api>

@@ -1,7 +1,6 @@
 /// <reference types="@capacitor/cli" />
 import type { PluginListenerHandle } from '@capacitor/core';
 import type { MPConfiguration, PrivacyConsentState } from '@mparticle/web-sdk';
-import type mParticle from 'mparticle__web-sdk';
 
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
@@ -13,7 +12,7 @@ declare module '@capacitor/cli' {
   }
 }
 
-export interface MparticlePlugin<Events, ScreenEvents> {
+export interface MparticlePlugin {
   init(
     key: string,
     config: Record<string, unknown>,
@@ -31,11 +30,7 @@ export interface MparticlePlugin<Events, ScreenEvents> {
   getMPID(): Promise<string | void>;
   trackEvent: Events;
   trackPageView: ScreenEvents;
-  //getInstance(): mParticleInstanceType;
-  getInstance<
-    Events = DefaultEvent,
-    ScreenEvents = DefaultEvent,
-  >(): MparticlePlugin<Events, ScreenEvents>;
+  getInstance(): mParticleInstance;
   loginUser(options?: { email: string; customerId: string }): Promise<any>;
   logoutUser(options?: any): Promise<any>;
   registerUser(options?: {
@@ -63,16 +58,15 @@ export type Consent = {
   location?: string;
   hardwareId?: string;
 };
+export type Events = DefaultEvent;
+export type ScreenEvents = DefaultEvent;
 export type mParticleReadyListener = (event: MparticleReadyEvent) => void;
 export type DefaultEvent = (name: string, data?: any) => void;
-export type mParticleInstanceType = typeof mParticle;
-/*type mparticleInstanceType = typeof mParticleInstance;
-interface MparticleInstanceTypeInterface extends mparticleInstanceType {
-  getInstance<
-    Events = DefaultEvent,
-    ScreenEvents = DefaultEvent,
-  >(): MparticlePlugin<Events, ScreenEvents>;
+
+export interface mParticle<Events, ScreenEvents> {
+  trackEvent: Events;
+  trackPageView: ScreenEvents;
 }
 export declare class mParticleInstance {
   constructor(instanceName?: string);
-}*/
+}
