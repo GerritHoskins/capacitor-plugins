@@ -59,7 +59,3 @@ export type Events = DefaultEvent;
 export type ScreenEvents = DefaultEvent;
 export type mParticleReadyListener = (event: MparticleReadyEvent) => void;
 export type DefaultEvent = (name: string, data?: any) => void;
-
-export declare class mParticleInstance {
-  constructor(instanceName?: string);
-}

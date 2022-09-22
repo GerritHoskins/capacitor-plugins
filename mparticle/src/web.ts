@@ -2,12 +2,7 @@ import { WebPlugin } from '@capacitor/core';
 import type { UserIdentities, GDPRConsentState } from '@mparticle/web-sdk';
 import mParticle from '@mparticle/web-sdk';
 
-import type {
-  Consent,
-  Identifier,
-  mParticleInstance,
-  MparticlePlugin,
-} from './definitions';
+import type { Consent, Identifier, MparticlePlugin } from './definitions';
 
 export class MparticleWeb extends WebPlugin implements MparticlePlugin {
   init(key: string, config: Record<string, unknown>): Promise<void> {
@@ -19,9 +14,6 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
 
       mParticle.init(key, mParticleConfig);
     });
-  }
-  getInstance(): mParticleInstance {
-    return mParticle.getInstance();
   }
   identifyUser(identifier: Identifier): Promise<void> {
     if (!identifier) return Promise.resolve();
