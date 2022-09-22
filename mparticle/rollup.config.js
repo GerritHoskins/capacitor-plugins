@@ -18,5 +18,10 @@ export default {
       inlineDynamicImports: true,
     },
   ],
-  external: ['@capacitor/core', '@capacitor/cli', '@mparticle/web-sdk'],
+  external: [
+    '@capacitor/core',
+    '@capacitor/cli',
+    '@mparticle/web-sdk',
+    '@types/mparticle__web-sdk',
+  ],
 };

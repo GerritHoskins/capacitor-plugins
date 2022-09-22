@@ -19,6 +19,7 @@ npx cap sync
 * [`setGDPRConsent(...)`](#setgdprconsent)
 * [`getGDPRConsent(...)`](#getgdprconsent)
 * [`getMPID()`](#getmpid)
+* [`getInstance()`](#getinstance)
 * [`loginUser(...)`](#loginuser)
 * [`logoutUser(...)`](#logoutuser)
 * [`registerUser(...)`](#registeruser)
@@ -108,6 +109,17 @@ getMPID() => Promise<string | void>
 ```
 
 **Returns:** <code>Promise&lt;string | void&gt;</code>
+
+--------------------
+
+
+### getInstance()
+
+```typescript
+getInstance() => mParticleInstanceType
+```
+
+**Returns:** <code>typeof import("/Users/gerrithoskins/BitBurst/gh-capacitor-plugins/mparticle/node_modules/@types/mparticle__web-sdk/index")</code>
 
 --------------------
 
@@ -214,6 +226,11 @@ Construct a type with a set of properties K of type T
 #### Identifier
 
 <code>{ email?: string; customerId?: string; other?: string; }</code>
+
+
+#### mParticleInstanceType
+
+<code>typeof mParticle</code>
 
 
 #### mParticleReadyListener
