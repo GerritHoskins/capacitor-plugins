@@ -6,10 +6,13 @@ import type {
   Consent,
   Identifier,
   MparticlePlugin,
-  mParticleInstanceType,
+  DefaultEvent,
 } from './definitions';
 
-export class MparticleWeb extends WebPlugin implements MparticlePlugin {
+export class MparticleWeb
+  extends WebPlugin
+  implements MparticlePlugin<DefaultEvent, DefaultEvent>
+{
   init(key: string, config: Record<string, unknown>): Promise<void> {
     return new Promise(resolve => {
       const mParticleConfig = {
@@ -20,8 +23,11 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
       mParticle.init(key, mParticleConfig);
     });
   }
-  getInstance(instanceName?: string): mParticleInstanceType {
-    return mParticle.getInstance(instanceName) as mParticleInstanceType;
+  getInstance<
+    Events = DefaultEvent,
+    ScreenEvents = DefaultEvent,
+  >(): MparticlePlugin<Events, ScreenEvents> {
+    return {} as MparticlePlugin<Events, ScreenEvents>;
   }
   identifyUser(identifier: Identifier): Promise<void> {
     if (!identifier) return Promise.resolve();
