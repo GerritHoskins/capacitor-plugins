@@ -7,4 +7,4 @@ const Mparticle = registerPlugin<MparticlePlugin>('Mparticle', {
 });
 
 export * from './definitions';
-export default { Mparticle };
+export { Mparticle };
