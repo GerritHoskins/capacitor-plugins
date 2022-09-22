@@ -2,22 +2,18 @@ import Foundation
 import Capacitor
 import mParticle_Apple_SDK
 
-/**
- * Please read the Capacitor iOS Plugin Development Guide
- * here: https://capacitorjs.com/docs/plugins/ios
- */
 @objc(MparticlePlugin)
 public class MparticlePlugin: CAPPlugin {
     private let implementation = Mparticle()
 
     override public func load() {
-        implementation.start(MParticleOptions(key: "eu1-f4d0f1212b62a64589e30e1d9d852e17", secret: "kl_hrnSPIlQeMobS3ZV_BlywiiNnNJLpxokrdSfv3siwQ0yctPIdtYHr9MNEXEq7"))
+        implementation.start(MParticleOptions(key: "", secret: ""))
     }
 
     @objc func identifyUser(_ call: CAPPluginCall) {
         let email = call.getString("email") ?? ""
         let customerId = call.getString("customerId") ?? ""
-        MParticle.sharedInstance().identity.login(implementation.identityRequest(email, customerId)!, completion: implementation.identityCallback)
+        MParticle.sharedInstance().identity.identify(implementation.identityRequest(email, customerId)!, completion: implementation.identityCallback)
     }
 
     @objc func setUserAttribute(_ call: CAPPluginCall) {
@@ -43,10 +39,10 @@ public class MparticlePlugin: CAPPlugin {
         ])
     }
 
-    @objc func logEvent(_ call: CAPPluginCall) {
-        let name = call.getString("eventName") ?? ""
-        let type =  UInt(call.getInt("eventType") ?? 0)
-        let props = call.getObject("eventProperties") ?? [:]
+    @objc func trackEvent(_ call: CAPPluginCall) {
+        let name = call.getString("name") ?? ""
+        let type =  UInt(call.getInt("eventType") ?? 8) // EventType 8:Other
+        let props = call.getObject("data") ?? [:]
         if let event = MPEvent(name: name, type: MPEventType.init(rawValue: type) ?? MPEventType.other) {
             event.customAttributes = props
             MParticle.sharedInstance().logEvent(event)
@@ -54,11 +50,11 @@ public class MparticlePlugin: CAPPlugin {
         call.resolve()
     }
 
-    @objc func logPageView(_ call: CAPPluginCall) {
-        let name = call.getString("pageName") ?? ""
-        let screenInfo = ["page": call.getString("pageLink") ?? ""]
+    @objc func trackPageView(_ call: CAPPluginCall) {
+        let name = call.getString("name") ?? ""
+        let data = call.getAny("data")
 
-        MParticle.sharedInstance().logScreen(name, eventInfo: screenInfo)
+        MParticle.sharedInstance().logScreen(name, eventInfo: data as? [String: Any])
         call.resolve()
     }
 
@@ -93,7 +89,6 @@ public class MparticlePlugin: CAPPlugin {
                      .retry:
                     break
                 default:
-                    // this typically means an implementation issue
                     break
                 }
             }

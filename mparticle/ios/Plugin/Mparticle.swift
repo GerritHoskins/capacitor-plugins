@@ -43,10 +43,6 @@ import Capacitor
         return MParticle.sharedInstance().identity.currentUser
     }
 
-    @objc public func identifyUser() -> MParticleUser? {
-        return MParticle.sharedInstance().identity.currentUser
-    }
-
     @objc public func identityRequest(_ email: String, _ customerId: String) -> MPIdentityApiRequest? {
         self.identityRequest = MPIdentityApiRequest.withEmptyUser()
         self.identityRequest?.email = email
