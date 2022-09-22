@@ -12,7 +12,10 @@ declare module '@capacitor/cli' {
   }
 }
 
-export interface MparticlePlugin<Events = DefaultEvent, ScreenEvents = DefaultEvent> {
+export interface MparticlePlugin<
+  Events = DefaultEvent,
+  ScreenEvents = DefaultEvent,
+> {
   init(
     key: string,
     config: Record<string, unknown>,
@@ -30,6 +33,10 @@ export interface MparticlePlugin<Events = DefaultEvent, ScreenEvents = DefaultEv
   getMPID(): Promise<string | void>;
   trackEvent: Events;
   trackPageView: ScreenEvents;
+  getInstance<
+    Events = DefaultEvent,
+    ScreenEvents = DefaultEvent,
+  >(): MparticlePlugin<Events, ScreenEvents>;
   loginUser(options?: { email: string; customerId: string }): Promise<any>;
   logoutUser(options?: any): Promise<any>;
   registerUser(options?: {

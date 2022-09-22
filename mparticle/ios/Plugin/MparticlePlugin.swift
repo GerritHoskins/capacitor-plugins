@@ -32,10 +32,10 @@ public class MparticlePlugin: CAPPlugin {
         let name = call.getString("email") ?? ""
         let value = call.getString("customerId") ?? ""
         MParticle.sharedInstance().Identity().identify(implementation.identityRequest(email,customerId);
-        call.resolve();
+            call.resolve();
     }
 
-     @objc func setUserAttribute(_ call: CAPPluginCall) {
+    @objc func setUserAttribute(_ call: CAPPluginCall) {
         let name = call.getString("attributeName") ?? ""
         let value = call.getString("attributeValue") ?? ""
 
@@ -105,11 +105,11 @@ public class MparticlePlugin: CAPPlugin {
                 let resultCode = MPIdentityErrorResponseCode(rawValue: UInt((error! as NSError).code))
                 switch (resultCode!) {
                 case .clientNoConnection,
-                    .clientSideTimeout:
+                     .clientSideTimeout:
                     //retry the IDSync request
                     break;
                 case .requestInProgress,
-                    .retry:
+                     .retry:
                     break;
                 default:
                     // this typically means an implementation issue
@@ -121,6 +121,6 @@ public class MparticlePlugin: CAPPlugin {
     }
 
     @objc func addListener(_ call: CAPPluginCall) {
-         call.unimplemented();
+        call.unimplemented();
     }
 }

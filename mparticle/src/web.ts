@@ -4,14 +4,13 @@ import mParticle from '@mparticle/web-sdk';
 
 import type {
   Consent,
+  DefaultEvent,
   Identifier,
   MparticlePlugin,
 } from './definitions';
+import { MpTracking } from './plugin';
 
-export class MparticleWeb
-  extends WebPlugin
-  implements MparticlePlugin
-{
+export class MparticleWeb extends WebPlugin implements MparticlePlugin {
   init(key: string, config: Record<string, unknown>): Promise<void> {
     return new Promise(resolve => {
       const mParticleConfig = {
@@ -22,9 +21,12 @@ export class MparticleWeb
       mParticle.init(key, mParticleConfig);
     });
   }
-  getInstance(instanceName?: string): any {
-    return mParticle.getInstance(instanceName);
-  };
+  getInstance<
+    Events = DefaultEvent,
+    ScreenEvents = DefaultEvent,
+  >(): MparticlePlugin<Events, ScreenEvents> {
+    return new MpTracking().getInstance();
+  }
   identifyUser(identifier: Identifier): Promise<void> {
     if (!identifier) return Promise.resolve();
     const { email, customerId, other } = identifier;
