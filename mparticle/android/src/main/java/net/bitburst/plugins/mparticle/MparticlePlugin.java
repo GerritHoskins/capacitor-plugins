@@ -23,43 +23,11 @@ public class MparticlePlugin extends Plugin {
     public static final String LOG_TAG = "bitburst.mparticle ";
     private static Mparticle implementation = null;
 
-    private String planId = "bitcode_frontend_plan";
-    private int planVersion = 4;
-
-    String mParticleKey = "eu1-f7ebd620020cce4e9672de46c1f443ac"; //this.getContext().getString(R.string.mparticle_key);
-    String mParticleSecret = ""; // this.getContext().getString(R.string.mparticle_secret);
-
     @Override
     public void load() {
-        try {
-            JSObject mParticleConfig = fromJSONObject(getConfig().getObject("config"));
-            /* Boolean isDevelopmentMode = mParticleConfig.getBoolean("isDevelopmentMode"); */
-            //mParticleKey = getConfig().getString("key");
-            mParticleSecret = getConfig().getString("secret");
-
-            JSObject dataPlan = mParticleConfig.getJSObject("dataPlan");
-            assert dataPlan != null;
-            planId = dataPlan.getString("planId");
-            planVersion = dataPlan.getInt("planVersion");
-        } catch (JSONException e) {
-            Log.d(LOG_TAG, "load failed ", e);
-        }
-
-        MParticleOptions options = MParticleOptions
-            .builder(getBridge().getContext())
-            .credentials(mParticleKey, mParticleSecret)
-            .environment(MParticle.Environment.AutoDetect)
-            .dataplan(planId, planVersion)
-            .build();
-        implementation = new Mparticle(this, options);
-
+        implementation = new Mparticle(this);
+        notifyListeners("mParticleReady", new JSObject().put("ready", Mparticle.sharedInstance() != null), true);
         super.load();
-        notifyListeners("mParticleReady", new JSObject().put("ready", Mparticle.getInstance() != null), true);
-    }
-
-    @PluginMethod
-    public void init(PluginCall call) {
-        call.resolve();
     }
 
     @PluginMethod
@@ -67,7 +35,7 @@ public class MparticlePlugin extends Plugin {
         String email = call.getString("email");
         String customerId = call.getString("customerId");
         IdentityApiRequest request = implementation.identityRequest(email, customerId);
-        Mparticle.getInstance().Identity().identify(request);
+        Mparticle.sharedInstance().Identity().identify(request);
         call.resolve();
     }
 
@@ -123,13 +91,13 @@ public class MparticlePlugin extends Plugin {
         }
 
         String name = callData.getString("name");
-        Integer type = callData.getInteger("eventType");
+        Integer type = callData.getInteger("eventType", 8); //EventType 8:OTHER
         assert name != null;
         assert type != null;
 
         MPEvent event = new MPEvent.Builder(name, implementation.getEventType(type)).customAttributes(customAttributes).build();
 
-        Mparticle.getInstance().logEvent(event);
+        Mparticle.sharedInstance().logEvent(event);
         call.resolve();
     }
 
@@ -155,7 +123,7 @@ public class MparticlePlugin extends Plugin {
             e.printStackTrace();
         }
 
-        Mparticle.getInstance().logScreen(name, pageData);
+        Mparticle.sharedInstance().logScreen(name, pageData);
         call.resolve();
     }
 
@@ -163,13 +131,13 @@ public class MparticlePlugin extends Plugin {
     public void loginUser(PluginCall call) {
         String email = call.getString("email");
         String customerId = call.getString("customerId");
-        Mparticle.getInstance().Identity().login(implementation.identityRequest(email, customerId));
+        Mparticle.sharedInstance().Identity().login(implementation.identityRequest(email, customerId));
         call.resolve();
     }
 
     @PluginMethod
     public void logoutUser(PluginCall call) {
-        Mparticle.getInstance().Identity().logout(IdentityApiRequest.withEmptyUser().build());
+        Mparticle.sharedInstance().Identity().logout(IdentityApiRequest.withEmptyUser().build());
         call.resolve();
     }
 
@@ -178,7 +146,7 @@ public class MparticlePlugin extends Plugin {
         String email = call.getString("email");
         String customerId = call.getString("customerId");
         Mparticle
-            .getInstance()
+            .sharedInstance()
             .Identity()
             .login(implementation.identityRequest(email, customerId))
             .addSuccessListener(

@@ -18,14 +18,14 @@ public class Mparticle {
     private OnReadyListener onReadyListener;
     private static MParticle instance = MParticle.getInstance();
 
-    public Mparticle(MparticlePlugin plugin, MParticleOptions options) {
+    public Mparticle(MparticlePlugin plugin) {
         this.onReadyListener =
             () -> {
                 if (onReadyListener != null) {
                     onReadyListener.onReady();
                 }
             };
-        start(options);
+        start(plugin.getConfig());
     }
 
     public void setOnReadyListener(@Nullable OnReadyListener listener) {
@@ -38,11 +38,19 @@ public class Mparticle {
     }
 
     @SuppressLint("MParticleInitialization")
-    public void start(MParticleOptions options) {
+    public void start(PluginConfig mParticleConfig) {
+        mParticleKey = mParticleConfig.getString("key");
+        mParticleSecret = mParticleConfig.getString("secret");
+        MParticleOptions options = MParticleOptions
+            .builder(getBridge().getContext())
+            .credentials(mParticleKey, mParticleSecret)
+            .environment(MParticle.Environment.AutoDetect)
+            .dataplan("bitcode_frontend_plan", 4)
+            .build();
         MParticle.start(options);
     }
 
-    public static MParticle getInstance() {
+    public static MParticle sharedInstance() {
         if (instance == null) {
             instance = MParticle.getInstance();
         }
@@ -50,12 +58,12 @@ public class Mparticle {
     }
 
     public EventType getEventType(Integer eType) {
-        int ord = eType;
+        /*int ord = eType;
         for (EventType e : EventType.values()) {
             if (e.ordinal() == ord) {
                 return e;
             }
-        }
+        }*/
         return EventType.Other;
     }
 
