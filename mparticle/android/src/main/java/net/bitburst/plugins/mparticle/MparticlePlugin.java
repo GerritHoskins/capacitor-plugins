@@ -4,15 +4,18 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.PluginMethodHandle;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.mparticle.consent.GDPRConsent;
 import com.mparticle.identity.IdentityApiRequest;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 @CapacitorPlugin(name = "Mparticle")
 public class MparticlePlugin extends Plugin {
@@ -62,7 +65,8 @@ public class MparticlePlugin extends Plugin {
 
     @PluginMethod
     public void setGDPRConsent(PluginCall call) {
-        JSONArray consents = (JSONArray) call.getArray("gdprConsents");
+        JSONObject consents = (JSONObject) call.getData();
+
         try {
             implementation.addGDPRConsentState(consents);
         } catch (JSONException | ParseException e) {

@@ -2,7 +2,6 @@ package net.bitburst.plugins.mparticle;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.getcapacitor.JSObject;
@@ -17,12 +16,12 @@ import com.mparticle.identity.IdentityApiRequest;
 import com.mparticle.identity.MParticleUser;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,7 +47,7 @@ public class Mparticle {
     }
 
     public Mparticle(Application application) {
-       start(application);
+        start(application);
     }
 
     public void setOnReadyListener(@Nullable OnReadyListener listener) {
@@ -62,15 +61,16 @@ public class Mparticle {
 
     @SuppressLint("MParticleInitialization")
     public void start(Application application) {
-   // public void start(MparticlePlugin plugin) {
-        MParticleOptions options = MParticleOptions.builder(application.getApplicationContext())
-                .credentials("eu1-f7ebd620020cce4e9672de46c1f443ac", "5xhdPuvut8IbRN4qe3siZw7Rg9RqnF9Ef3-McNLJVDnFEjH9fM1-O38SyYZtgCoC")
-                .environment(MParticle.Environment.AutoDetect)
-                .dataplan("bitcode_frontend_plan", 4)
-                .build();
+        // public void start(MparticlePlugin plugin) {
+        MParticleOptions options = MParticleOptions
+            .builder(application.getApplicationContext())
+            .credentials("eu1-f7ebd620020cce4e9672de46c1f443ac", "5xhdPuvut8IbRN4qe3siZw7Rg9RqnF9Ef3-McNLJVDnFEjH9fM1-O38SyYZtgCoC")
+            .environment(MParticle.Environment.AutoDetect)
+            .dataplan("bitcode_frontend_plan", 4)
+            .build();
 
         MParticle.start(options);
-     /*   String mParticleKey = plugin.getConfig().getString("key");
+        /*   String mParticleKey = plugin.getConfig().getString("key");
         String mParticleSecret = plugin.getConfig().getString("secret");
         MParticleOptions options = MParticleOptions
             .builder(plugin.getBridge().getContext())
@@ -117,15 +117,30 @@ public class Mparticle {
         return new MPEvent.Builder(name, getEventType(type)).customAttributes(customAttributes).build();
     }
 
-    public void addGDPRConsentState(final JSONArray consents) throws JSONException, ParseException {
+    public void addGDPRConsentState(final JSONObject consents) throws JSONException, ParseException {
         MParticleUser user = currentUser();
-        final JSONObject map = consents.getJSONObject(0);
-        String purpose = consents.getString(1);
-        if (map != null && purpose != null) {
-            GDPRConsent newConsent = ConvertGDPRConsent(map);
-            ConsentState state = ConsentState.builder().addGDPRConsentState(purpose, newConsent).build();
+        JSONObject map;
+        String purpose;
 
-            user.setConsentState(state);
+        if (consents != null) {
+            JSONArray keys = consents.names();
+            GDPRConsent newConsent;
+            ConsentState state;
+
+            for (int i = 0; i < Objects.requireNonNull(keys).length(); i++) {
+                String key = null;
+                JSONObject value = null;
+                try {
+                    key = keys.getString(i);
+                    value = consents.getJSONObject(key);
+                    purpose = key;
+                    newConsent = ConvertGDPRConsent(value);
+                    state = ConsentState.builder().addGDPRConsentState(purpose, newConsent).build();
+                    user.setConsentState(state);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -155,8 +170,8 @@ public class Mparticle {
         final JSONObject map = args.getJSONObject(0);
         if (map != null) {
             IdentityApiRequest request = ConvertIdentityAPIRequest(map);
-            Objects.requireNonNull(MParticle
-                            .getInstance())
+            Objects
+                .requireNonNull(MParticle.getInstance())
                 .Identity()
                 .identify(request)
                 .addFailureListener(
@@ -215,7 +230,7 @@ public class Mparticle {
     }
 
     private static GDPRConsent ConvertGDPRConsent(JSONObject map) throws JSONException, ParseException {
-        String dateStr = map.getString("timestamp");
+        String dateStr = "2022-08-29T16:02:17.14Z";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date timestamp = sdf.parse(dateStr);
 

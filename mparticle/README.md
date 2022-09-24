@@ -62,13 +62,12 @@ identifyUser(identifier?: Identifier | undefined) => Promise<void>
 ### setUserAttribute(...)
 
 ```typescript
-setUserAttribute(attributeName: string, attributeValue: string) => Promise<void>
+setUserAttribute(attribute: Attribute) => Promise<void>
 ```
 
-| Param                | Type                |
-| -------------------- | ------------------- |
-| **`attributeName`**  | <code>string</code> |
-| **`attributeValue`** | <code>string</code> |
+| Param           | Type                                            |
+| --------------- | ----------------------------------------------- |
+| **`attribute`** | <code><a href="#attribute">Attribute</a></code> |
 
 --------------------
 
@@ -76,12 +75,12 @@ setUserAttribute(attributeName: string, attributeValue: string) => Promise<void>
 ### setGDPRConsent(...)
 
 ```typescript
-setGDPRConsent(consents: Record<string, Consent>) => void
+setGDPRConsent(gdprConsents: GDPRConsents) => void
 ```
 
-| Param          | Type                                                                                    |
-| -------------- | --------------------------------------------------------------------------------------- |
-| **`consents`** | <code><a href="#record">Record</a>&lt;string, <a href="#consent">Consent</a>&gt;</code> |
+| Param              | Type                                                  |
+| ------------------ | ----------------------------------------------------- |
+| **`gdprConsents`** | <code><a href="#gdprconsents">GDPRConsents</a></code> |
 
 --------------------
 
@@ -89,12 +88,12 @@ setGDPRConsent(consents: Record<string, Consent>) => void
 ### getGDPRConsent(...)
 
 ```typescript
-getGDPRConsent(consents: string[]) => Record<string, boolean> | void
+getGDPRConsent(options: { consents: string[]; }) => Record<string, boolean> | void
 ```
 
-| Param          | Type                  |
-| -------------- | --------------------- |
-| **`consents`** | <code>string[]</code> |
+| Param         | Type                                 |
+| ------------- | ------------------------------------ |
+| **`options`** | <code>{ consents: string[]; }</code> |
 
 **Returns:** <code>void | <a href="#record">Record</a>&lt;string, boolean&gt;</code>
 
@@ -115,12 +114,12 @@ getMPID() => Promise<string | void>
 ### loginUser(...)
 
 ```typescript
-loginUser(options?: { email: string; customerId: string; } | undefined) => Promise<any>
+loginUser(identifier?: Identifier | undefined) => Promise<any>
 ```
 
-| Param         | Type                                                |
-| ------------- | --------------------------------------------------- |
-| **`options`** | <code>{ email: string; customerId: string; }</code> |
+| Param            | Type                                              |
+| ---------------- | ------------------------------------------------- |
+| **`identifier`** | <code><a href="#identifier">Identifier</a></code> |
 
 **Returns:** <code>Promise&lt;any&gt;</code>
 
@@ -145,12 +144,12 @@ logoutUser(options?: any) => Promise<any>
 ### registerUser(...)
 
 ```typescript
-registerUser(options?: { email: string; customerId: string; userAttributes: any; } | undefined) => Promise<any>
+registerUser(identifier?: Identifier | undefined) => Promise<any>
 ```
 
-| Param         | Type                                                                     |
-| ------------- | ------------------------------------------------------------------------ |
-| **`options`** | <code>{ email: string; customerId: string; userAttributes: any; }</code> |
+| Param            | Type                                              |
+| ---------------- | ------------------------------------------------- |
+| **`identifier`** | <code><a href="#identifier">Identifier</a></code> |
 
 **Returns:** <code>Promise&lt;any&gt;</code>
 
@@ -203,6 +202,16 @@ Construct a type with a set of properties K of type T
 #### Identifier
 
 <code>{ email?: string; customerId?: string; other?: string; }</code>
+
+
+#### Attribute
+
+<code>{ name: string; value: string; }</code>
+
+
+#### GDPRConsents
+
+<code><a href="#record">Record</a>&lt;string, <a href="#consent">Consent</a>&gt;</code>
 
 
 #### Consent
