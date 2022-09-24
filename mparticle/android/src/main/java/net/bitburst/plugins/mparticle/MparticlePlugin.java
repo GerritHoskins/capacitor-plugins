@@ -4,18 +4,14 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
-import com.getcapacitor.PluginMethodHandle;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.mparticle.consent.GDPRConsent;
 import com.mparticle.identity.IdentityApiRequest;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import org.json.JSONArray;
+import java.util.Objects;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 @CapacitorPlugin(name = "Mparticle")
 public class MparticlePlugin extends Plugin {
@@ -37,17 +33,25 @@ public class MparticlePlugin extends Plugin {
 
     @PluginMethod
     public void identifyUser(PluginCall call) {
-        String email = call.getString("email");
-        String other = call.getString("other");
-        String customerId = call.getString("customerId");
-        IdentityApiRequest request = null;
         try {
-            request = implementation.identityRequest(call, email, customerId, other);
+            IdentityApiRequest request = implementation.identityRequest(call, call.getData());
+            Mparticle
+                .sharedInstance()
+                .Identity()
+                .identify(request)
+                .addFailureListener(
+                    identityHttpResponse -> call.reject("message ", Objects.requireNonNull(identityHttpResponse).toString())
+                )
+                .addSuccessListener(
+                    identityApiResult -> {
+                        implementation.identityResultHandler(call.getData(), identityApiResult);
+                        call.resolve();
+                    }
+                );
         } catch (JSONException e) {
             e.printStackTrace();
+            call.reject(LOG_TAG, e.getLocalizedMessage());
         }
-        Mparticle.sharedInstance().Identity().identify(request);
-        call.resolve();
     }
 
     @PluginMethod
@@ -56,35 +60,31 @@ public class MparticlePlugin extends Plugin {
         String value = call.getString("value");
         assert name != null;
         assert value != null;
-
-        if (implementation.currentUser() != null) {
-            implementation.currentUser().setUserAttribute(name, value);
-        }
+        implementation.setUserAttribute(name, value);
         call.resolve();
     }
 
     @PluginMethod
     public void setGDPRConsent(PluginCall call) {
-        JSONObject consents = (JSONObject) call.getData();
-
         try {
-            implementation.addGDPRConsentState(consents);
+            implementation.addGDPRConsentState(call.getData());
+            call.resolve();
         } catch (JSONException | ParseException e) {
             e.printStackTrace();
+            call.reject(LOG_TAG, e.getLocalizedMessage());
         }
-        call.resolve();
     }
 
     @PluginMethod
     public void getGDPRConsent(PluginCall call) {
-        Map<String, GDPRConsent> consents = new HashMap();
         try {
-            consents = implementation.getGDPRConsent();
+            Map<String, GDPRConsent> consents = implementation.getGDPRConsent();
+            JSObject ret = new JSObject().put("consents", consents);
+            call.resolve(ret);
         } catch (JSONException e) {
             e.printStackTrace();
+            call.reject(LOG_TAG, e.getLocalizedMessage());
         }
-        JSObject ret = new JSObject().put("consents", consents);
-        call.resolve(ret);
     }
 
     @PluginMethod
@@ -122,21 +122,19 @@ public class MparticlePlugin extends Plugin {
 
     @PluginMethod
     public void loginUser(PluginCall call) {
-        String email = call.getString("email");
-        String customerId = call.getString("customerId");
-        String other = call.getString("other");
         try {
-            Mparticle.sharedInstance().Identity().login(implementation.identityRequest(call, email, customerId, other));
+            Mparticle.sharedInstance().Identity().login(implementation.identityRequest(call, call.getData()));
+            call.resolve();
         } catch (JSONException e) {
             e.printStackTrace();
+            call.reject(LOG_TAG, e.getLocalizedMessage());
         }
-        call.resolve();
     }
 
     @PluginMethod
     public void logoutUser(PluginCall call) {
         try {
-            Mparticle.sharedInstance().Identity().logout(implementation.identityRequest(call, null, null, null));
+            Mparticle.sharedInstance().Identity().logout(implementation.identityRequest(call, call.getData()));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -145,34 +143,20 @@ public class MparticlePlugin extends Plugin {
 
     @PluginMethod
     public void registerUser(PluginCall call) {
-        String email = call.getString("email");
-        String customerId = call.getString("customerId");
         try {
             Mparticle
                 .sharedInstance()
                 .Identity()
-                .login(implementation.identityRequest(call, email, customerId, null))
-                .addSuccessListener(
-                    result -> {
-                        JSObject temp = call.getObject("userAttributes");
-                        if (temp != null) {
-                            Iterator<String> iter = temp.keys();
-                            while (iter.hasNext()) {
-                                String key = iter.next();
-                                try {
-                                    Object value = temp.get(key);
-                                    result.getUser().setUserAttribute(key, value);
-                                } catch (JSONException e) {
-                                    call.reject(LOG_TAG, "failed to register user", e);
-                                }
-                            }
-                        }
+                .login(implementation.identityRequest(call, call.getData()))
+                .addFailureListener(
+                    identityHttpResponse -> {
+                        call.reject("message ", Objects.requireNonNull(identityHttpResponse).toString());
                     }
-                );
+                )
+                .addSuccessListener(identityApiResult -> implementation.identityResultHandler(call.getData(), identityApiResult));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        call.resolve();
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_NONE)

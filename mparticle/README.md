@@ -19,6 +19,8 @@ npx cap sync
 * [`setGDPRConsent(...)`](#setgdprconsent)
 * [`getGDPRConsent(...)`](#getgdprconsent)
 * [`getMPID()`](#getmpid)
+* [`trackEvent(...)`](#trackevent)
+* [`trackPageView(...)`](#trackpageview)
 * [`loginUser(...)`](#loginuser)
 * [`logoutUser(...)`](#logoutuser)
 * [`registerUser(...)`](#registeruser)
@@ -107,6 +109,32 @@ getMPID() => Promise<string | void>
 ```
 
 **Returns:** <code>Promise&lt;string | void&gt;</code>
+
+--------------------
+
+
+### trackEvent(...)
+
+```typescript
+trackEvent(event: DefaultEvent) => void
+```
+
+| Param       | Type                                                  |
+| ----------- | ----------------------------------------------------- |
+| **`event`** | <code><a href="#defaultevent">DefaultEvent</a></code> |
+
+--------------------
+
+
+### trackPageView(...)
+
+```typescript
+trackPageView(event: DefaultEvent) => void
+```
+
+| Param       | Type                                                  |
+| ----------- | ----------------------------------------------------- |
+| **`event`** | <code><a href="#defaultevent">DefaultEvent</a></code> |
 
 --------------------
 
@@ -219,23 +247,13 @@ Construct a type with a set of properties K of type T
 <code>{ consented?: boolean; timestamp?: number; consentDocument?: string; location?: string; hardwareId?: string; }</code>
 
 
+#### DefaultEvent
+
+<code>{ name: string; data?: any }</code>
+
+
 #### mParticleReadyListener
 
 <code>(event: <a href="#mparticlereadyevent">MparticleReadyEvent</a>): void</code>
-
-
-#### Events
-
-<code><a href="#defaultevent">DefaultEvent</a></code>
-
-
-#### DefaultEvent
-
-<code>(name: string, data?: any): void</code>
-
-
-#### ScreenEvents
-
-<code><a href="#defaultevent">DefaultEvent</a></code>
 
 </docgen-api>
