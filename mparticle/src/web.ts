@@ -2,7 +2,12 @@ import { WebPlugin } from '@capacitor/core';
 import type { UserIdentities, GDPRConsentState } from '@mparticle/web-sdk';
 import mParticle from '@mparticle/web-sdk';
 
-import type { Consent, Identifier, MparticlePlugin } from './definitions';
+import type {
+  Identifier,
+  MparticlePlugin,
+  Attribute,
+  GDPRConsents,
+} from './definitions';
 
 export class MparticleWeb extends WebPlugin implements MparticlePlugin {
   init(key: string, config: Record<string, unknown>): Promise<void> {
@@ -34,16 +39,16 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
       );
     });
   }
-  setUserAttribute(key: string, value: string): Promise<void> {
+  setUserAttribute(attribute: Attribute): Promise<void> {
     if (!mParticle.isInitialized()) return Promise.resolve();
 
     const user = mParticle.Identity.getCurrentUser();
     if (!user) return Promise.resolve();
 
-    user.setUserAttribute(key, value);
+    user.setUserAttribute(attribute.name, attribute.value);
     return Promise.resolve();
   }
-  setGDPRConsent(consents: Record<string, Consent>): void {
+  setGDPRConsent(gdprConsents: GDPRConsents): void {
     if (!mParticle.isInitialized()) return;
 
     const user = mParticle.Identity.getCurrentUser();
@@ -51,7 +56,7 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
 
     const consentState = mParticle.Consent.createConsentState();
 
-    for (const [key, value] of Object.entries(consents)) {
+    for (const [key, value] of Object.entries(gdprConsents)) {
       consentState.addGDPRConsentState(
         key,
         mParticle.Consent.createGDPRConsent(
@@ -66,7 +71,9 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
 
     user.setConsentState(consentState);
   }
-  getGDPRConsent(consents: string[]): Record<string, boolean> | void {
+  getGDPRConsent(options: {
+    consents: string[];
+  }): Record<string, boolean> | void {
     if (!mParticle.isInitialized()) return;
 
     const user = mParticle.Identity.getCurrentUser();
@@ -78,7 +85,7 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
     const gdprConsentState: GDPRConsentState =
       consentState.getGDPRConsentState();
 
-    return consents.reduce((consentsAcc: any, consent) => {
+    return options.consents.reduce((consentsAcc: any, consent) => {
       const state = gdprConsentState[consent];
       consentsAcc[consent] = state ? state.Consented : false;
 

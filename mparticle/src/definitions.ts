@@ -19,22 +19,17 @@ export interface MparticlePlugin {
     secret?: string,
   ): Promise<void>;
   identifyUser(identifier?: Identifier): Promise<void>;
-  setUserAttribute(
-    attributeName: string,
-    attributeValue: string,
-  ): Promise<void>;
-  setGDPRConsent(consents: Record<string, Consent>): void;
-  getGDPRConsent(consents: string[]): Record<string, boolean> | void;
+  setUserAttribute(attribute: Attribute): Promise<void>;
+  setGDPRConsent(gdprConsents: GDPRConsents): void;
+  getGDPRConsent(options: {
+    consents: string[];
+  }): Record<string, boolean> | void;
   getMPID(): Promise<string | void>;
   trackEvent: Events;
   trackPageView: ScreenEvents;
-  loginUser(options?: { email: string; customerId: string }): Promise<any>;
+  loginUser(identifier?: Identifier): Promise<any>;
   logoutUser(options?: any): Promise<any>;
-  registerUser(options?: {
-    email: string;
-    customerId: string;
-    userAttributes: any;
-  }): Promise<any>;
+  registerUser(identifier?: Identifier): Promise<any>;
   addListener(
     eventName: 'mParticleReady',
     listenerFunc: mParticleReadyListener,
@@ -43,6 +38,10 @@ export interface MparticlePlugin {
 export interface MparticleReadyEvent {
   ready: boolean;
 }
+export type Attribute = {
+  name: string;
+  value: string;
+};
 export type Identifier = {
   email?: string;
   customerId?: string;
@@ -55,6 +54,7 @@ export type Consent = {
   location?: string;
   hardwareId?: string;
 };
+export type GDPRConsents = Record<string, Consent>;
 export type Events = DefaultEvent;
 export type ScreenEvents = DefaultEvent;
 export type mParticleReadyListener = (event: MparticleReadyEvent) => void;

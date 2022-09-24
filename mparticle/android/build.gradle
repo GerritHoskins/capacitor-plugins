@@ -55,4 +55,7 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation 'com.mparticle:android-core:5.41.1'
+    implementation "com.mparticle:android-googleanalyticsfirebasega4-kit:5.41.1"
+    implementation 'com.mparticle:android-clevertap-kit:5.41.1'
+    implementation 'com.mparticle:android-appsflyer-kit:5.41.1'
 }

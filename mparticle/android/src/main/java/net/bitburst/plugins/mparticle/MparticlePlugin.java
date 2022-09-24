@@ -23,8 +23,13 @@ public class MparticlePlugin extends Plugin {
     @Override
     public void load() {
         implementation = new Mparticle(this);
-        notifyListeners("mParticleReady", new JSObject().put("ready", Mparticle.sharedInstance() != null), true);
+        //notifyListeners("mParticleReady", new JSObject().put("ready", Mparticle.sharedInstance() != null), true);
         super.load();
+    }
+
+    @PluginMethod
+    public void init(PluginCall call) {
+        call.resolve();
     }
 
     @PluginMethod
@@ -44,8 +49,8 @@ public class MparticlePlugin extends Plugin {
 
     @PluginMethod
     public void setUserAttribute(PluginCall call) {
-        String name = call.getString("attributeName");
-        String value = call.getString("attributeValue");
+        String name = call.getString("name");
+        String value = call.getString("value");
         assert name != null;
         assert value != null;
 
@@ -57,7 +62,7 @@ public class MparticlePlugin extends Plugin {
 
     @PluginMethod
     public void setGDPRConsent(PluginCall call) {
-        JSONArray consents = (JSONArray) call.getArray("consents");
+        JSONArray consents = (JSONArray) call.getArray("gdprConsents");
         try {
             implementation.addGDPRConsentState(consents);
         } catch (JSONException | ParseException e) {

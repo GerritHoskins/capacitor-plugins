@@ -1,6 +1,9 @@
 package net.bitburst.plugins.mparticle;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
@@ -18,6 +21,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +44,11 @@ public class Mparticle {
                     onReadyListener.onReady();
                 }
             };
-        start(plugin);
+        start(plugin.getActivity().getApplication());
+    }
+
+    public Mparticle(Application application) {
+       start(application);
     }
 
     public void setOnReadyListener(@Nullable OnReadyListener listener) {
@@ -52,8 +61,16 @@ public class Mparticle {
     }
 
     @SuppressLint("MParticleInitialization")
-    public void start(MparticlePlugin plugin) {
-        String mParticleKey = plugin.getConfig().getString("key");
+    public void start(Application application) {
+   // public void start(MparticlePlugin plugin) {
+        MParticleOptions options = MParticleOptions.builder(application.getApplicationContext())
+                .credentials("eu1-f7ebd620020cce4e9672de46c1f443ac", "5xhdPuvut8IbRN4qe3siZw7Rg9RqnF9Ef3-McNLJVDnFEjH9fM1-O38SyYZtgCoC")
+                .environment(MParticle.Environment.AutoDetect)
+                .dataplan("bitcode_frontend_plan", 4)
+                .build();
+
+        MParticle.start(options);
+     /*   String mParticleKey = plugin.getConfig().getString("key");
         String mParticleSecret = plugin.getConfig().getString("secret");
         MParticleOptions options = MParticleOptions
             .builder(plugin.getBridge().getContext())
@@ -61,7 +78,7 @@ public class Mparticle {
             .environment(MParticle.Environment.AutoDetect)
             .dataplan("bitcode_frontend_plan", 4)
             .build();
-        MParticle.start(options);
+        MParticle.start(options);*/
     }
 
     public static MParticle sharedInstance() {
@@ -82,7 +99,7 @@ public class Mparticle {
     }
 
     public MParticleUser currentUser() {
-        MParticleUser user = MParticle.getInstance().Identity().getCurrentUser();
+        MParticleUser user = Objects.requireNonNull(MParticle.getInstance()).Identity().getCurrentUser();
         assert user != null;
         return user;
     }
@@ -138,8 +155,8 @@ public class Mparticle {
         final JSONObject map = args.getJSONObject(0);
         if (map != null) {
             IdentityApiRequest request = ConvertIdentityAPIRequest(map);
-            MParticle
-                .getInstance()
+            Objects.requireNonNull(MParticle
+                            .getInstance())
                 .Identity()
                 .identify(request)
                 .addFailureListener(
