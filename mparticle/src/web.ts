@@ -7,6 +7,7 @@ import type {
   MparticlePlugin,
   Attribute,
   GDPRConsents,
+  DefaultEvent,
 } from './definitions';
 
 export class MparticleWeb extends WebPlugin implements MparticlePlugin {
@@ -99,15 +100,15 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
 
     return Promise.resolve(user.getMPID());
   }
-  trackEvent(name: string, data = {}): void {
+  trackEvent(event: DefaultEvent): void {
     if (!mParticle.isInitialized()) return;
 
-    mParticle.logEvent(name, mParticle.EventType.Other, data);
+    mParticle.logEvent(event.name, mParticle.EventType.Other, event.data);
   }
-  trackPageView(name: string, data = {}): void {
+  trackPageView(event: DefaultEvent): void {
     if (!mParticle.isInitialized()) return;
 
-    mParticle.logPageView(name, data);
+    mParticle.logPageView(event.name, event.data);
   }
   loginUser(): Promise<any> {
     return Promise.reject('not implemented on web.');

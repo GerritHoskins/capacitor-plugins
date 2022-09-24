@@ -25,8 +25,8 @@ export interface MparticlePlugin {
     consents: string[];
   }): Record<string, boolean> | void;
   getMPID(): Promise<string | void>;
-  trackEvent: Events;
-  trackPageView: ScreenEvents;
+  trackEvent(event: DefaultEvent): void;
+  trackPageView(event: DefaultEvent): void;
   loginUser(identifier?: Identifier): Promise<any>;
   logoutUser(options?: any): Promise<any>;
   registerUser(identifier?: Identifier): Promise<any>;
@@ -54,8 +54,6 @@ export type Consent = {
   location?: string;
   hardwareId?: string;
 };
+export type DefaultEvent = { name: string; data?: any };
 export type GDPRConsents = Record<string, Consent>;
-export type Events = DefaultEvent;
-export type ScreenEvents = DefaultEvent;
 export type mParticleReadyListener = (event: MparticleReadyEvent) => void;
-export type DefaultEvent = (name: string, data?: any) => void;

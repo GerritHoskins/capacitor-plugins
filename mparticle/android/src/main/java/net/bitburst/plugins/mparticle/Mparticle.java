@@ -14,8 +14,10 @@ import com.mparticle.consent.ConsentState;
 import com.mparticle.consent.GDPRConsent;
 import com.mparticle.identity.IdentityApiRequest;
 import com.mparticle.identity.MParticleUser;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,7 +63,6 @@ public class Mparticle {
 
     @SuppressLint("MParticleInitialization")
     public void start(Application application) {
-        // public void start(MparticlePlugin plugin) {
         MParticleOptions options = MParticleOptions
             .builder(application.getApplicationContext())
             .credentials("eu1-f7ebd620020cce4e9672de46c1f443ac", "5xhdPuvut8IbRN4qe3siZw7Rg9RqnF9Ef3-McNLJVDnFEjH9fM1-O38SyYZtgCoC")
@@ -193,7 +194,7 @@ public class Mparticle {
     }
 
     public static Map<String, String> ConvertStringMap(JSONObject jsonObject) throws JSONException {
-        Map<String, String> map = new HashMap();
+        Map<String, String> map = new HashMap<String, String>();
 
         if (jsonObject != null) {
             Iterator<String> iterator = jsonObject.keys();
@@ -216,7 +217,7 @@ public class Mparticle {
     }
 
     private static Map<MParticle.IdentityType, String> ConvertUserIdentities(JSONObject jsonObject) throws JSONException {
-        Map<MParticle.IdentityType, String> map = new HashMap();
+        Map<MParticle.IdentityType, String> map = new HashMap<MParticle.IdentityType, String>();
         if (jsonObject != null) {
             Map<String, String> stringMap = ConvertStringMap(jsonObject);
             for (Map.Entry<String, String> entry : stringMap.entrySet()) {
@@ -230,16 +231,20 @@ public class Mparticle {
     }
 
     private static GDPRConsent ConvertGDPRConsent(JSONObject map) throws JSONException, ParseException {
-        String dateStr = "2022-08-29T16:02:17.14Z";
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date timestamp = sdf.parse(dateStr);
+        Boolean consented = false;
+        consented = map.getBoolean("consented");
+        Long timestamp = new Timestamp(System.currentTimeMillis()).getTime();
+        String document = "";
+        String location = "";
+        String hardwareId = "";
+        hardwareId = map.getString("hardwareId");
 
         GDPRConsent consent = GDPRConsent
-            .builder(map.getBoolean("consented"))
-            .document(map.getString("document"))
-            .timestamp(timestamp.getTime())
-            .location(map.getString("location"))
-            .hardwareId(map.getString("hardwareId"))
+            .builder(consented)
+            .document(document)
+            .timestamp(timestamp)
+            .location(location)
+            .hardwareId(hardwareId)
             .build();
 
         return consent;
