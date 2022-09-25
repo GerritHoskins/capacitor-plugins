@@ -21,12 +21,12 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
       mParticle.init(key, mParticleConfig);
     });
   }
-  identifyUser(identifier: Identifier): Promise<void> {
+  identifyUser(identifier: Identifier): Promise<any> {
     if (!identifier) return Promise.resolve();
     const { email, customerId, other } = identifier;
 
     return new Promise(resolve => {
-      if (!mParticle.isInitialized()) return resolve();
+      if (!mParticle.isInitialized()) return resolve(undefined);
       const userIdentities: UserIdentities = {};
       if (email) userIdentities.email = email;
       if (customerId) userIdentities.customerid = customerId;
@@ -36,7 +36,7 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
         {
           userIdentities: userIdentities,
         },
-        () => resolve(),
+        () => resolve(userIdentities.customerid),
       );
     });
   }
@@ -47,6 +47,18 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
     if (!user) return Promise.resolve();
 
     user.setUserAttribute(attribute.name, attribute.value);
+    return Promise.resolve();
+  }
+  setUserAttributes(attributes: Attribute[]): Promise<void> {
+    if (!mParticle.isInitialized()) return Promise.resolve();
+
+    const user = mParticle.Identity.getCurrentUser();
+    if (!user) return Promise.resolve();
+
+    attributes.forEach(attribute =>
+      user.setUserAttribute(attribute.name, attribute.value),
+    );
+
     return Promise.resolve();
   }
   setGDPRConsent(gdprConsents: GDPRConsents): void {
@@ -110,13 +122,22 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
 
     mParticle.logPageView(event.name, event.data);
   }
-  loginUser(): Promise<any> {
-    return Promise.reject('not implemented on web.');
+  loginUser(identifier?: Identifier): Promise<any> {
+    if (!identifier) return Promise.resolve();
+    const { customerId } = identifier;
+
+    return new Promise(resolve => {
+      if (!mParticle.isInitialized()) return Promise.resolve();
+      mParticle.Identity.login(
+        { userIdentities: { customerid: customerId } as UserIdentities },
+        result => resolve(result.getUser().getMPID),
+      );
+    });
   }
   logoutUser(): Promise<any> {
-    return Promise.reject('not implemented on web.');
-  }
-  registerUser(): Promise<any> {
-    return Promise.reject('not implemented on web.');
+    return new Promise(resolve => {
+      if (!mParticle.isInitialized()) return Promise.resolve();
+      mParticle.Identity.logout({}, result => resolve(result.getUser()));
+    });
   }
 }

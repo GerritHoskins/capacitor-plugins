@@ -12,20 +12,18 @@ import com.mparticle.MParticleOptions;
 import com.mparticle.consent.ConsentState;
 import com.mparticle.consent.GDPRConsent;
 import com.mparticle.identity.IdentityApiRequest;
-import com.mparticle.identity.IdentityApiResult;
 import com.mparticle.identity.MParticleUser;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Mparticle {
-
-    private long userid = 0;
 
     public interface OnReadyListener {
         void onReady();
@@ -85,13 +83,23 @@ public class Mparticle {
         return Objects.requireNonNull(MParticle.getInstance()).Identity().getCurrentUser();
     }
 
-    public void setUserAttribute(final String name, final String value) {
-        MParticleUser selectedUser = Objects.requireNonNull(MParticle.getInstance()).Identity().getUser(this.userid);
-        if (selectedUser != null) selectedUser.setUserAttribute(name, value);
+    public boolean setUserAttribute(final String userId, final String name, final JSObject value) {
+        long mpid = MparticleHelper.parseString(userId);
+        MParticleUser selectedUser = Objects.requireNonNull(MParticle.getInstance()).Identity().getUser(mpid);
+        return selectedUser.setUserAttribute(name, value);
+    }
+
+    public boolean setUserAttributes(final String userId, final List<Object> attributes) throws JSONException {
+        long mpid = MparticleHelper.parseString(userId);
+        MParticleUser selectedUser = MParticle.getInstance().Identity().getUser(mpid);
+        assert attributes != null;
+        Map<String, Object> attributeMap = MparticleHelper.MapObjectList(attributes);
+        assert selectedUser != null;
+        return selectedUser.setUserAttributes(attributeMap);
     }
 
     public MPEvent trackEvent(final JSObject data) throws JSONException {
-        Map<String, String> customAttributes = ConvertStringMap((JSONObject) data);
+        Map<String, String> customAttributes = MparticleHelper.ConvertStringMap((JSONObject) data);
         String name = data.getString("name");
         EventType eventType = getEventType(data.getInteger("eventType", 8)); //EventType 8:OTHER
         assert name != null;
@@ -130,49 +138,17 @@ public class Mparticle {
         return ConvertIdentityAPIRequest((JSONObject) data);
     }
 
-    public void identityResultHandler(JSObject data, IdentityApiResult result) {
-        if (data != null) {
-            Iterator<String> iter = data.keys();
-            while (iter.hasNext()) {
-                String key = iter.next();
-                try {
-                    Object value = data.get(key);
-                    result.getUser().setUserAttribute(key, value);
-                    MParticleUser user = result.getUser();
-                    this.userid = user.getId();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private static Map<String, String> ConvertStringMap(JSONObject jsonObject) throws JSONException {
-        Map<String, String> map = new HashMap<>();
-
-        if (jsonObject != null) {
-            Iterator<String> iterator = jsonObject.keys();
-            while (iterator.hasNext()) {
-                String key = iterator.next();
-                map.put(key, jsonObject.getString(key));
-            }
-        }
-        return map;
-    }
-
     private static IdentityApiRequest ConvertIdentityAPIRequest(JSONObject map) throws JSONException {
         IdentityApiRequest.Builder identityRequest = IdentityApiRequest.withEmptyUser();
-
         Map<MParticle.IdentityType, String> userIdentities = ConvertUserIdentities(map);
         identityRequest.userIdentities(userIdentities);
-
         return identityRequest.build();
     }
 
     private static Map<MParticle.IdentityType, String> ConvertUserIdentities(JSONObject jsonObject) throws JSONException {
         Map<MParticle.IdentityType, String> map = new HashMap<>();
         if (jsonObject != null) {
-            Map<String, String> stringMap = ConvertStringMap(jsonObject);
+            Map<String, String> stringMap = MparticleHelper.ConvertStringMap(jsonObject);
             for (Map.Entry<String, String> entry : stringMap.entrySet()) {
                 MParticle.IdentityType identity = ConvertIdentityType(entry.getKey());
                 String value = entry.getValue();
@@ -217,13 +193,5 @@ public class Mparticle {
             }
         }
         return EventType.Other;
-    }
-
-    private long parseMpid(String longString) {
-        try {
-            return Long.parseLong(longString);
-        } catch (NumberFormatException ex) {
-            return 0L;
-        }
     }
 }

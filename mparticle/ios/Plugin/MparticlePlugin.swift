@@ -11,16 +11,25 @@ public class MparticlePlugin: CAPPlugin {
     }
 
     @objc func identifyUser(_ call: CAPPluginCall) {
+        let other = call.getString("other") ?? ""
         let email = call.getString("email") ?? ""
         let customerId = call.getString("customerId") ?? ""
         MParticle.sharedInstance().identity.identify(implementation.identityRequest(email, customerId)!, completion: implementation.identityCallback)
     }
 
     @objc func setUserAttribute(_ call: CAPPluginCall) {
-        let name = call.getString("attributeName") ?? ""
-        let value = call.getString("attributeValue") ?? ""
+        let userId = call.getString("userId") ?? ""
+        let name = call.getString("name") ?? ""
+        let value = call.getString("value") ?? ""
 
         implementation.currentUser()?.setUserAttribute(name, value: value)
+        call.resolve()
+    }
+
+    @objc func setUserAttributes(_ call: CAPPluginCall) {
+        let attributes = call.getArray("attributes") ?? ""
+
+        //implementation.currentUser()?.setUserAttribute(name, value: value)
         call.resolve()
     }
 
@@ -35,7 +44,7 @@ public class MparticlePlugin: CAPPlugin {
     @objc func getMPID(_ call: CAPPluginCall) {
         let mpid = implementation.currentUser()!.userId.stringValue
         call.resolve([
-            "MPID": mpid
+            "userId": mpid
         ])
     }
 
@@ -70,7 +79,7 @@ public class MparticlePlugin: CAPPlugin {
     @objc func registerUser(_ call: CAPPluginCall) {
         let email = call.getString("email") ?? ""
         let customerId = call.getString("customerId") ?? ""
-        let userAttributes = call.getObject("userAttributes") ?? [:]
+        let other = call.getString("other") ?? ""
 
         MParticle.sharedInstance().identity.login(implementation.identityRequest(email, customerId)!, completion: { (result: MPIdentityApiResult?, error: Error?) -> Void in
             if result?.user != nil {

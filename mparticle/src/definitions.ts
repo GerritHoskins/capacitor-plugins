@@ -18,8 +18,9 @@ export interface MparticlePlugin {
     config: Record<string, unknown>,
     secret?: string,
   ): Promise<void>;
-  identifyUser(identifier?: Identifier): Promise<void>;
+  identifyUser(identifier?: Identifier): Promise<any>;
   setUserAttribute(attribute: Attribute): Promise<void>;
+  setUserAttributes(attributes: Attribute[]): Promise<void>;
   setGDPRConsent(gdprConsents: GDPRConsents): void;
   getGDPRConsent(options: {
     consents: string[];
@@ -29,7 +30,6 @@ export interface MparticlePlugin {
   trackPageView(event: DefaultEvent): void;
   loginUser(identifier?: Identifier): Promise<any>;
   logoutUser(options?: any): Promise<any>;
-  registerUser(identifier?: Identifier): Promise<any>;
   addListener(
     eventName: 'mParticleReady',
     listenerFunc: mParticleReadyListener,

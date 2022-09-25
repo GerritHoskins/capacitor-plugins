@@ -7,8 +7,10 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.mparticle.consent.GDPRConsent;
 import com.mparticle.identity.IdentityApiRequest;
+import com.mparticle.identity.MParticleUser;
 import java.text.ParseException;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.json.JSONException;
@@ -33,19 +35,35 @@ public class MparticlePlugin extends Plugin {
 
     @PluginMethod
     public void identifyUser(PluginCall call) {
+        JSObject data = call.getData();
         try {
-            IdentityApiRequest request = implementation.identityRequest(call, call.getData());
+            IdentityApiRequest request = implementation.identityRequest(call, data);
             Mparticle
                 .sharedInstance()
                 .Identity()
                 .identify(request)
                 .addFailureListener(
-                    identityHttpResponse -> call.reject("message ", Objects.requireNonNull(identityHttpResponse).toString())
+                    identityHttpResponse -> call.reject(LOG_TAG, Objects.requireNonNull(identityHttpResponse).toString())
                 )
                 .addSuccessListener(
                     identityApiResult -> {
-                        implementation.identityResultHandler(call.getData(), identityApiResult);
-                        call.resolve();
+                        if (data != null) {
+                            Iterator<String> iterator = data.keys();
+                            while (iterator.hasNext()) {
+                                String key = iterator.next();
+                                try {
+                                    MParticleUser user = identityApiResult.getUser();
+                                    user.setUserAttribute(key, data.get(key));
+
+                                    JSObject ret = new JSObject();
+                                    ret.put("userId", Long.toString(user.getId()));
+                                    call.resolve();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    call.reject(LOG_TAG, e.getLocalizedMessage());
+                                }
+                            }
+                        }
                     }
                 );
         } catch (JSONException e) {
@@ -56,12 +74,32 @@ public class MparticlePlugin extends Plugin {
 
     @PluginMethod
     public void setUserAttribute(PluginCall call) {
+        String userId = call.getString("userId");
         String name = call.getString("name");
-        String value = call.getString("value");
-        assert name != null;
-        assert value != null;
-        implementation.setUserAttribute(name, value);
+        JSObject value = call.getObject("value");
+        var success = implementation.setUserAttribute(userId, name, value);
+        if (!success) {
+            call.reject(LOG_TAG, "failed to set user attribute");
+            return;
+        }
         call.resolve();
+    }
+
+    @PluginMethod
+    public void setUserAttributes(PluginCall call) {
+        try {
+            List<Object> attributes = call.getArray("attributes").toList();
+            String userId = call.getString("userId");
+            var success = implementation.setUserAttributes(userId, attributes);
+            if (!success) {
+                call.reject(LOG_TAG, "failed to set user attributes");
+                return;
+            }
+            call.resolve();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            call.reject(LOG_TAG, e.getLocalizedMessage());
+        }
     }
 
     @PluginMethod
@@ -90,7 +128,7 @@ public class MparticlePlugin extends Plugin {
     @PluginMethod
     public void getMPID(PluginCall call) {
         long mpid = implementation.currentUser().getId();
-        JSObject ret = new JSObject().put("MPID", mpid);
+        JSObject ret = new JSObject().put("userId", Long.toString(mpid));
         call.resolve(ret);
     }
 
@@ -123,8 +161,19 @@ public class MparticlePlugin extends Plugin {
     @PluginMethod
     public void loginUser(PluginCall call) {
         try {
-            Mparticle.sharedInstance().Identity().login(implementation.identityRequest(call, call.getData()));
-            call.resolve();
+            Mparticle
+                .sharedInstance()
+                .Identity()
+                .login(implementation.identityRequest(call, call.getData()))
+                .addFailureListener(identityHttpResponse -> call.reject(LOG_TAG, Objects.requireNonNull(identityHttpResponse).toString()))
+                .addSuccessListener(
+                    identityApiResult -> {
+                        String userId = Long.toString(identityApiResult.getUser().getId());
+                        JSObject ret = new JSObject();
+                        ret.put("userId", userId);
+                        call.resolve(ret);
+                    }
+                );
         } catch (JSONException e) {
             e.printStackTrace();
             call.reject(LOG_TAG, e.getLocalizedMessage());
@@ -134,28 +183,21 @@ public class MparticlePlugin extends Plugin {
     @PluginMethod
     public void logoutUser(PluginCall call) {
         try {
-            Mparticle.sharedInstance().Identity().logout(implementation.identityRequest(call, call.getData()));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        call.resolve();
-    }
-
-    @PluginMethod
-    public void registerUser(PluginCall call) {
-        try {
             Mparticle
                 .sharedInstance()
                 .Identity()
-                .login(implementation.identityRequest(call, call.getData()))
-                .addFailureListener(
-                    identityHttpResponse -> {
-                        call.reject("message ", Objects.requireNonNull(identityHttpResponse).toString());
+                .logout(implementation.identityRequest(call, call.getData()))
+                .addFailureListener(identityHttpResponse -> call.reject(LOG_TAG, Objects.requireNonNull(identityHttpResponse).toString()))
+                .addSuccessListener(
+                    identityApiResult -> {
+                        JSObject ret = new JSObject();
+                        ret.put("user", identityApiResult.getUser());
+                        call.resolve(ret);
                     }
-                )
-                .addSuccessListener(identityApiResult -> implementation.identityResultHandler(call.getData(), identityApiResult));
+                );
         } catch (JSONException e) {
             e.printStackTrace();
+            call.reject(LOG_TAG, e.getLocalizedMessage());
         }
     }
 

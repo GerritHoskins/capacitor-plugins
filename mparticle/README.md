@@ -16,6 +16,7 @@ npx cap sync
 * [`init(...)`](#init)
 * [`identifyUser(...)`](#identifyuser)
 * [`setUserAttribute(...)`](#setuserattribute)
+* [`setUserAttributes(...)`](#setuserattributes)
 * [`setGDPRConsent(...)`](#setgdprconsent)
 * [`getGDPRConsent(...)`](#getgdprconsent)
 * [`getMPID()`](#getmpid)
@@ -23,7 +24,6 @@ npx cap sync
 * [`trackPageView(...)`](#trackpageview)
 * [`loginUser(...)`](#loginuser)
 * [`logoutUser(...)`](#logoutuser)
-* [`registerUser(...)`](#registeruser)
 * [`addListener('mParticleReady', ...)`](#addlistenermparticleready)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
@@ -51,12 +51,14 @@ init(key: string, config: Record<string, unknown>, secret?: string | undefined) 
 ### identifyUser(...)
 
 ```typescript
-identifyUser(identifier?: Identifier | undefined) => Promise<void>
+identifyUser(identifier?: Identifier | undefined) => Promise<any>
 ```
 
 | Param            | Type                                              |
 | ---------------- | ------------------------------------------------- |
 | **`identifier`** | <code><a href="#identifier">Identifier</a></code> |
+
+**Returns:** <code>Promise&lt;any&gt;</code>
 
 --------------------
 
@@ -70,6 +72,19 @@ setUserAttribute(attribute: Attribute) => Promise<void>
 | Param           | Type                                            |
 | --------------- | ----------------------------------------------- |
 | **`attribute`** | <code><a href="#attribute">Attribute</a></code> |
+
+--------------------
+
+
+### setUserAttributes(...)
+
+```typescript
+setUserAttributes(attributes: Attribute[]) => Promise<void>
+```
+
+| Param            | Type                     |
+| ---------------- | ------------------------ |
+| **`attributes`** | <code>Attribute[]</code> |
 
 --------------------
 
@@ -163,21 +178,6 @@ logoutUser(options?: any) => Promise<any>
 | Param         | Type             |
 | ------------- | ---------------- |
 | **`options`** | <code>any</code> |
-
-**Returns:** <code>Promise&lt;any&gt;</code>
-
---------------------
-
-
-### registerUser(...)
-
-```typescript
-registerUser(identifier?: Identifier | undefined) => Promise<any>
-```
-
-| Param            | Type                                              |
-| ---------------- | ------------------------------------------------- |
-| **`identifier`** | <code><a href="#identifier">Identifier</a></code> |
 
 **Returns:** <code>Promise&lt;any&gt;</code>
 
