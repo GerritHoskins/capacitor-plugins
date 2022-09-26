@@ -11,30 +11,46 @@ public class MparticlePlugin: CAPPlugin {
     }
 
     @objc func identifyUser(_ call: CAPPluginCall) {
-        let other = call.getString("other") ?? ""
-        let email = call.getString("email") ?? ""
-        let customerId = call.getString("customerId") ?? ""
-        MParticle.sharedInstance().identity.identify(implementation.identityRequest(email, customerId)!, completion: implementation.identityCallback)
+        let userAttributes:JSObject = call.getData() ?? [:]
+        MParticle.sharedInstance().identity.login(implementation.identityRequest(email, customerId)!, completion: { (result: MPIdentityApiResult?, error: Error?) -> Void in
+            if result?.user != nil {
+                for (key, value) in userAttributes {
+                    result?.user.setUserAttribute(key, value: value)
+                }
+                resolve(user.userId)
+            } else {
+                NSLog(error!.localizedDescription)
+                let resultCode = MPIdentityErrorResponseCode(rawValue: UInt((error! as NSError).code))
+                switch resultCode! {
+                case .clientNoConnection,
+                     .clientSideTimeout:
+                    // retry the IDSync request
+                    break
+                case .requestInProgress,
+                     .retry:
+                    break
+                default:
+                    break
+                }
+            }
+        })
+        call.resolve()
     }
 
     @objc func setUserAttribute(_ call: CAPPluginCall) {
-        let userId = call.getString("userId") ?? ""
-        let name = call.getString("name") ?? ""
-        let value = call.getString("value") ?? ""
-
-        implementation.currentUser()?.setUserAttribute(name, value: value)
+        implementation.currentUser()?.setUserAttribute(call.getData())
         call.resolve()
     }
 
     @objc func setUserAttributes(_ call: CAPPluginCall) {
         let attributes = call.getArray("attributes") ?? ""
-
-        //implementation.currentUser()?.setUserAttribute(name, value: value)
+        //implementation.currentUser()?.setUserAttributes(name, value: value)
         call.resolve()
     }
 
     @objc func setGDPRConsent(_ call: CAPPluginCall) {
-        call.unimplemented()
+      let consents:JSObject = call.getObject("consents") ?? [:]
+      implementation.addGDPRConsentState(consents);
     }
 
     @objc func getGDPRConsent(_ call: CAPPluginCall) {
@@ -73,35 +89,6 @@ public class MparticlePlugin: CAPPlugin {
 
     @objc func logoutUser(_ call: CAPPluginCall) {
         MParticle.sharedInstance().identity.logout(completion: implementation.identityCallback)
-        call.resolve()
-    }
-
-    @objc func registerUser(_ call: CAPPluginCall) {
-        let email = call.getString("email") ?? ""
-        let customerId = call.getString("customerId") ?? ""
-        let other = call.getString("other") ?? ""
-
-        MParticle.sharedInstance().identity.login(implementation.identityRequest(email, customerId)!, completion: { (result: MPIdentityApiResult?, error: Error?) -> Void in
-            if result?.user != nil {
-                for (key, value) in userAttributes {
-                    result?.user.setUserAttribute(key, value: value)
-                }
-            } else {
-                NSLog(error!.localizedDescription)
-                let resultCode = MPIdentityErrorResponseCode(rawValue: UInt((error! as NSError).code))
-                switch resultCode! {
-                case .clientNoConnection,
-                     .clientSideTimeout:
-                    // retry the IDSync request
-                    break
-                case .requestInProgress,
-                     .retry:
-                    break
-                default:
-                    break
-                }
-            }
-        })
         call.resolve()
     }
 
