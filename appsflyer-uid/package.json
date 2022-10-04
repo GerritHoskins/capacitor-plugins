@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/appsflyer-uid",
-  "version": "4.0.6",
+  "version": "4.0.7",
   "description": "capacitor plugin for fetching the appsflyer uid",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
