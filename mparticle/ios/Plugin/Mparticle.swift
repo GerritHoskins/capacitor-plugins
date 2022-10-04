@@ -5,6 +5,7 @@ import AppTrackingTransparency
 import AdSupport
 import Capacitor
 
+
 @objc public class Mparticle: NSObject {
     var identityRequest: MPIdentityApiRequest?
     /*
@@ -17,7 +18,7 @@ import Capacitor
         options.dataPlanId = "bitcode_frontend_plan"
         options.dataPlanVersion = 4
 
-        options.identifyRequest = self.identityRequest("", "")!
+        options.identifyRequest = self.identityRequest([:])!
         options.onIdentifyComplete = identityCallback
 
         if #available(iOS 14, *) {
@@ -47,31 +48,37 @@ import Capacitor
         return MParticle.sharedInstance().identity.currentUser
     }
 
-    @objc public func setUserAttribute(_ data: [String: Any]?) -> Boolean? {
-     if let attributes = data,
-       let name = attributes["name"] as? String,
-       let value = attributes["value"],
-       let userId = attributes["userId"] as? String,
-       let mpid = Int64(userId),
-       let user = MParticle.sharedInstance().identity.getUser(NSNumber(value:mpid)) {
-        return user.setUserAttribute(name, value: value)
-       }
+    @objc public func identityRequest(_ data: JSObject) -> MPIdentityApiRequest? {
+        self.identityRequest = MPIdentityApiRequest.withEmptyUser()
+        for (key,value) in data {
+            self.identityRequest!.setIdentity(value as? String, identityType: self.convertIdentityType(key))
+        }
+
+        return self.identityRequest
     }
 
-    @objc public func setUserAttributes(_ data: [String: Any]?) -> Boolean? {
-        for key in data.keys {
-           if let attributes = data,
-               let name = attributes["name"] as? String,
-               let value = attributes["value"],
-               let userId = attributes["userId"] as? String,
-               let mpid = Int64(userId),
-               let user = MParticle.sharedInstance().identity.getUser(NSNumber(value:mpid)) {
-                return user.setUserAttribute(name, value: value)
-               }
-        }
+    public func setUserAttribute(_ userId: String, _ name: String, _ value: JSObject) -> Bool {
+        guard let mpid = Int64(userId) else { return false }
+        let user = MParticle.sharedInstance().identity.getUser(NSNumber(value:mpid))
+        user?.setUserAttribute(name, value: value)
+        return true
+    }
+
+    public func setUserAttributes(_ userId: String, _ data: JSArray) -> Bool {
+       guard let mpid = Int64(userId) else { return false }
+       let user = MParticle.sharedInstance().identity.getUser(NSNumber(value:mpid))
+       data.forEach { (attribute) in
+           user?.setUserAttribute(attribute["name"] as! String, value: attribute["value"] as Any)
+       }
+       return true
     }
 
     @objc public func trackEvent() -> MPEvent? {
+        if let event = MPEvent(name: "Video Watched", type: MPEventType.navigation) {
+            event.customAttributes = ["category": "Destination Intro", "title": "Paris"]
+            MParticle.sharedInstance().logEvent(event)
+        }
+    }
     /*
        if let callArguments = call.arguments as? [String: Any],
                   let eventName = callArguments["eventName"] as? String,
@@ -92,8 +99,8 @@ import Capacitor
                } else {
                    print("Incorrect argument for \(call.method) iOS method")
                }
-               */
-    }
+
+    }*/
 
     @objc public func trackPageView() -> MPEvent? {
     /*
@@ -116,14 +123,11 @@ import Capacitor
     */
     }
 
-    @objc public func addGDPRConsentState(_ consents: JSObject) {
+    public func addGDPRConsentState(_ consents: JSObject) {
       let user = self.currentUser()
       for key in consents.keys {
            let consentState = user.consentState() {
-                consentState.addGDPRConsentState(consent, purpose: key)
-            }
-            else {
-                print("Incorrect argument for \(call.method) iOS method")
+                consentState.addGDPRConsentState(consents[key], purpose: key)
             }
       }
       /*if let callArguments = call.arguments as? [String: Any],
@@ -180,11 +184,14 @@ import Capacitor
                }
     }
 
-    @objc public func identityRequest(_ email: String, _ customerId: String) -> MPIdentityApiRequest? {
-        self.identityRequest = MPIdentityApiRequest.withEmptyUser()
-        self.identityRequest?.email = email
-        self.identityRequest!.customerId = customerId
-        return self.identityRequest
+    private func convertIdentityType(_ val: String) -> MPIdentity {
+        if (val == "customerId") {
+            return MPIdentity.customerId;
+        } else if (val == "email") {
+            return MPIdentity.email;
+        } else {
+            return MPIdentity.other;
+        }
     }
 
     var identityCallback = {(result: MPIdentityApiResult?, error: Error?) in

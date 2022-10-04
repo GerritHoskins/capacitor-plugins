@@ -18,7 +18,7 @@ import org.json.JSONException;
 @CapacitorPlugin(name = "Mparticle")
 public class MparticlePlugin extends Plugin {
 
-    public static final String LOG_TAG = "bitburst.mparticle ";
+    public static final String LOG_TAG = "bitburst.mparticle.plugin ";
     private static Mparticle implementation = null;
 
     @Override

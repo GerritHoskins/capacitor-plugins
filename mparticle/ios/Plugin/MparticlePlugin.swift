@@ -2,49 +2,44 @@ import Foundation
 import Capacitor
 import mParticle_Apple_SDK
 
+public typealias JSObject = [String:Any]
+public typealias JSArray = [JSObject]
+
 @objc(MparticlePlugin)
 public class MparticlePlugin: CAPPlugin {
     private let implementation = Mparticle()
+    public let LOG_TAG = "bitburst.mparticle.plugin "
 
     override public func load() {
         implementation.start(MParticleOptions(key: "", secret: ""))
     }
 
     @objc func identifyUser(_ call: CAPPluginCall) {
-        let userAttributes:JSObject = call.getData() ?? [:]
-        MParticle.sharedInstance().identity.login(implementation.identityRequest(email, customerId)!, completion: { (result: MPIdentityApiResult?, error: Error?) -> Void in
-            if result?.user != nil {
-                for (key, value) in userAttributes {
-                    result?.user.setUserAttribute(key, value: value)
-                }
-                resolve(user.userId)
-            } else {
-                NSLog(error!.localizedDescription)
-                let resultCode = MPIdentityErrorResponseCode(rawValue: UInt((error! as NSError).code))
-                switch resultCode! {
-                case .clientNoConnection,
-                     .clientSideTimeout:
-                    // retry the IDSync request
-                    break
-                case .requestInProgress,
-                     .retry:
-                    break
-                default:
-                    break
-                }
-            }
-        })
+        let data:JSObject = call.getObject("identifier") ?? [:]
+        MParticle.sharedInstance().identity.identify(implementation.identityRequest(data)!, completion: {(identityResult: MPIdentityApiResult?, error: Error?) in
+           // result(convertToIdentityResultJson(result: identityResult, error: error))
+          })
         call.resolve()
     }
 
     @objc func setUserAttribute(_ call: CAPPluginCall) {
-        implementation.currentUser()?.setUserAttribute(call.getData())
+        let userId = call.getString("userId") ?? ""
+        let name = call.getString("name") ?? ""
+        let value = call.getObject("value") ?? [:]
+        let success = implementation.setUserAttribute(userId, name, value)
+        if(!success) {
+            call.reject(self.LOG_TAG, "failed to set user attribute")
+        }
         call.resolve()
     }
 
     @objc func setUserAttributes(_ call: CAPPluginCall) {
-        let attributes = call.getArray("attributes") ?? ""
-        //implementation.currentUser()?.setUserAttributes(name, value: value)
+        let userId = call.getString("userId") ?? ""
+        let attributes = (call.getArray("attributes") ?? []) as! JSArray
+        let success = implementation.setUserAttributes(userId, attributes)
+        if(!success) {
+            call.reject(self.LOG_TAG, "failed to set user attributes")
+        }
         call.resolve()
     }
 
