@@ -1,6 +1,6 @@
 {
   "name": "@gerrithoskins/appsflyer-uid",
-  "version": "4.0.5",
+  "version": "4.0.6",
   "description": "capacitor plugin for fetching the appsflyer uid",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -16,7 +16,7 @@
   "author": "",
   "license": "MIT",
   "repository": {
-    "url": "git+https://github.com/GerritHoskins/capacitor-plugins"
+    "url": "https://github.com/GerritHoskins/capacitor-plugins"
   },
   "bugs": {
     "url": "https://github.com/BitBurst-GmbH/capacitor-plugins/issues"
@@ -35,7 +35,7 @@
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",
     "eslint": "eslint . --ext ts",
     "prettier": "prettier \"**/*.{css,html,ts,js,java}\"",
-    "swiftlint": "node-swiftlint",
+    "swiftlint": "node-swiftlint --fix --format",
     "docgen": "docgen --api AppsflyerUidPlugin --output-readme README.md --output-json dist/docs.json",
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
     "clean": "rimraf ./dist",
