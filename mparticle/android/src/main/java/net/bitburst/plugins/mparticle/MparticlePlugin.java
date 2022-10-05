@@ -24,7 +24,6 @@ public class MparticlePlugin extends Plugin {
     @Override
     public void load() {
         implementation = new Mparticle(this);
-        //notifyListeners("mParticleReady", new JSObject().put("ready", Mparticle.sharedInstance() != null), true);
         super.load();
     }
 
@@ -42,9 +41,7 @@ public class MparticlePlugin extends Plugin {
                 .sharedInstance()
                 .Identity()
                 .identify(request)
-                .addFailureListener(
-                    identityHttpResponse -> call.reject(LOG_TAG, Objects.requireNonNull(identityHttpResponse).toString())
-                )
+                .addFailureListener(identityHttpResponse -> call.reject(LOG_TAG, Objects.requireNonNull(identityHttpResponse).toString()))
                 .addSuccessListener(
                     identityApiResult -> {
                         if (data != null) {

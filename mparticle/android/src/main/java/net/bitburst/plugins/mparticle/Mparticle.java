@@ -59,10 +59,8 @@ public class Mparticle {
 
     @SuppressLint("MParticleInitialization")
     public void start(Application application) {
-        String mParticleKey = mPlugin.getConfig().getString("key", "eu1-f7ebd620020cce4e9672de46c1f443ac");
-        String mParticleSecret = mPlugin
-            .getConfig()
-            .getString("secret", "5xhdPuvut8IbRN4qe3siZw7Rg9RqnF9Ef3-McNLJVDnFEjH9fM1-O38SyYZtgCoC");
+        String mParticleKey = mPlugin.getConfig().getString("key", "");
+        String mParticleSecret = mPlugin.getConfig().getString("secret", "");
         MParticleOptions options = MParticleOptions
             .builder(application.getApplicationContext())
             .credentials(mParticleKey, mParticleSecret)

@@ -3,6 +3,11 @@ import AppsFlyerLib
 
 @objc public class AppsflyerUid: NSObject {
     @objc public func getUID() -> String {
-        return ""
+        var uid = ""
+        if(AppsFlyerLib.shared().getAppsFlyerUID() != "") {
+            uid = AppsFlyerLib.shared().getAppsFlyerUID()
+        }
+
+        return uid
     }
 }
