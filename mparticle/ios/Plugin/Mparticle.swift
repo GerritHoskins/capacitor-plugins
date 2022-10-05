@@ -7,7 +7,6 @@ import Capacitor
 
 @objc public class Mparticle: NSObject {
     var identityRequest: MPIdentityApiRequest?
-    var userId: NSNumber?
 
     /*if var appDelegate = UIApplication.shared.delegate as? AppDelegate {
      appDelegate.test()
@@ -27,7 +26,6 @@ import Capacitor
                 switch status {
                 case .authorized:
                     MParticle.sharedInstance().setATTStatus(MPATTAuthorizationStatus(rawValue: 3)!, withATTStatusTimestampMillis: nil)
-                    print(ASIdentifierManager.shared().advertisingIdentifier.uuidString)
                     self.identityRequest!.setIdentity(ASIdentifierManager.shared().advertisingIdentifier.uuidString, identityType: MPIdentity.iosAdvertiserId)
                     MParticle.sharedInstance().identity.modify(identityRequest!, completion: self.identityCallback)
                 case .denied:
@@ -57,20 +55,18 @@ import Capacitor
         return self.identityRequest
     }
 
-    public func setUserAttribute(_ userId: String, _ name: String, _ value: JSObject) -> Bool {
-        guard let mpid = Int64(userId) else { return false }
+    public func setUserAttribute(_ userId: String, _ name: String, _ value: String) {
+        let mpid = Int64(userId) ?? self.currentUser()?.userId as! Int64
         let user = MParticle.sharedInstance().identity.getUser(NSNumber(value: mpid))
         user?.setUserAttribute(name, value: value)
-        return true
     }
 
-    public func setUserAttributes(_ userId: String, _ data: JSArray) -> Bool {
-        guard let mpid = Int64(userId) else { return false }
+    public func setUserAttributes(_ userId: String, _ data: JSArray) {
+        let mpid = Int64(userId) ?? self.currentUser()?.userId as! Int64
         let user = MParticle.sharedInstance().identity.getUser(NSNumber(value: mpid))
         data.forEach { (attribute) in
             user?.setUserAttribute(attribute["name"] as! String, value: attribute["value"] as Any)
         }
-        return true
     }
 
     public func addGDPRConsentState(_ consented: Bool, _ consents: JSObject) {
@@ -95,7 +91,7 @@ import Capacitor
     }
 
     @objc public func trackPageView(_ name: String, _ eventType: MPEventType, _ data: JSObject) {
-        if let mpEvent = MPEvent(name: name, type: eventType ) {
+        if MPEvent(name: name, type: eventType ) != nil {
             MParticle.sharedInstance().logScreen(name, eventInfo: data)
         }
     }
