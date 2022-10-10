@@ -22,9 +22,7 @@ npx cap sync
 * [`getMPID()`](#getmpid)
 * [`trackEvent(...)`](#trackevent)
 * [`trackPageView(...)`](#trackpageview)
-* [`loginUser(...)`](#loginuser)
-* [`logoutUser(...)`](#logoutuser)
-* [`addListener('mParticleReady', ...)`](#addlistenermparticleready)
+* [`trackPurchase(...)`](#trackpurchase)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -154,48 +152,15 @@ trackPageView(event: DefaultEvent) => void
 --------------------
 
 
-### loginUser(...)
+### trackPurchase(...)
 
 ```typescript
-loginUser(identifier?: Identifier | undefined) => Promise<any>
+trackPurchase(product: Product) => Promise<void>
 ```
 
-| Param            | Type                                              |
-| ---------------- | ------------------------------------------------- |
-| **`identifier`** | <code><a href="#identifier">Identifier</a></code> |
-
-**Returns:** <code>Promise&lt;any&gt;</code>
-
---------------------
-
-
-### logoutUser(...)
-
-```typescript
-logoutUser(options?: any) => Promise<any>
-```
-
-| Param         | Type             |
-| ------------- | ---------------- |
-| **`options`** | <code>any</code> |
-
-**Returns:** <code>Promise&lt;any&gt;</code>
-
---------------------
-
-
-### addListener('mParticleReady', ...)
-
-```typescript
-addListener(eventName: 'mParticleReady', listenerFunc: mParticleReadyListener) => Promise<PluginListenerHandle> & PluginListenerHandle
-```
-
-| Param              | Type                                                                      |
-| ------------------ | ------------------------------------------------------------------------- |
-| **`eventName`**    | <code>'mParticleReady'</code>                                             |
-| **`listenerFunc`** | <code><a href="#mparticlereadylistener">mParticleReadyListener</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+| Param         | Type                                        |
+| ------------- | ------------------------------------------- |
+| **`product`** | <code><a href="#product">Product</a></code> |
 
 --------------------
 
@@ -203,18 +168,22 @@ addListener(eventName: 'mParticleReady', listenerFunc: mParticleReadyListener) =
 ### Interfaces
 
 
-#### PluginListenerHandle
+#### Product
 
-| Prop         | Type                                      |
-| ------------ | ----------------------------------------- |
-| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
-
-
-#### MparticleReadyEvent
-
-| Prop        | Type                 |
-| ----------- | -------------------- |
-| **`ready`** | <code>boolean</code> |
+| Prop                        | Type                                    |
+| --------------------------- | --------------------------------------- |
+| **`id`**                    | <code>string</code>                     |
+| **`name`**                  | <code>string</code>                     |
+| **`brand`**                 | <code>string</code>                     |
+| **`category`**              | <code>string</code>                     |
+| **`variant`**               | <code>string</code>                     |
+| **`position`**              | <code>number</code>                     |
+| **`price`**                 | <code>number</code>                     |
+| **`quantity`**              | <code>number</code>                     |
+| **`coupon_code`**           | <code>string</code>                     |
+| **`added_to_cart_time_ms`** | <code>number</code>                     |
+| **`total_product_amount`**  | <code>number</code>                     |
+| **`custom_attributes`**     | <code>{ [key: string]: string; }</code> |
 
 
 ### Type Aliases
@@ -252,8 +221,8 @@ Construct a type with a set of properties K of type T
 <code>{ name: string; data?: any }</code>
 
 
-#### mParticleReadyListener
+#### Product
 
-<code>(event: <a href="#mparticlereadyevent">MparticleReadyEvent</a>): void</code>
+<code>{ productName: string; productSku: string; productPrice: number; productQuantity: number; transactionId: string; }</code>
 
 </docgen-api>
