@@ -160,19 +160,11 @@ public class MparticlePlugin extends Plugin {
         JSObject callData = call.getData();
         if (callData == null) return;
         try {
-            Product product = implementation.createMParticleProduct(callData);
-            TransactionAttributes attributes = new TransactionAttributes();
-            CommerceEvent event = new CommerceEvent.Builder(Product.ADD_TO_CART, product)
-            .customAttributes(customAttributes)
-            .transactionAttributes(attributes)
-            .build();
-            MParticle.getInstance().logEvent(event);
+            Mparticle.sharedInstance().logEvent(implementation.trackPurchase(callData));
         } catch (JSONException e) {
             e.printStackTrace();
             call.reject(LOG_TAG, "failed to track purchase event ", e);
         }
         call.resolve();
-
-
     }
 }

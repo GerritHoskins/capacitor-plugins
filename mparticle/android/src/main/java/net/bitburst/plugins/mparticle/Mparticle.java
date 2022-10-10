@@ -9,6 +9,9 @@ import com.mparticle.MPEvent;
 import com.mparticle.MParticle;
 import com.mparticle.MParticle.EventType;
 import com.mparticle.MParticleOptions;
+import com.mparticle.commerce.CommerceEvent;
+import com.mparticle.commerce.Product;
+import com.mparticle.commerce.TransactionAttributes;
 import com.mparticle.consent.ConsentState;
 import com.mparticle.consent.GDPRConsent;
 import com.mparticle.identity.IdentityApiRequest;
@@ -85,13 +88,13 @@ public class Mparticle {
         return new MPEvent.Builder(name, eventType).customAttributes(customAttributes).build();
     }
 
-    public MPEvent createMParticleProduct(final JSObject data) throws JSONException {
-        Map<String, String> customAttributes = MparticleHelper.ConvertStringMap((JSONObject) data);
-        String name = data.getString("name");
-        EventType eventType = getEventType(data.getInteger("eventType", 8)); //EventType 8:OTHER
-        assert name != null;
-        assert eventType != null;
-        return new MPEvent.Builder(name, eventType).customAttributes(customAttributes).build();
+    public CommerceEvent trackPurchase(final JSObject data) throws JSONException {
+        Product product = Mparticle.createMParticleProduct(data);
+        TransactionAttributes attributes = new TransactionAttributes();
+        return new CommerceEvent.Builder(Product.ADD_TO_CART, product)
+            .customAttributes(product.getCustomAttributes())
+            .transactionAttributes(attributes.setId(Objects.requireNonNull(data.getString("transactionId", "no transactionId found"))))
+            .build();
     }
 
     public void addGDPRConsentState(final JSObject consents) throws JSONException, ParseException {
@@ -123,29 +126,6 @@ public class Mparticle {
     public IdentityApiRequest identityRequest(PluginCall call, JSObject data) throws JSONException {
         call.setKeepAlive(true);
         return ConvertIdentityAPIRequest((JSONObject) data);
-    }
-
-    public Product createMParticleProduct(final JSObject data) throws JSONException  {
-        Map<String, String> customAttributes = new HashMap<String, String>();
-        if (data != null) {
-            Iterator<String> iter = data.keys();
-            while (iter.hasNext()) {
-                String key = iter.next();
-                try {
-                    Object value = data.get(key);
-                    customAttributes.put(key, value.toString());
-                    } catch (JSONException e) {
-                     e.printStackTrace();
-                }
-            }
-        }
-        return new Product.Builder(
-            (String) productData.getString("name"),
-            (String) productData.getString("sku"),
-            (double) productData.getInteger("cost"))
-            .quantity((double) productData.getInteger("quantity"))
-            .customAttributes((Map<String,String>) customAttributes)
-            .build();
     }
 
     private static IdentityApiRequest ConvertIdentityAPIRequest(JSONObject map) throws JSONException {
@@ -183,6 +163,18 @@ public class Mparticle {
         builder.location(location);
         builder.hardwareId(hardwareId);
         return builder.build();
+    }
+
+    private static Product createMParticleProduct(final JSObject data) throws JSONException {
+        Map<String, String> customAttributes = MparticleHelper.ConvertStringMap((JSONObject) data.get("attributes"));
+        return new Product.Builder(
+            Objects.requireNonNull(data.getString("name")),
+            Objects.requireNonNull(data.getString("sku")),
+            (double) Objects.requireNonNull(data.getInteger("price"))
+        )
+            .quantity((double) Objects.requireNonNull(data.getInteger("quantity")))
+            .customAttributes(customAttributes)
+            .build();
     }
 
     private static MParticle.IdentityType ConvertIdentityType(String val) {

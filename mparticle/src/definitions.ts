@@ -46,11 +46,12 @@ export type Consent = {
   hardwareId?: string;
 };
 export type Product = {
-  productName: string;
-  productSku: string;
-  productPrice: number;
-  productQuantity: number;
+  name: string;
+  sku: string;
+  price: number;
+  quantity: number;
   transactionId: string;
+  attributes?: any;
 };
 export type DefaultEvent = { name: string; data?: any };
 export type GDPRConsents = Record<string, Consent>;

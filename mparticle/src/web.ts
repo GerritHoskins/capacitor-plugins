@@ -130,7 +130,7 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
 
     const transactionAttributes = {
       Id: product.transactionId,
-      Revenue: product.productPrice,
+      Revenue: product.price,
     };
 
     return this.logProductAction(
@@ -141,13 +141,12 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
       transactionAttributes,
     );
   }
-  private createMParticleProduct(productData: any) {
+  private createMParticleProduct(productData: Product) {
     return mParticle.eCommerce.createProduct(
       productData.name,
       productData.sku,
-      productData.cost,
+      productData.price,
       productData.quantity,
-      undefined,
       undefined,
       undefined,
       undefined,
