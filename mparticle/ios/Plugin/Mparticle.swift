@@ -95,16 +95,16 @@ import Capacitor
     @objc public func trackPurchaseEvent(_ data: AnyObject) {
         let productData = data as! [String: Any]
         let product = MPProduct.init(
-           name: productData["name"] as! String,
-           sku: "\(productData["sku"] ?? 0)",
-           quantity: productData["quantity"] as! NSNumber,
-           price: (productData["price"] as? NSNumber) ?? nil
+            name: productData["name"] as! String,
+            sku: "\(productData["sku"] ?? 0)",
+            quantity: productData["quantity"] as! NSNumber,
+            price: (productData["price"] as? NSNumber) ?? nil
         )
 
-        if let productAttributes = productData["attributes"] as? Dictionary<String, JSValue> {
-           for productAttribute in productAttributes {
-               product[productAttribute.key] = "\(productAttribute.value)"
-           }
+        if let productAttributes = productData["attributes"] as? [String: JSValue] {
+            for productAttribute in productAttributes {
+                product[productAttribute.key] = "\(productAttribute.value)"
+            }
         }
 
         let transactionAttributes = MPTransactionAttributes.init()

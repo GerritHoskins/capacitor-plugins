@@ -16,4 +16,7 @@ Pod::Spec.new do |s|
   s.static_framework = true
   s.dependency 'Capacitor'
   s.dependency 'mParticle-Apple-SDK'
+  s.dependency 'mParticle-AppsFlyer'
+  s.dependency 'mParticle-CleverTap'
+  s.dependency 'mParticle-Google-Analytics-Firebase-GA4'
 end

@@ -7,7 +7,10 @@ target 'Plugin' do
   use_frameworks!
   pod 'Capacitor', :path => '../node_modules/@capacitor/ios'
   pod 'CapacitorCordova', :path => '../node_modules/@capacitor/ios'
-  pod 'mParticle-Apple-SDK', '~> 8.8'
+  pod 'mParticle-Apple-SDK', '~> 8.8.1'
+  pod 'mParticle-AppsFlyer'
+  pod 'mParticle-CleverTap'
+  pod 'mParticle-Google-Analytics-Firebase-GA4'
 end
 
 target 'PluginTests' do

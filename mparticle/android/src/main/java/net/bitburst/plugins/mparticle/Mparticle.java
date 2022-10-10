@@ -99,10 +99,10 @@ public class Mparticle {
         attributes.setRevenue(product.getTotalAmount());
 
         return new CommerceEvent.Builder(Product.PURCHASE, product)
-                .products(products)
-                .customAttributes(product.getCustomAttributes())
-                .transactionAttributes(attributes)
-                .build();
+            .products(products)
+            .customAttributes(product.getCustomAttributes())
+            .transactionAttributes(attributes)
+            .build();
     }
 
     public void addGDPRConsentState(final JSObject consents) throws JSONException, ParseException {
