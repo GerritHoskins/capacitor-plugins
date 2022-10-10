@@ -12,4 +12,5 @@ CAP_PLUGIN(MparticlePlugin, "Mparticle",
            CAP_PLUGIN_METHOD(getMPID, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(trackEvent, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(trackPageView, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(trackPurchase, CAPPluginReturnPromise);
 )
