@@ -89,25 +89,20 @@ public class Mparticle {
         return new MPEvent.Builder(name, eventType).customAttributes(customAttributes).build();
     }
 
-    public CommerceEvent trackCartToPurchaseEvent(final JSObject data) throws JSONException {
+    public CommerceEvent trackPurchaseEvent(final JSObject data) throws JSONException {
         Product product = Mparticle.createMParticleProduct(data);
-        TransactionAttributes attributes = new TransactionAttributes();
-        attributes.setId(Objects.requireNonNull(data.getString("transactionId")));
-        attributes.setRevenue((double) Objects.requireNonNull(data.getInteger("revenue")));
-
-        CommerceEvent event = new CommerceEvent.Builder(Product.ADD_TO_CART, product)
-            .customAttributes(product.getCustomAttributes())
-            .transactionAttributes(attributes)
-            .build();
-        Objects.requireNonNull(MParticle.getInstance()).logEvent(event);
-
         List<Product> products = new ArrayList<>();
         products.add(product);
+
+        TransactionAttributes attributes = new TransactionAttributes();
+        attributes.setId(Objects.requireNonNull(data.getString("transactionId")));
+        attributes.setRevenue(product.getTotalAmount());
+
         return new CommerceEvent.Builder(Product.PURCHASE, product)
-            .products(products)
-            .customAttributes(product.getCustomAttributes())
-            .transactionAttributes(attributes)
-            .build();
+                .products(products)
+                .customAttributes(product.getCustomAttributes())
+                .transactionAttributes(attributes)
+                .build();
     }
 
     public void addGDPRConsentState(final JSObject consents) throws JSONException, ParseException {

@@ -1,13 +1,13 @@
 import { WebPlugin } from '@capacitor/core';
-import type { UserIdentities, GDPRConsentState } from '@mparticle/web-sdk';
-import mParticle from '@mparticle/web-sdk';
+import type { GDPRConsentState, UserIdentities } from '@mparticle/web-sdk';
+import mParticle, { ProductActionType } from '@mparticle/web-sdk';
 
 import type {
+  Attribute,
+  DefaultEvent,
+  GDPRConsents,
   Identifier,
   MparticlePlugin,
-  Attribute,
-  GDPRConsents,
-  DefaultEvent,
   Product,
 } from './definitions';
 
@@ -129,16 +129,17 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
     const productToLog = this.createMParticleProduct(product);
 
     const transactionAttributes = {
-      transactionId: product.transactionId,
-      revenue: product.price,
+      Id: product.transactionId,
+      Revenue: product.price,
     };
 
-    return this.logProductAction(
-      null,
+    return mParticle.eCommerce.logProductAction(
+      ProductActionType.Purchase,
       productToLog,
-      product.attributes,
+      product.attributes || undefined,
+      undefined,
       transactionAttributes,
-      null,
+      undefined,
     );
   }
   private createMParticleProduct(productData: Product) {
@@ -152,21 +153,6 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
       undefined,
       undefined,
       productData.attributes,
-    );
-  }
-  private async logProductAction(
-    eventType: any,
-    product: any,
-    customAttributes?: any,
-    transactionAttributes?: any,
-    customFlags?: any,
-  ) {
-    return mParticle.eCommerce.logProductAction(
-      eventType,
-      product,
-      customAttributes,
-      customFlags,
-      transactionAttributes,
     );
   }
 }

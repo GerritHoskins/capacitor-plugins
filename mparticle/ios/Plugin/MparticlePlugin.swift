@@ -64,20 +64,20 @@ public class MparticlePlugin: CAPPlugin {
     @objc func trackEvent(_ call: CAPPluginCall) {
         let name = call.getString("name") ?? ""
         let data = call.getObject("data") ?? [:]
-        implementation.trackEvent(name, MPEventType.other, data)
+        implementation.trackEvent(name, data)
         call.resolve()
     }
 
     @objc func trackPageView(_ call: CAPPluginCall) {
         let name = call.getString("name") ?? ""
         let data = call.getObject("data") ?? [:]
-        implementation.trackPageView(name, MPEventType.other, data)
+        implementation.trackPageView(name, data)
         call.resolve()
     }
 
     @objc func trackPurchase(_ call: CAPPluginCall) {
         let data = call.getObject("product") ?? [:]
-        implementation.trackCartToPurchaseEvent(MPEventType.purchase, data as AnyObject)
+        implementation.trackPurchaseEvent(data as AnyObject)
         call.resolve()
     }
 }

@@ -160,7 +160,7 @@ public class MparticlePlugin extends Plugin {
         JSObject callData = call.getData();
         if (callData == null) return;
         try {
-            Mparticle.sharedInstance().logEvent(implementation.trackCartToPurchaseEvent(callData));
+            Mparticle.sharedInstance().logEvent(implementation.trackPurchaseEvent(callData));
         } catch (JSONException e) {
             e.printStackTrace();
             call.reject(LOG_TAG, "failed to track purchase event ", e);

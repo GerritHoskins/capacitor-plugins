@@ -8,10 +8,6 @@ import Capacitor
 @objc public class Mparticle: NSObject {
     var identityRequest: MPIdentityApiRequest?
 
-    /*if var appDelegate = UIApplication.shared.delegate as? AppDelegate {
-     appDelegate.test()
-     }*/
-
     @objc public func start(_ options: MParticleOptions) {
         options.environment = MPEnvironment.autoDetect
         options.dataPlanId = "bitcode_frontend_plan"
@@ -83,43 +79,40 @@ import Capacitor
         return self.currentUser()?.consentState()?.gdprConsentState()
     }
 
-    @objc public func trackEvent(_ name: String, _ eventType: MPEventType, _ data: JSObject) {
-        if let mpEvent = MPEvent(name: name, type: eventType ) {
+    @objc public func trackEvent(_ name: String, _ data: JSObject) {
+        if let mpEvent = MPEvent(name: name, type: MPEventType.other ) {
             mpEvent.customAttributes = data
             MParticle.sharedInstance().logEvent(mpEvent)
         }
     }
 
-    @objc public func trackPageView(_ name: String, _ eventType: MPEventType, _ data: JSObject) {
-        if MPEvent(name: name, type: eventType ) != nil {
+    @objc public func trackPageView(_ name: String, _ data: JSObject) {
+        if MPEvent(name: name, type: MPEventType.other ) != nil {
             MParticle.sharedInstance().logScreen(name, eventInfo: data)
         }
     }
 
-    @objc public func trackCartToPurchaseEvent(_ eventType: MPEventType, _ data: AnyObject) {
+    @objc public func trackPurchaseEvent(_ data: AnyObject) {
         let productData = data as! [String: Any]
         let product = MPProduct.init(
-            name: productData["name"] as! String,
-            sku: "\(productData["sku"] ?? 0)",
-            quantity: productData["quantity"] as! NSNumber,
-            price: (productData["price"] as? NSNumber) ?? nil
+           name: productData["name"] as! String,
+           sku: "\(productData["sku"] ?? 0)",
+           quantity: productData["quantity"] as! NSNumber,
+           price: (productData["price"] as? NSNumber) ?? nil
         )
 
-        if let productAttributes = productData["attributes"] as? [String: JSValue] {
-            for productAttribute in productAttributes {
-                product[productAttribute.key] = "\(productAttribute.value)"
-            }
+        if let productAttributes = productData["attributes"] as? Dictionary<String, JSValue> {
+           for productAttribute in productAttributes {
+               product[productAttribute.key] = "\(productAttribute.value)"
+           }
         }
 
         let transactionAttributes = MPTransactionAttributes.init()
-        var event = MPCommerceEvent.init(action: MPCommerceEventAction.addToCart, product: product)
-        event.customAttributes = productData["attributes"] as? [String: Any]
-        event.transactionAttributes = transactionAttributes
-        MParticle.sharedInstance().logEvent(event)
-
-        event = MPCommerceEvent.init(action: MPCommerceEventAction.purchase, product: product)
         transactionAttributes.transactionId = productData["transactionId"] as? String
-        transactionAttributes.revenue = productData["revenue"] as? NSNumber
+        transactionAttributes.revenue = (product.totalAmount) as NSNumber
+
+        let event = MPCommerceEvent.init(action: MPCommerceEventAction.purchase, product: product)
+        event.customAttributes = productData["attributes"] as? [String: Any]
         event.transactionAttributes = transactionAttributes
         MParticle.sharedInstance().logEvent(event)
     }
