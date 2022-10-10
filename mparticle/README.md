@@ -223,6 +223,6 @@ Construct a type with a set of properties K of type T
 
 #### Product
 
-<code>{ productName: string; productSku: string; productPrice: number; productQuantity: number; transactionId: string; }</code>
+<code>{ name: string; sku: string; price: number; quantity: number; transactionId: string; attributes?: any; }</code>
 
 </docgen-api>
