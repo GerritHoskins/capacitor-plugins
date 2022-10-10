@@ -74,18 +74,4 @@ public class MparticlePlugin: CAPPlugin {
         implementation.trackPageView(name, MPEventType.other, data)
         call.resolve()
     }
-
-    @objc func loginUser(_ call: CAPPluginCall) {
-        MParticle.sharedInstance().identity.login(completion: implementation.identityCallback)
-        call.resolve()
-    }
-
-    @objc func logoutUser(_ call: CAPPluginCall) {
-        MParticle.sharedInstance().identity.logout(completion: implementation.identityCallback)
-        call.resolve()
-    }
-
-    @objc override public func addListener(_ call: CAPPluginCall) {
-        call.resolve()
-    }
 }

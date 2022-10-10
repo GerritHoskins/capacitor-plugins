@@ -25,36 +25,16 @@ import org.json.JSONObject;
 
 public class Mparticle {
 
-    public interface OnReadyListener {
-        void onReady();
-    }
-
-    private OnReadyListener onReadyListener;
     private static MParticle instance = MParticle.getInstance();
     private MparticlePlugin mPlugin;
 
     public Mparticle(MparticlePlugin plugin) {
         this.mPlugin = plugin;
-        this.onReadyListener =
-            () -> {
-                if (onReadyListener != null) {
-                    onReadyListener.onReady();
-                }
-            };
         start(plugin.getActivity().getApplication());
     }
 
     public Mparticle(Application application) {
         start(application);
-    }
-
-    public void setOnReadyListener(@Nullable OnReadyListener listener) {
-        this.onReadyListener = listener;
-    }
-
-    @Nullable
-    public OnReadyListener getAuthStateChangeListener() {
-        return onReadyListener;
     }
 
     @SuppressLint("MParticleInitialization")
@@ -105,6 +85,15 @@ public class Mparticle {
         return new MPEvent.Builder(name, eventType).customAttributes(customAttributes).build();
     }
 
+    public MPEvent createMParticleProduct(final JSObject data) throws JSONException {
+        Map<String, String> customAttributes = MparticleHelper.ConvertStringMap((JSONObject) data);
+        String name = data.getString("name");
+        EventType eventType = getEventType(data.getInteger("eventType", 8)); //EventType 8:OTHER
+        assert name != null;
+        assert eventType != null;
+        return new MPEvent.Builder(name, eventType).customAttributes(customAttributes).build();
+    }
+
     public void addGDPRConsentState(final JSObject consents) throws JSONException, ParseException {
         MParticleUser user = currentUser();
         if (consents != null) {
@@ -134,6 +123,29 @@ public class Mparticle {
     public IdentityApiRequest identityRequest(PluginCall call, JSObject data) throws JSONException {
         call.setKeepAlive(true);
         return ConvertIdentityAPIRequest((JSONObject) data);
+    }
+
+    public Product createMParticleProduct(final JSObject data) throws JSONException  {
+        Map<String, String> customAttributes = new HashMap<String, String>();
+        if (data != null) {
+            Iterator<String> iter = data.keys();
+            while (iter.hasNext()) {
+                String key = iter.next();
+                try {
+                    Object value = data.get(key);
+                    customAttributes.put(key, value.toString());
+                    } catch (JSONException e) {
+                     e.printStackTrace();
+                }
+            }
+        }
+        return new Product.Builder(
+            (String) productData.getString("name"),
+            (String) productData.getString("sku"),
+            (double) productData.getInteger("cost"))
+            .quantity((double) productData.getInteger("quantity"))
+            .customAttributes((Map<String,String>) customAttributes)
+            .build();
     }
 
     private static IdentityApiRequest ConvertIdentityAPIRequest(JSONObject map) throws JSONException {

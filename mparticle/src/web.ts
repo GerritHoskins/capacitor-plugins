@@ -8,6 +8,7 @@ import type {
   Attribute,
   GDPRConsents,
   DefaultEvent,
+  Product,
 } from './definitions';
 
 export class MparticleWeb extends WebPlugin implements MparticlePlugin {
@@ -122,22 +123,51 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
 
     mParticle.logPageView(event.name, event.data);
   }
-  loginUser(identifier?: Identifier): Promise<any> {
-    if (!identifier) return Promise.resolve();
-    const { customerId } = identifier;
+  async trackPurchase(product: Product): Promise<void> {
+    if (!mParticle.isInitialized()) return;
 
-    return new Promise(resolve => {
-      if (!mParticle.isInitialized()) return Promise.resolve();
-      mParticle.Identity.login(
-        { userIdentities: { customerid: customerId } as UserIdentities },
-        result => resolve(result.getUser().getMPID),
-      );
-    });
+    const productToLog = this.createMParticleProduct(product);
+
+    const transactionAttributes = {
+      Id: product.transactionId,
+      Revenue: product.productPrice,
+    };
+
+    return this.logProductAction(
+      null,
+      productToLog,
+      null,
+      null,
+      transactionAttributes,
+    );
   }
-  logoutUser(): Promise<any> {
-    return new Promise(resolve => {
-      if (!mParticle.isInitialized()) return Promise.resolve();
-      mParticle.Identity.logout({}, result => resolve(result.getUser()));
-    });
+  private createMParticleProduct(productData: any) {
+    return mParticle.eCommerce.createProduct(
+      productData.name,
+      productData.sku,
+      productData.cost,
+      productData.quantity,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      productData.attributes,
+    );
+  }
+  private async logProductAction(
+    eventType: any,
+    product: any,
+    customAttributes: any,
+    transactionAttributes?: any,
+    customFlags?: any,
+  ) {
+    return mParticle.eCommerce.logProductAction(
+      eventType,
+      product,
+      customAttributes,
+      customFlags,
+      transactionAttributes,
+    );
   }
 }

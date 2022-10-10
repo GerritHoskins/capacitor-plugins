@@ -1,5 +1,4 @@
 /// <reference types="@capacitor/cli" />
-import type { PluginListenerHandle } from '@capacitor/core';
 import type { MPConfiguration } from '@mparticle/web-sdk';
 
 declare module '@capacitor/cli' {
@@ -28,15 +27,7 @@ export interface MparticlePlugin {
   getMPID(): Promise<string | void>;
   trackEvent(event: DefaultEvent): void;
   trackPageView(event: DefaultEvent): void;
-  loginUser(identifier?: Identifier): Promise<any>;
-  logoutUser(options?: any): Promise<any>;
-  addListener(
-    eventName: 'mParticleReady',
-    listenerFunc: mParticleReadyListener,
-  ): Promise<PluginListenerHandle> & PluginListenerHandle;
-}
-export interface MparticleReadyEvent {
-  ready: boolean;
+  trackPurchase(product: Product): Promise<void>;
 }
 export type Attribute = {
   name: string;
@@ -54,6 +45,12 @@ export type Consent = {
   location?: string;
   hardwareId?: string;
 };
+export type Product = {
+  productName: string;
+  productSku: string;
+  productPrice: number;
+  productQuantity: number;
+  transactionId: string;
+};
 export type DefaultEvent = { name: string; data?: any };
 export type GDPRConsents = Record<string, Consent>;
-export type mParticleReadyListener = (event: MparticleReadyEvent) => void;

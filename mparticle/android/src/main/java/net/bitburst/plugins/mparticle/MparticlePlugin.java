@@ -156,50 +156,23 @@ public class MparticlePlugin extends Plugin {
     }
 
     @PluginMethod
-    public void loginUser(PluginCall call) {
+    public void trackPurchase(PluginCall call) {
+        JSObject callData = call.getData();
+        if (callData == null) return;
         try {
-            Mparticle
-                .sharedInstance()
-                .Identity()
-                .login(implementation.identityRequest(call, call.getData()))
-                .addFailureListener(identityHttpResponse -> call.reject(LOG_TAG, Objects.requireNonNull(identityHttpResponse).toString()))
-                .addSuccessListener(
-                    identityApiResult -> {
-                        String userId = Long.toString(identityApiResult.getUser().getId());
-                        JSObject ret = new JSObject();
-                        ret.put("userId", userId);
-                        call.resolve(ret);
-                    }
-                );
+            Product product = implementation.createMParticleProduct(callData);
+            TransactionAttributes attributes = new TransactionAttributes();
+            CommerceEvent event = new CommerceEvent.Builder(Product.ADD_TO_CART, product)
+            .customAttributes(customAttributes)
+            .transactionAttributes(attributes)
+            .build();
+            MParticle.getInstance().logEvent(event);
         } catch (JSONException e) {
             e.printStackTrace();
-            call.reject(LOG_TAG, e.getLocalizedMessage());
+            call.reject(LOG_TAG, "failed to track purchase event ", e);
         }
-    }
+        call.resolve();
 
-    @PluginMethod
-    public void logoutUser(PluginCall call) {
-        try {
-            Mparticle
-                .sharedInstance()
-                .Identity()
-                .logout(implementation.identityRequest(call, call.getData()))
-                .addFailureListener(identityHttpResponse -> call.reject(LOG_TAG, Objects.requireNonNull(identityHttpResponse).toString()))
-                .addSuccessListener(
-                    identityApiResult -> {
-                        JSObject ret = new JSObject();
-                        ret.put("user", identityApiResult.getUser());
-                        call.resolve(ret);
-                    }
-                );
-        } catch (JSONException e) {
-            e.printStackTrace();
-            call.reject(LOG_TAG, e.getLocalizedMessage());
-        }
-    }
 
-    @PluginMethod(returnType = PluginMethod.RETURN_NONE)
-    public void addListener(PluginCall call) {
-        super.addListener(call);
     }
 }
