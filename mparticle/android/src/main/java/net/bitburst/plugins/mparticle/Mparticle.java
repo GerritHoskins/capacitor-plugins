@@ -18,6 +18,7 @@ import com.mparticle.identity.IdentityApiRequest;
 import com.mparticle.identity.MParticleUser;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -88,13 +89,25 @@ public class Mparticle {
         return new MPEvent.Builder(name, eventType).customAttributes(customAttributes).build();
     }
 
-    public CommerceEvent trackPurchase(final JSObject data) throws JSONException {
+    public CommerceEvent trackCartToPurchaseEvent(final JSObject data) throws JSONException {
         Product product = Mparticle.createMParticleProduct(data);
         TransactionAttributes attributes = new TransactionAttributes();
-        return new CommerceEvent.Builder(Product.ADD_TO_CART, product)
+        attributes.setId(Objects.requireNonNull(data.getString("transactionId")));
+        attributes.setRevenue((double) Objects.requireNonNull(data.getInteger("revenue")));
+
+        CommerceEvent event = new CommerceEvent.Builder(Product.ADD_TO_CART, product)
             .customAttributes(product.getCustomAttributes())
-            .transactionAttributes(attributes.setId(Objects.requireNonNull(data.getString("transactionId", "no transactionId found"))))
+            .transactionAttributes(attributes)
             .build();
+        Objects.requireNonNull(MParticle.getInstance()).logEvent(event);
+
+        List<Product> products = new ArrayList<>();
+        products.add(product);
+        return new CommerceEvent.Builder(Product.PURCHASE, product)
+                .products(products)
+                .customAttributes(product.getCustomAttributes())
+                .transactionAttributes(attributes)
+                .build();
     }
 
     public void addGDPRConsentState(final JSObject consents) throws JSONException, ParseException {
