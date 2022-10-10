@@ -129,16 +129,16 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
     const productToLog = this.createMParticleProduct(product);
 
     const transactionAttributes = {
-      Id: product.transactionId,
-      Revenue: product.price,
+      transactionId: product.transactionId,
+      revenue: product.price,
     };
 
     return this.logProductAction(
       null,
       productToLog,
-      null,
-      null,
+      product.attributes,
       transactionAttributes,
+      null,
     );
   }
   private createMParticleProduct(productData: Product) {
@@ -157,7 +157,7 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
   private async logProductAction(
     eventType: any,
     product: any,
-    customAttributes: any,
+    customAttributes?: any,
     transactionAttributes?: any,
     customFlags?: any,
   ) {
