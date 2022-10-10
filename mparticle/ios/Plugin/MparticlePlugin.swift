@@ -21,7 +21,7 @@ public class MparticlePlugin: CAPPlugin {
         MParticle.sharedInstance().identity.identify(implementation.identityRequest(data)!, completion: {(identityResult: MPIdentityApiResult?, _: Error?) in
 
             call.resolve([
-                "userId": identityResult?.user.userId
+                "userId": identityResult?.user.userId ?? ""
             ])
         })
     }
@@ -72,6 +72,12 @@ public class MparticlePlugin: CAPPlugin {
         let name = call.getString("name") ?? ""
         let data = call.getObject("data") ?? [:]
         implementation.trackPageView(name, MPEventType.other, data)
+        call.resolve()
+    }
+
+    @objc func trackPurchase(_ call: CAPPluginCall) {
+        let data = call.getObject("product") ?? [:]
+        implementation.trackCartToPurchaseEvent(MPEventType.purchase, data as AnyObject)
         call.resolve()
     }
 }

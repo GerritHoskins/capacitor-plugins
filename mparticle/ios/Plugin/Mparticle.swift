@@ -96,6 +96,34 @@ import Capacitor
         }
     }
 
+    @objc public func trackCartToPurchaseEvent(_ eventType: MPEventType, _ data: AnyObject) {
+        let productData = data as! [String: Any]
+        let product = MPProduct.init(
+            name: productData["name"] as! String,
+            sku: "\(productData["sku"] ?? 0)",
+            quantity: productData["quantity"] as! NSNumber,
+            price: (productData["price"] as? NSNumber) ?? nil
+        )
+
+        if let productAttributes = productData["attributes"] as? [String: JSValue] {
+            for productAttribute in productAttributes {
+                product[productAttribute.key] = "\(productAttribute.value)"
+            }
+        }
+
+        let transactionAttributes = MPTransactionAttributes.init()
+        var event = MPCommerceEvent.init(action: MPCommerceEventAction.addToCart, product: product)
+        event.customAttributes = productData["attributes"] as? [String: Any]
+        event.transactionAttributes = transactionAttributes
+        MParticle.sharedInstance().logEvent(event)
+
+        event = MPCommerceEvent.init(action: MPCommerceEventAction.purchase, product: product)
+        transactionAttributes.transactionId = productData["transactionId"] as? String
+        transactionAttributes.revenue = productData["revenue"] as? NSNumber
+        event.transactionAttributes = transactionAttributes
+        MParticle.sharedInstance().logEvent(event)
+    }
+
     private func convertIdentityType(_ val: String) -> MPIdentity {
         if val == "customerId" {
             return MPIdentity.customerId
