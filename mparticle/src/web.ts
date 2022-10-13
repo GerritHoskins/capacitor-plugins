@@ -1,6 +1,6 @@
 import { WebPlugin } from '@capacitor/core';
 import type { GDPRConsentState, UserIdentities } from '@mparticle/web-sdk';
-import mParticle, { ProductActionType } from '@mparticle/web-sdk';
+import mParticle from '@mparticle/web-sdk';
 
 import type {
   Attribute,
@@ -134,7 +134,7 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
     };
 
     return mParticle.eCommerce.logProductAction(
-      ProductActionType.Purchase,
+      mParticle.ProductActionType.Purchase,
       productToLog,
       product.attributes || undefined,
       undefined,
