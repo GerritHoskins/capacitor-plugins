@@ -11,18 +11,27 @@ public class MparticlePlugin: CAPPlugin {
     public let LOG_TAG = "bitburst.mparticle.plugin "
 
     override public func load() {
-        let key = getConfig().getString("key") ?? ""
-        let secret = getConfig().getString("secret") ?? ""
+        let key = getConfig().getString("iosKey") ?? ""
+        let secret = getConfig().getString("iosSecret") ?? ""
         implementation.start(MParticleOptions(key: key, secret: secret))
     }
 
     @objc func identifyUser(_ call: CAPPluginCall) {
-        let data: JSObject = call.getObject("identifier") ?? [:]
-        MParticle.sharedInstance().identity.identify(implementation.identityRequest(data)!, completion: {(identityResult: MPIdentityApiResult?, _: Error?) in
+        call.keepAlive = true
+        let email = call.getString("email", "not set")
+        let customerId = call.getString("customerId", "not set")
+        let other = call.getString("other", "not set")
 
-            call.resolve([
-                "userId": identityResult?.user.userId ?? ""
-            ])
+        MParticle.sharedInstance().identity.identify(implementation.identityRequest(email, customerId, other)!, completion: {(identityResult: MPIdentityApiResult?, _: Error?) in
+            if identityResult?.user.userId != nil {
+                call.resolve([
+                    "userId": identityResult?.user.userId ?? ""
+                ])
+            } else {
+                print(self.LOG_TAG + "failed to identify user.")
+                call.reject("failed to identify user.")
+            }
+
         })
     }
 
@@ -76,8 +85,14 @@ public class MparticlePlugin: CAPPlugin {
     }
 
     @objc func trackPurchase(_ call: CAPPluginCall) {
-        let data = call.getObject("product") ?? [:]
-        implementation.trackPurchaseEvent(data as AnyObject)
+        let name = call.getString("name", "not set")
+        let sku = call.getString("sku", "not set")
+        let quantity = call.getInt("quantity", -1)
+        let price = call.getFloat("price", -1)
+        let transactionId = call.getString("transactionId", "not set")
+        let customAttributes = call.getObject("customAttributes")
+
+        implementation.trackPurchaseEvent(name, sku, quantity, price, transactionId, customAttributes)
         call.resolve()
     }
 }

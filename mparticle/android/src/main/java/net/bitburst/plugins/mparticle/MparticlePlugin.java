@@ -44,23 +44,10 @@ public class MparticlePlugin extends Plugin {
                 .addFailureListener(identityHttpResponse -> call.reject(LOG_TAG, Objects.requireNonNull(identityHttpResponse).toString()))
                 .addSuccessListener(
                     identityApiResult -> {
-                        if (data != null) {
-                            Iterator<String> iterator = data.keys();
-                            while (iterator.hasNext()) {
-                                String key = iterator.next();
-                                try {
-                                    MParticleUser user = identityApiResult.getUser();
-                                    user.setUserAttribute(key, data.get(key));
-
-                                    JSObject ret = new JSObject();
-                                    ret.put("userId", Long.toString(user.getId()));
-                                    call.resolve();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    call.reject(LOG_TAG, e.getLocalizedMessage());
-                                }
-                            }
-                        }
+                        MParticleUser user = identityApiResult.getUser();
+                        JSObject ret = new JSObject();
+                        ret.put("userId", Long.toString(user.getId()));
+                        call.resolve(ret);
                     }
                 );
         } catch (JSONException e) {

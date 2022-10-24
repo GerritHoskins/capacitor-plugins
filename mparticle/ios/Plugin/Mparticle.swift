@@ -11,9 +11,10 @@ import Capacitor
     @objc public func start(_ options: MParticleOptions) {
         options.environment = MPEnvironment.autoDetect
         options.dataPlanId = "bitcode_frontend_plan"
-        options.dataPlanVersion = 4
+        options.dataPlanVersion = 6
 
-        options.identifyRequest = self.identityRequest([:])!
+        options.identifyRequest = self.identityRequest(nil, nil, nil)!
+
         options.onIdentifyComplete = identityCallback
 
         if #available(iOS 14, *) {
@@ -42,10 +43,12 @@ import Capacitor
         return MParticle.sharedInstance().identity.currentUser
     }
 
-    @objc public func identityRequest(_ data: JSObject) -> MPIdentityApiRequest? {
+    @objc public func identityRequest(_ email: String?, _ customerId: String?, _ other: String?) -> MPIdentityApiRequest? {
         self.identityRequest = MPIdentityApiRequest.withEmptyUser()
-        for (key, value) in data {
-            self.identityRequest!.setIdentity(value as? String, identityType: self.convertIdentityType(key))
+        if email != nil {
+            self.identityRequest!.setIdentity(email, identityType: self.convertIdentityType("email"))
+            self.identityRequest!.setIdentity(customerId, identityType: self.convertIdentityType("customerId"))
+            self.identityRequest!.setIdentity(other, identityType: self.convertIdentityType("other"))
         }
 
         return self.identityRequest
@@ -92,27 +95,20 @@ import Capacitor
         }
     }
 
-    @objc public func trackPurchaseEvent(_ data: AnyObject) {
-        let productData = data as! [String: Any]
+    @objc public func trackPurchaseEvent(_ name: String, _ sku: String, _ quantity: Int, _ price: Float, _ transactionId: String, _ customAttributes: [String: Any]?) {
         let product = MPProduct.init(
-            name: productData["name"] as! String,
-            sku: "\(productData["sku"] ?? 0)",
-            quantity: productData["quantity"] as! NSNumber,
-            price: (productData["price"] as? NSNumber) ?? nil
+            name: name,
+            sku: sku,
+            quantity: NSNumber(value: quantity),
+            price: NSNumber(value: price)
         )
 
-        if let productAttributes = productData["attributes"] as? [String: JSValue] {
-            for productAttribute in productAttributes {
-                product[productAttribute.key] = "\(productAttribute.value)"
-            }
-        }
-
         let transactionAttributes = MPTransactionAttributes.init()
-        transactionAttributes.transactionId = productData["transactionId"] as? String
-        transactionAttributes.revenue = (product.totalAmount) as NSNumber
+        transactionAttributes.transactionId = transactionId
+        transactionAttributes.revenue = NSNumber(value: (Float(quantity) * price))
 
         let event = MPCommerceEvent.init(action: MPCommerceEventAction.purchase, product: product)
-        event.customAttributes = productData["attributes"] as? [String: Any]
+        event.customAttributes = customAttributes
         event.transactionAttributes = transactionAttributes
         MParticle.sharedInstance().logEvent(event)
     }

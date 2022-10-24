@@ -12,22 +12,22 @@ import type {
 } from './definitions';
 
 export class MparticleWeb extends WebPlugin implements MparticlePlugin {
-  init(key: string, config: Record<string, unknown>): Promise<void> {
+  init(webKey: string, config: Record<string, unknown>): Promise<void> {
     return new Promise(resolve => {
       const mParticleConfig = {
         ...config,
         identityCallback: () => resolve(),
       };
 
-      mParticle.init(key, mParticleConfig);
+      mParticle.init(webKey, mParticleConfig);
     });
   }
-  identifyUser(identifier: Identifier): Promise<any> {
-    if (!identifier) return Promise.resolve();
+  identifyUser(identifier: Identifier): Promise<string> {
+    if (!identifier) return Promise.resolve('');
     const { email, customerId, other } = identifier;
 
     return new Promise(resolve => {
-      if (!mParticle.isInitialized()) return resolve(undefined);
+      if (!mParticle.isInitialized()) return resolve('');
       const userIdentities: UserIdentities = {};
       if (email) userIdentities.email = email;
       if (customerId) userIdentities.customerid = customerId;
@@ -37,26 +37,34 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
         {
           userIdentities: userIdentities,
         },
-        () => resolve(userIdentities.customerid),
+        () => resolve(userIdentities.customerid || ''),
       );
     });
   }
-  setUserAttribute(attribute: Attribute): Promise<void> {
+  setUserAttribute(options: {
+    attribute: Attribute;
+    userId?: string;
+  }): Promise<void> {
     if (!mParticle.isInitialized()) return Promise.resolve();
 
-    const user = mParticle.Identity.getCurrentUser();
+    const user: mParticle.User = this.getMParticleUser(options.userId);
     if (!user) return Promise.resolve();
 
-    user.setUserAttribute(attribute.name, attribute.value);
+    const { name, value } = options.attribute;
+
+    user.setUserAttribute(name, value);
     return Promise.resolve();
   }
-  setUserAttributes(attributes: Attribute[]): Promise<void> {
+  setUserAttributes(options: {
+    attributes: Attribute[];
+    userId?: string;
+  }): Promise<void> {
     if (!mParticle.isInitialized()) return Promise.resolve();
 
-    const user = mParticle.Identity.getCurrentUser();
+    const user: mParticle.User = this.getMParticleUser(options.userId);
     if (!user) return Promise.resolve();
 
-    attributes.forEach(attribute =>
+    options.attributes.forEach(attribute =>
       user.setUserAttribute(attribute.name, attribute.value),
     );
 
@@ -136,7 +144,7 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
     return mParticle.eCommerce.logProductAction(
       mParticle.ProductActionType.Purchase,
       productToLog,
-      product.attributes || undefined,
+      product.customAttributes || undefined,
       undefined,
       transactionAttributes,
       undefined,
@@ -152,7 +160,11 @@ export class MparticleWeb extends WebPlugin implements MparticlePlugin {
       undefined,
       undefined,
       undefined,
-      productData.attributes,
+      productData.customAttributes,
     );
+  }
+  private getMParticleUser(userId?: string): mParticle.User {
+    if (userId) return mParticle.Identity.getUser(userId);
+    return mParticle.Identity.getCurrentUser();
   }
 }

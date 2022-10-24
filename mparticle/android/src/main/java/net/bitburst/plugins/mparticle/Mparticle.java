@@ -43,13 +43,13 @@ public class Mparticle {
 
     @SuppressLint("MParticleInitialization")
     public void start(Application application) {
-        String mParticleKey = mPlugin.getConfig().getString("key", "");
-        String mParticleSecret = mPlugin.getConfig().getString("secret", "");
+        String mParticleKey = mPlugin.getConfig().getString("androidKey", "android key is wrong or missing!");
+        String mParticleSecret = mPlugin.getConfig().getString("androidSecret", "android secret is wrong or missing!");
         MParticleOptions options = MParticleOptions
             .builder(application.getApplicationContext())
             .credentials(mParticleKey, mParticleSecret)
             .environment(MParticle.Environment.AutoDetect)
-            .dataplan("bitcode_frontend_plan", 4)
+            .dataplan("bitcode_frontend_plan", 6)
             .build();
         MParticle.start(options);
     }
@@ -68,6 +68,9 @@ public class Mparticle {
     public boolean setUserAttribute(final String userId, final String name, final JSObject value) {
         long mpid = MparticleHelper.parseString(userId);
         MParticleUser selectedUser = Objects.requireNonNull(MParticle.getInstance()).Identity().getUser(mpid);
+        if (selectedUser == null) {
+            return currentUser().setUserAttribute(name, value);
+        }
         return selectedUser.setUserAttribute(name, value);
     }
 
@@ -76,12 +79,14 @@ public class Mparticle {
         MParticleUser selectedUser = MParticle.getInstance().Identity().getUser(mpid);
         assert attributes != null;
         Map<String, Object> attributeMap = MparticleHelper.MapObjectList(attributes);
-        assert selectedUser != null;
+        if (selectedUser == null) {
+            return currentUser().setUserAttributes(attributeMap);
+        }
         return selectedUser.setUserAttributes(attributeMap);
     }
 
     public MPEvent trackEvent(final JSObject data) throws JSONException {
-        Map<String, String> customAttributes = MparticleHelper.ConvertStringMap((JSONObject) data);
+        Map<String, String> customAttributes = MparticleHelper.ConvertStringMap((JSONObject) data.getJSObject("data"));
         String name = data.getString("name");
         EventType eventType = getEventType(data.getInteger("eventType", 8)); //EventType 8:OTHER
         assert name != null;
@@ -174,7 +179,7 @@ public class Mparticle {
     }
 
     private static Product createMParticleProduct(final JSObject data) throws JSONException {
-        Map<String, String> customAttributes = MparticleHelper.ConvertStringMap((JSONObject) data.get("attributes"));
+        Map<String, String> customAttributes = MparticleHelper.ConvertStringMap((JSONObject) data.get("customAttributes"));
         return new Product.Builder(
             Objects.requireNonNull(data.getString("name")),
             Objects.requireNonNull(data.getString("sku")),

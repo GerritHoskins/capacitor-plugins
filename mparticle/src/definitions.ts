@@ -4,22 +4,27 @@ import type { MPConfiguration } from '@mparticle/web-sdk';
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
     Mparticle: {
-      key?: string;
-      secret?: string;
+      androidKey?: string;
+      androidSecret?: string;
+      iosKey?: string;
+      iosSecret?: string;
+      webKey?: string;
       config?: MPConfiguration;
     };
   }
 }
 
 export interface MparticlePlugin {
-  init(
-    key: string,
-    config: Record<string, unknown>,
-    secret?: string,
-  ): Promise<void>;
-  identifyUser(identifier?: Identifier): Promise<any>;
-  setUserAttribute(attribute: Attribute): Promise<void>;
-  setUserAttributes(attributes: Attribute[]): Promise<void>;
+  init(webKey: string, config: Record<string, unknown>): Promise<void>;
+  identifyUser(identifier?: Identifier): Promise<string>;
+  setUserAttribute(options: {
+    userId?: string;
+    attribute: Attribute;
+  }): Promise<void>;
+  setUserAttributes(options: {
+    userId?: string;
+    attributes: Attribute[];
+  }): Promise<void>;
   setGDPRConsent(gdprConsents: GDPRConsents): void;
   getGDPRConsent(options: {
     consents: string[];
@@ -51,7 +56,7 @@ export type Product = {
   price: number;
   quantity: number;
   transactionId: string;
-  attributes?: any;
+  customAttributes?: any;
 };
 export type DefaultEvent = { name: string; data?: any };
 export type GDPRConsents = Record<string, Consent>;
