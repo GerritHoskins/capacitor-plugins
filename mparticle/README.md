@@ -34,14 +34,13 @@ npx cap sync
 ### init(...)
 
 ```typescript
-init(key: string, config: Record<string, unknown>, secret?: string | undefined) => Promise<void>
+init(webKey: string, config: Record<string, unknown>) => Promise<void>
 ```
 
 | Param        | Type                                                             |
 | ------------ | ---------------------------------------------------------------- |
-| **`key`**    | <code>string</code>                                              |
+| **`webKey`** | <code>string</code>                                              |
 | **`config`** | <code><a href="#record">Record</a>&lt;string, unknown&gt;</code> |
-| **`secret`** | <code>string</code>                                              |
 
 --------------------
 
@@ -49,14 +48,14 @@ init(key: string, config: Record<string, unknown>, secret?: string | undefined) 
 ### identifyUser(...)
 
 ```typescript
-identifyUser(identifier?: Identifier | undefined) => Promise<any>
+identifyUser(identifier?: Identifier | undefined) => Promise<string>
 ```
 
 | Param            | Type                                              |
 | ---------------- | ------------------------------------------------- |
 | **`identifier`** | <code><a href="#identifier">Identifier</a></code> |
 
-**Returns:** <code>Promise&lt;any&gt;</code>
+**Returns:** <code>Promise&lt;string&gt;</code>
 
 --------------------
 
@@ -64,12 +63,12 @@ identifyUser(identifier?: Identifier | undefined) => Promise<any>
 ### setUserAttribute(...)
 
 ```typescript
-setUserAttribute(attribute: Attribute) => Promise<void>
+setUserAttribute(options: { userId?: string; attribute: Attribute; }) => Promise<void>
 ```
 
-| Param           | Type                                            |
-| --------------- | ----------------------------------------------- |
-| **`attribute`** | <code><a href="#attribute">Attribute</a></code> |
+| Param         | Type                                                                             |
+| ------------- | -------------------------------------------------------------------------------- |
+| **`options`** | <code>{ userId?: string; attribute: <a href="#attribute">Attribute</a>; }</code> |
 
 --------------------
 
@@ -77,12 +76,12 @@ setUserAttribute(attribute: Attribute) => Promise<void>
 ### setUserAttributes(...)
 
 ```typescript
-setUserAttributes(attributes: Attribute[]) => Promise<void>
+setUserAttributes(options: { userId?: string; attributes: Attribute[]; }) => Promise<void>
 ```
 
-| Param            | Type                     |
-| ---------------- | ------------------------ |
-| **`attributes`** | <code>Attribute[]</code> |
+| Param         | Type                                                       |
+| ------------- | ---------------------------------------------------------- |
+| **`options`** | <code>{ userId?: string; attributes: Attribute[]; }</code> |
 
 --------------------
 
@@ -223,6 +222,6 @@ Construct a type with a set of properties K of type T
 
 #### Product
 
-<code>{ name: string; sku: string; price: number; quantity: number; transactionId: string; attributes?: any; }</code>
+<code>{ name: string; sku: string; price: number; quantity: number; transactionId: string; customAttributes?: any; }</code>
 
 </docgen-api>

@@ -51,9 +51,11 @@ public class MparticlePlugin: CAPPlugin {
     }
 
     @objc func setGDPRConsent(_ call: CAPPluginCall) {
-        let consents: JSObject = call.getObject("consents") ?? [:]
-        let consented = call.getBool("consented") ?? false
-        implementation.addGDPRConsentState(consented, consents)
+        let analytics = call.getObject("analytics") ?? [:]
+        let advertising = call.getObject("advertising") ?? [:]
+        let general = call.getObject("general") ?? [:]
+        implementation.addGDPRConsentState(analytics, advertising, general)
+        call.resolve()
     }
 
     @objc func getGDPRConsent(_ call: CAPPluginCall) {

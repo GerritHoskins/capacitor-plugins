@@ -68,14 +68,31 @@ import Capacitor
         }
     }
 
-    public func addGDPRConsentState(_ consented: Bool, _ consents: JSObject) {
-        let user = self.currentUser()
-        let consentGDPR = MPGDPRConsent()
-        consentGDPR.consented = consented
-        for (key, _) in consents {
-            user?.consentState()?.addGDPRConsentState(consents[key] as! MPGDPRConsent, purpose: key)
+    public func addGDPRConsentState(_ analytics: JSObject, _ advertising: JSObject, _ general: JSObject ) {
+        self.prepareAndSetConsentData("analytics", analytics)
+        self.prepareAndSetConsentData("advertising", advertising)
+        self.prepareAndSetConsentData("general", general)
+    }
 
+    private func prepareAndSetConsentData(_ purpose: String, _ data: JSObject) {
+        let consentGDPR = MPGDPRConsent()
+        consentGDPR.consented = data["consented"] as! Bool
+        consentGDPR.document = data["document"] as? String
+        consentGDPR.timestamp = data["timestamp"] as? Date ?? NSDate.now as Date
+        consentGDPR.location = data["location"] as? String
+        consentGDPR.hardwareId = data["hardwareId"] as? String
+
+        let user = self.currentUser()
+        let newConsentState = MPConsentState()
+        if let existingConsentState = user!.consentState() {
+            if let priorCCPA = existingConsentState.ccpaConsentState() {
+                newConsentState.setCCPA(priorCCPA)
+            }
+            newConsentState.setGDPR(existingConsentState.gdprConsentState())
         }
+
+        newConsentState.addGDPRConsentState(consentGDPR, purpose: purpose)
+        user?.setConsentState(newConsentState)
     }
 
     @objc public func getGDPRConsent() -> [String: MPGDPRConsent]? {
