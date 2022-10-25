@@ -8,7 +8,6 @@ declare module '@capacitor/cli' {
       androidSecret?: string;
       iosKey?: string;
       iosSecret?: string;
-      webKey?: string;
       config?: MPConfiguration;
     };
   }
