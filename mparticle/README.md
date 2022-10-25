@@ -31,49 +31,7 @@ npx cap sync
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### Plugin Config (Android & iOS)
-```typescript
-Mparticle: {
-  androidKey?: string;
-  androidSecret?: string;
-  iosKey?: string;
-  iosSecret?: string;
-  config?: MPConfiguration;
-};
-
-interface MPConfiguration {
- isDevelopmentMode?: boolean | undefined;
- identifyRequest?: IdentifyRequest | undefined;
- identityCallback?: IdentityCallback | undefined;
- dataPlan?: DataPlanConfig | undefined;
- appVersion?: string | undefined;
- appName?: string | undefined;
- package?: string | undefined;
- logLevel?: 'verbose' | 'warning' | 'none' | undefined;
- logger?: Logger | undefined;
- sessionTimeout?: number | undefined;
- deviceId?: string | undefined;
- onCreateBatch?: onCreateBatch | undefined;
- useCookieStorage?: boolean | undefined;
- maxCookieSize?: number | undefined;
- cookieDomain?: string | undefined;
- customFlags?: SDKEventCustomFlags | undefined;
- /**
-  * @warning only change workspaceToken if you are absolutely sure you know what you are doing
-  */
- workspaceToken?: string | undefined;
- /**
-  * @warning only change requiredWebviewBridgeName if you are absolutely sure you know what you are doing
-  */
- requiredWebviewBridgeName?: string | undefined;
- /**
-  * @warning only change minWebviewBridgeVersion if you are absolutely sure you know what you are doing
-  */
- minWebviewBridgeVersion?: 1 | 2 | undefined;
-}
-```
-
-### init(...) (WEB ONLY)
+### init(...)
 
 ```typescript
 init(webKey: string, config: Record<string, unknown>) => Promise<void>
@@ -112,36 +70,6 @@ setUserAttribute(options: { userId?: string; attribute: Attribute; }) => Promise
 | ------------- | -------------------------------------------------------------------------------- |
 | **`options`** | <code>{ userId?: string; attribute: <a href="#attribute">Attribute</a>; }</code> |
 
-**Example:**
-
-```typescript
-import { Mparticle } from './index';
-
-// example 1
-Mparticle.setUserAttribute({ 
-  attribute: {
-    name: name,
-    value: value
-  }
-});
-
-// example 2
-Mparticle.identifyUser({
- email,
- customerId,
- other
-}).then(userId => {
- Mparticle.setUserAttribute({
-  userId,
-  attribute: {
-   name: name,
-   value: value
-  }
- })
-});
-
-```
-
 --------------------
 
 
@@ -154,38 +82,6 @@ setUserAttributes(options: { userId?: string; attributes: Attribute[]; }) => Pro
 | Param         | Type                                                       |
 | ------------- | ---------------------------------------------------------- |
 | **`options`** | <code>{ userId?: string; attributes: Attribute[]; }</code> |
-
-**Example:**
-
-```typescript
-import { Mparticle } from './index';
-
-// example 1
-Mparticle.setUserAttributes({
-  attributes: [
-   { name: 'example', value: data.value },
-   { name: 'example_2', value: data.value },
-   { name: 'example_3', value: data.value },
- ]
-});
-
-// example 2
-Mparticle.identifyUser({
- email,
- customerId,
- other
-}).then(uid => {
- Mparticle.setUserAttributes({
-  userId, 
-  attributes: [
-   { name: 'example', value: data.value },
-   { name: 'example_2', value: data.value },
-   { name: 'example_3', value: data.value },
-  ] 
- })
-});
-
-```
 
 --------------------
 
@@ -296,9 +192,7 @@ trackPurchase(product: Product) => Promise<void>
 
 Construct a type with a set of properties K of type T
 
-<code>{
-[P in K]: T;
-}</code>
+<code>{ [P in K]: T; }</code>
 
 
 #### Identifier
