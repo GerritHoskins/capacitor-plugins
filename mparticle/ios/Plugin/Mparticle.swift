@@ -45,12 +45,9 @@ import Capacitor
 
     @objc public func identityRequest(_ email: String?, _ customerId: String?, _ other: String?) -> MPIdentityApiRequest? {
         self.identityRequest = MPIdentityApiRequest.withEmptyUser()
-        if email != nil {
-            self.identityRequest!.setIdentity(email, identityType: self.convertIdentityType("email"))
-            self.identityRequest!.setIdentity(customerId, identityType: self.convertIdentityType("customerId"))
-            self.identityRequest!.setIdentity(other, identityType: self.convertIdentityType("other"))
-        }
-
+        self.identityRequest!.setIdentity(email, identityType: self.convertIdentityType("email"))
+        self.identityRequest!.setIdentity(customerId, identityType: self.convertIdentityType("customerId"))
+        self.identityRequest!.setIdentity(other, identityType: self.convertIdentityType("other"))
         return self.identityRequest
     }
 
