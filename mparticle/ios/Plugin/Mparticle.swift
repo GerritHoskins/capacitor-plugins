@@ -69,12 +69,12 @@ import Capacitor
     }
 
     public func addGDPRConsentState(_ analytics: JSObject, _ advertising: JSObject, _ general: JSObject ) {
-        self.prepareAndSetConsentData("analytics", analytics)
-        self.prepareAndSetConsentData("advertising", advertising)
-        self.prepareAndSetConsentData("general", general)
+        self.setGDPRConsentState("analytics", analytics)
+        self.setGDPRConsentState("advertising", advertising)
+        self.setGDPRConsentState("general", general)
     }
 
-    private func prepareAndSetConsentData(_ purpose: String, _ data: JSObject) {
+    private func setGDPRConsentState(_ purpose: String, _ data: JSObject) {
         let consentGDPR = MPGDPRConsent()
         consentGDPR.consented = data["consented"] as! Bool
         consentGDPR.document = data["document"] as? String
@@ -83,16 +83,16 @@ import Capacitor
         consentGDPR.hardwareId = data["hardwareId"] as? String
 
         let user = self.currentUser()
-        let newConsentState = MPConsentState()
+        let newConsent = MPConsentState()
         if let existingConsentState = user!.consentState() {
-            if let priorCCPA = existingConsentState.ccpaConsentState() {
-                newConsentState.setCCPA(priorCCPA)
+            if let priorGDRP = existingConsentState.gdprConsentState() {
+                newConsent.setGDPR(priorGDRP)
             }
-            newConsentState.setGDPR(existingConsentState.gdprConsentState())
+            newConsent.setGDPR(existingConsentState.gdprConsentState())
         }
 
-        newConsentState.addGDPRConsentState(consentGDPR, purpose: purpose)
-        user?.setConsentState(newConsentState)
+        newConsent.addGDPRConsentState(consentGDPR, purpose: purpose)
+        user?.setConsentState(newConsent)
     }
 
     @objc public func getGDPRConsent() -> [String: MPGDPRConsent]? {

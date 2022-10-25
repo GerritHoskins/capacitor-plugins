@@ -2,7 +2,6 @@ package net.bitburst.plugins.mparticle;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
-import androidx.annotation.Nullable;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.mparticle.MPEvent;
@@ -76,7 +75,7 @@ public class Mparticle {
 
     public boolean setUserAttributes(final String userId, final List<Object> attributes) throws JSONException {
         long mpid = MparticleHelper.parseString(userId);
-        MParticleUser selectedUser = MParticle.getInstance().Identity().getUser(mpid);
+        MParticleUser selectedUser = Objects.requireNonNull(MParticle.getInstance()).Identity().getUser(mpid);
         assert attributes != null;
         Map<String, Object> attributeMap = MparticleHelper.MapObjectList(attributes);
         if (selectedUser == null) {
@@ -86,7 +85,7 @@ public class Mparticle {
     }
 
     public MPEvent trackEvent(final JSObject data) throws JSONException {
-        Map<String, String> customAttributes = MparticleHelper.ConvertStringMap((JSONObject) data.getJSObject("data"));
+        Map<String, String> customAttributes = MparticleHelper.ConvertStringMap(data.getJSObject("data"));
         String name = data.getString("name");
         EventType eventType = getEventType(data.getInteger("eventType", 8)); //EventType 8:OTHER
         assert name != null;
@@ -112,6 +111,7 @@ public class Mparticle {
 
     public void addGDPRConsentState(final JSObject consents) throws JSONException, ParseException {
         MParticleUser user = currentUser();
+        ConsentState.Builder state = ConsentState.builder();
         if (consents != null) {
             GDPRConsent newConsent;
             Iterator<String> iter = consents.keys();
@@ -120,12 +120,12 @@ public class Mparticle {
                 try {
                     Object value = consents.get(key);
                     newConsent = ConvertGDPRConsent((JSONObject) value);
-                    var state = ConsentState.builder().addGDPRConsentState(key, newConsent).build();
-                    user.setConsentState(state);
+                    state.addGDPRConsentState(key, newConsent);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
+            user.setConsentState(state.build());
         }
     }
 
@@ -138,7 +138,7 @@ public class Mparticle {
 
     public IdentityApiRequest identityRequest(PluginCall call, JSObject data) throws JSONException {
         call.setKeepAlive(true);
-        return ConvertIdentityAPIRequest((JSONObject) data);
+        return ConvertIdentityAPIRequest(data);
     }
 
     private static IdentityApiRequest ConvertIdentityAPIRequest(JSONObject map) throws JSONException {
@@ -162,20 +162,13 @@ public class Mparticle {
     }
 
     private static GDPRConsent ConvertGDPRConsent(JSONObject consent) throws JSONException {
-        boolean consented = false;
-        consented = consent.getBoolean("consented");
+        boolean consented = consent.getBoolean("consented");
         Long timestamp = new Timestamp(System.currentTimeMillis()).getTime();
         String document = "";
         String location = "";
-        String hardwareId = "";
-        hardwareId = consent.getString("hardwareId");
+        String hardwareId = consent.getString("hardwareId");
 
-        GDPRConsent.Builder builder = GDPRConsent.builder(consented);
-        builder.document(document);
-        builder.timestamp(timestamp);
-        builder.location(location);
-        builder.hardwareId(hardwareId);
-        return builder.build();
+        return GDPRConsent.builder(consented).document(document).timestamp(timestamp).location(location).hardwareId(hardwareId).build();
     }
 
     private static Product createMParticleProduct(final JSObject data) throws JSONException {
