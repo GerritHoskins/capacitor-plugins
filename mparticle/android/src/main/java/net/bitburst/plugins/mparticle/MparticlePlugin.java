@@ -23,7 +23,11 @@ public class MparticlePlugin extends Plugin {
 
     @Override
     public void load() {
-        implementation = new Mparticle(this);
+        try {
+            implementation = new Mparticle(this);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         super.load();
     }
 

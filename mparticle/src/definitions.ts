@@ -1,5 +1,4 @@
 /// <reference types="@capacitor/cli" />
-import type { MPConfiguration } from '@mparticle/web-sdk';
 
 declare module '@capacitor/cli' {
   export interface PluginsConfig {
@@ -8,7 +7,10 @@ declare module '@capacitor/cli' {
       androidSecret?: string;
       iosKey?: string;
       iosSecret?: string;
-      config?: MPConfiguration;
+      dataPlan?: {
+        planId: string;
+        planVersion: number;
+      };
     };
   }
 }

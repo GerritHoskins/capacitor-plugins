@@ -31,24 +31,33 @@ public class Mparticle {
     private static MParticle instance = MParticle.getInstance();
     private MparticlePlugin mPlugin;
 
-    public Mparticle(MparticlePlugin plugin) {
+    public Mparticle(MparticlePlugin plugin) throws JSONException {
         this.mPlugin = plugin;
         start(plugin.getActivity().getApplication());
     }
 
-    public Mparticle(Application application) {
+    public Mparticle(Application application) throws JSONException {
         start(application);
     }
 
     @SuppressLint("MParticleInitialization")
-    public void start(Application application) {
+    public void start(Application application) throws JSONException {
         String mParticleKey = mPlugin.getConfig().getString("androidKey", "android key is wrong or missing!");
         String mParticleSecret = mPlugin.getConfig().getString("androidSecret", "android secret is wrong or missing!");
+        JSONObject mParticleDataPlan = mPlugin.getConfig().getObject("dataPlan");
+
+        String planId = "";
+        Integer planVersion = -1;
+        if(mParticleDataPlan != null) {
+            planId = mParticleDataPlan.getString("planId");
+            planVersion = mParticleDataPlan.getInt("planVersion");
+        }
+
         MParticleOptions options = MParticleOptions
             .builder(application.getApplicationContext())
             .credentials(mParticleKey, mParticleSecret)
             .environment(MParticle.Environment.AutoDetect)
-            .dataplan("bitcode_frontend_plan", 6)
+            .dataplan(planId, planVersion)
             .build();
         MParticle.start(options);
     }
