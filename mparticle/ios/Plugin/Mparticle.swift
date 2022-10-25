@@ -8,13 +8,16 @@ import Capacitor
 @objc public class Mparticle: NSObject {
     var identityRequest: MPIdentityApiRequest?
 
-    @objc public func start(_ options: MParticleOptions) {
+    @objc public func start(_ config: PluginConfig) {
+        let key = config.getString("iosKey") ?? ""
+        let secret = config.getString("iosSecret") ?? ""
+        let options = MParticleOptions(key: key, secret: secret)
+        if let dataPlan = config.getObject("dataPlan") {
+            options.dataPlanId = dataPlan["planId"] as? String ?? ""
+            options.dataPlanVersion = dataPlan["planVersion"] as? NSNumber ?? -1
+        }
         options.environment = MPEnvironment.autoDetect
-        options.dataPlanId = "bitcode_frontend_plan"
-        options.dataPlanVersion = 6
-
         options.identifyRequest = self.identityRequest(nil, nil, nil)!
-
         options.onIdentifyComplete = identityCallback
 
         if #available(iOS 14, *) {

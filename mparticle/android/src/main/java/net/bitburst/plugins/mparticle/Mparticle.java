@@ -48,7 +48,7 @@ public class Mparticle {
 
         String planId = "";
         Integer planVersion = -1;
-        if(mParticleDataPlan != null) {
+        if (mParticleDataPlan != null) {
             planId = mParticleDataPlan.getString("planId");
             planVersion = mParticleDataPlan.getInt("planVersion");
         }

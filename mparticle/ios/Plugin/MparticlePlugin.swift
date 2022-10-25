@@ -11,9 +11,7 @@ public class MparticlePlugin: CAPPlugin {
     public let LOG_TAG = "bitburst.mparticle.plugin "
 
     override public func load() {
-        let key = getConfig().getString("iosKey") ?? ""
-        let secret = getConfig().getString("iosSecret") ?? ""
-        implementation.start(MParticleOptions(key: key, secret: secret))
+        implementation.start(getConfig())
     }
 
     @objc func identifyUser(_ call: CAPPluginCall) {
