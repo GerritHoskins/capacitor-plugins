@@ -17,7 +17,6 @@ import Capacitor
             options.dataPlanVersion = dataPlan["planVersion"] as? NSNumber ?? -1
         }
         options.environment = MPEnvironment.autoDetect
-        options.identifyRequest = self.identityRequest(nil, nil, nil)!
         options.onIdentifyComplete = identityCallback
 
         if #available(iOS 14, *) {
@@ -25,9 +24,11 @@ import Capacitor
             ATTrackingManager.requestTrackingAuthorization(completionHandler: { [self] status in
                 switch status {
                 case .authorized:
+                    let mIdentityRequest = MPIdentityApiRequest.withEmptyUser()
                     MParticle.sharedInstance().setATTStatus(MPATTAuthorizationStatus(rawValue: 3)!, withATTStatusTimestampMillis: nil)
-                    self.identityRequest!.setIdentity(ASIdentifierManager.shared().advertisingIdentifier.uuidString, identityType: MPIdentity.iosAdvertiserId)
-                    MParticle.sharedInstance().identity.modify(identityRequest!, completion: self.identityCallback)
+                    mIdentityRequest.setIdentity(ASIdentifierManager.shared().advertisingIdentifier.uuidString, identityType: MPIdentity.iosAdvertiserId)
+                    MParticle.sharedInstance().identity.modify(mIdentityRequest, completion: self.identityCallback)
+                    options.attStatus = NSNumber.init(value: ATTrackingManager.trackingAuthorizationStatus.rawValue)
                 case .denied:
                     MParticle.sharedInstance().setATTStatus(MPATTAuthorizationStatus(rawValue: 2)!, withATTStatusTimestampMillis: nil)
                 case .notDetermined:
@@ -47,11 +48,11 @@ import Capacitor
     }
 
     @objc public func identityRequest(_ email: String?, _ customerId: String?, _ other: String?) -> MPIdentityApiRequest? {
-        self.identityRequest = MPIdentityApiRequest.withEmptyUser()
-        self.identityRequest!.setIdentity(email, identityType: self.convertIdentityType("email"))
-        self.identityRequest!.setIdentity(customerId, identityType: self.convertIdentityType("customerId"))
-        self.identityRequest!.setIdentity(other, identityType: self.convertIdentityType("other"))
-        return self.identityRequest
+        let mIdentityRequest = MPIdentityApiRequest.withEmptyUser()
+        mIdentityRequest.setIdentity(email, identityType: self.convertIdentityType("email"))
+        mIdentityRequest.setIdentity(customerId, identityType: self.convertIdentityType("customerId"))
+        mIdentityRequest.setIdentity(other, identityType: self.convertIdentityType("other"))
+        return mIdentityRequest
     }
 
     public func setUserAttribute(_ userId: String, _ name: String, _ value: String) {
@@ -64,7 +65,7 @@ import Capacitor
         let mpid = Int64(userId) ?? self.currentUser()?.userId as! Int64
         let user = MParticle.sharedInstance().identity.getUser(NSNumber(value: mpid))
         data.forEach { (attribute) in
-            user?.setUserAttribute(attribute["name"] as! String, value: attribute["value"] as Any)
+            user?.setUserAttribute(attribute["name"] as! String, value: attribute["value"] as! String)
         }
     }
 

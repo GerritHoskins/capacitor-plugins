@@ -10,8 +10,9 @@ public class MparticlePlugin: CAPPlugin {
     private let implementation = Mparticle()
     public let LOG_TAG = "bitburst.mparticle.plugin "
 
-    override public func load() {
+    @objc func `init`(_ call: CAPPluginCall) {
         implementation.start(getConfig())
+        call.resolve()
     }
 
     @objc func identifyUser(_ call: CAPPluginCall) {
