@@ -22,12 +22,12 @@ public class MparticleHelper {
         return map;
     }
 
-    static Map<String, Object> MapObjectList(List<Object> list) {
+    static Map<String, Object> MapObjectList(List<Object> list) throws JSONException {
         Map<String, Object> map = new HashMap<>();
-        JSObject temp;
+        JSONObject temp;
         for (int i = 0; i < list.size(); i++) {
-            temp = (JSObject) list.get(i);
-            map.put(temp.getString("name"), temp.getJSObject("value"));
+            temp = (JSONObject) list.get(i);
+            map.put(temp.getString("name"), temp.getString("value"));
         }
         return map;
     }
