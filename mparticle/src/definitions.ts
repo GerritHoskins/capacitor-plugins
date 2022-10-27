@@ -7,7 +7,7 @@ declare module '@capacitor/cli' {
       androidSecret?: string;
       iosKey?: string;
       iosSecret?: string;
-      dataPlan?: {
+      dataPlan: {
         planId: string;
         planVersion: number;
       };
@@ -16,7 +16,7 @@ declare module '@capacitor/cli' {
 }
 
 export interface MparticlePlugin {
-  init(webKey: string, config: Record<string, unknown>): Promise<void>;
+  init(webKey?: string, config?: Record<string, unknown>): Promise<void>;
   identifyUser(identifier?: Identifier): Promise<string>;
   setUserAttribute(options: {
     userId?: string;

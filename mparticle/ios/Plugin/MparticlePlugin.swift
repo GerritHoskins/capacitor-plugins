@@ -1,6 +1,7 @@
 import Foundation
 import Capacitor
 import mParticle_Apple_SDK
+import AppTrackingTransparency
 
 public typealias JSObject = [String: Any]
 public typealias JSArray = [JSObject]
@@ -9,6 +10,11 @@ public typealias JSArray = [JSObject]
 public class MparticlePlugin: CAPPlugin {
     private let implementation = Mparticle()
     public let LOG_TAG = "bitburst.mparticle.plugin "
+
+    override public func load() {
+        // for iOS we need to delay initializing for ATT status response
+        // initial load moved to init()
+    }
 
     @objc func `init`(_ call: CAPPluginCall) {
         implementation.start(getConfig())
@@ -30,7 +36,6 @@ public class MparticlePlugin: CAPPlugin {
                 print(self.LOG_TAG + "failed to identify user.")
                 call.reject("failed to identify user.")
             }
-
         })
     }
 

@@ -28,13 +28,33 @@ npx cap sync
 
 </docgen-index>
 
+
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### init(...)
+### Plugin Config (Android & iOS)
+```typescript
+Mparticle: {
+  androidKey?: string;
+  androidSecret?: string;
+  iosKey?: string;
+  iosSecret?: string;
+  dataPlan?: {
+    planId: string;
+    planVersion: number;
+  };
+};
+```
+
+### init(...) (Web & iOS)
+### IMPORTANT: the init function needs to be called for iOS to trigger the ATT Request Prompt and to properly start Mparticle with the correct ATT Status
 
 ```typescript
-init(webKey: string, config: Record<string, unknown>) => Promise<void>
+// Web requires at minium the webKey param
+init(webKey: string, config?: Record<string, unknown>) => Promise<void>
+
+// iOS does not require any params
+init() => Promise<void>
 ```
 
 | Param        | Type                                                             |
@@ -70,6 +90,36 @@ setUserAttribute(options: { userId?: string; attribute: Attribute; }) => Promise
 | ------------- | -------------------------------------------------------------------------------- |
 | **`options`** | <code>{ userId?: string; attribute: <a href="#attribute">Attribute</a>; }</code> |
 
+**Example:**
+
+```typescript
+import { Mparticle } from './index';
+
+// example 1
+Mparticle.setUserAttribute({ 
+  attribute: {
+    name: name,
+    value: value
+  }
+});
+
+// example 2
+Mparticle.identifyUser({
+ email,
+ customerId,
+ other
+}).then(userId => {
+ Mparticle.setUserAttribute({
+  userId,
+  attribute: {
+   name: name,
+   value: value
+  }
+ })
+});
+
+```
+
 --------------------
 
 
@@ -82,6 +132,38 @@ setUserAttributes(options: { userId?: string; attributes: Attribute[]; }) => Pro
 | Param         | Type                                                       |
 | ------------- | ---------------------------------------------------------- |
 | **`options`** | <code>{ userId?: string; attributes: Attribute[]; }</code> |
+
+**Example:**
+
+```typescript
+import { Mparticle } from './index';
+
+// example 1
+Mparticle.setUserAttributes({
+  attributes: [
+   { name: 'example', value: data.value },
+   { name: 'example_2', value: data.value },
+   { name: 'example_3', value: data.value },
+ ]
+});
+
+// example 2
+Mparticle.identifyUser({
+ email,
+ customerId,
+ other
+}).then(uid => {
+ Mparticle.setUserAttributes({
+  userId, 
+  attributes: [
+   { name: 'example', value: data.value },
+   { name: 'example_2', value: data.value },
+   { name: 'example_3', value: data.value },
+  ] 
+ })
+});
+
+```
 
 --------------------
 
@@ -192,7 +274,9 @@ trackPurchase(product: Product) => Promise<void>
 
 Construct a type with a set of properties K of type T
 
-<code>{ [P in K]: T; }</code>
+<code>{
+[P in K]: T;
+}</code>
 
 
 #### Identifier

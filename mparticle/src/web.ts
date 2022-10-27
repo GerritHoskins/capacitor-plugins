@@ -12,14 +12,14 @@ import type {
 } from './definitions';
 
 export class MparticleWeb extends WebPlugin implements MparticlePlugin {
-  init(webKey: string, config: Record<string, unknown>): Promise<void> {
+  init(webKey?: string, config?: Record<string, unknown>): Promise<void> {
     return new Promise(resolve => {
       const mParticleConfig = {
         ...config,
         identityCallback: () => resolve(),
       };
 
-      mParticle.init(webKey, mParticleConfig);
+      mParticle.init(webKey || '', mParticleConfig);
     });
   }
   identifyUser(identifier: Identifier): Promise<string> {

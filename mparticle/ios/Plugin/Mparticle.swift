@@ -19,27 +19,15 @@ import Capacitor
         options.environment = MPEnvironment.autoDetect
         options.onIdentifyComplete = identityCallback
 
-        if #available(iOS 14, *) {
-            options.attStatus = NSNumber.init(value: ATTrackingManager.trackingAuthorizationStatus.rawValue)
-            ATTrackingManager.requestTrackingAuthorization(completionHandler: { [self] status in
-                switch status {
-                case .authorized:
-                    let mIdentityRequest = MPIdentityApiRequest.withEmptyUser()
-                    MParticle.sharedInstance().setATTStatus(MPATTAuthorizationStatus(rawValue: 3)!, withATTStatusTimestampMillis: nil)
-                    mIdentityRequest.setIdentity(ASIdentifierManager.shared().advertisingIdentifier.uuidString, identityType: MPIdentity.iosAdvertiserId)
-                    MParticle.sharedInstance().identity.modify(mIdentityRequest, completion: self.identityCallback)
-                    options.attStatus = NSNumber.init(value: ATTrackingManager.trackingAuthorizationStatus.rawValue)
-                case .denied:
-                    MParticle.sharedInstance().setATTStatus(MPATTAuthorizationStatus(rawValue: 2)!, withATTStatusTimestampMillis: nil)
-                case .notDetermined:
-                    MParticle.sharedInstance().setATTStatus(MPATTAuthorizationStatus(rawValue: 0)!, withATTStatusTimestampMillis: nil)
-                case .restricted:
-                    MParticle.sharedInstance().setATTStatus(MPATTAuthorizationStatus(rawValue: 1)!, withATTStatusTimestampMillis: nil)
-                @unknown default:
-                    MParticle.sharedInstance().setATTStatus(MPATTAuthorizationStatus(rawValue: 0)!, withATTStatusTimestampMillis: nil)
-                }
-            })
+        if #available(iOS 14.0, *) {
+            ATTrackingManager.requestTrackingAuthorization { (res) in
+                options.attStatus = Int(res.rawValue) as NSNumber?
+            }
+        } else {
+            // for iOS versions 14 and below set default ATT Status of 3 (authorized)
+            options.attStatus = 3
         }
+
         MParticle.sharedInstance().start(with: options)
     }
 
@@ -144,6 +132,14 @@ import Capacitor
     var identityCallback = {(result: MPIdentityApiResult?, error: Error?) in
         if result?.user != nil {
             // IDSync request succeeded, identityCallback returns MPID here
+            // also sync ATT Status after user prompt response
+            // for iOS versions 14 and below set default ATT Status of 3 (authorized)
+            if #available(iOS 14.0, *) {
+                let mAttStatus: NSNumber = NSNumber.init(value: ATTrackingManager.trackingAuthorizationStatus.rawValue)
+                MParticle.sharedInstance().setATTStatus(MPATTAuthorizationStatus(rawValue: UInt(truncating: mAttStatus))!, withATTStatusTimestampMillis: nil)
+            } else {
+                MParticle.sharedInstance().setATTStatus(MPATTAuthorizationStatus(rawValue: 3)!, withATTStatusTimestampMillis: nil)
+            }
         } else {
             NSLog(error!.localizedDescription)
             let resultCode = MPIdentityErrorResponseCode(rawValue: UInt((error! as NSError).code))
