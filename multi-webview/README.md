@@ -9,6 +9,61 @@ npm install @gerrithoskins/multi-webview
 npx cap sync
 ```
 
+### iOS Setup
+
+After installation, run:
+
+```bash
+cd ios/App
+pod install
+cd ../..
+```
+
+Then clean and rebuild in Xcode:
+- Product → Clean Build Folder (Cmd+Shift+K)
+- Product → Build (Cmd+B)
+
+### Android Setup
+
+The plugin should work after `npx cap sync`. If you encounter issues, try:
+
+```bash
+cd android
+./gradlew clean build
+```
+
+## Troubleshooting
+
+### iOS: "UNIMPLEMENTED" Error
+
+If you get `{"code":"UNIMPLEMENTED"}` on iOS:
+
+1. **Ensure plugin is synced**:
+   ```bash
+   npx cap sync ios
+   ```
+
+2. **Update pods**:
+   ```bash
+   cd ios/App
+   pod install
+   pod update
+   ```
+
+3. **Clean build in Xcode**:
+   - Open Xcode: `npx cap open ios`
+   - Product → Clean Build Folder
+   - Product → Build
+
+4. **Verify iOS deployment target** is at least 13.0 in your `Podfile`:
+   ```ruby
+   platform :ios, '13.0'
+   ```
+
+5. **Check plugin version** in `package.json` is 1.1.0 or higher
+
+See [DEVELOPMENT.md](./DEVELOPMENT.md) for detailed troubleshooting.
+
 ## API
 
 <docgen-index>
