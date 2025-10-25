@@ -161,6 +161,36 @@ public class MultiWebviewPlugin: CAPPlugin {
         call.resolve(["webviews": webviews])
     }
 
+    @objc func getWebviewInfo(_ call: CAPPluginCall) {
+        guard let id = call.getString("id") else {
+            call.reject("Must provide webview id")
+            return
+        }
+
+        do {
+            let info = try manager.getWebviewInfo(id: id)
+            call.resolve(info)
+        } catch {
+            call.reject("Failed to get webview info: \(error.localizedDescription)")
+        }
+    }
+
+    @objc func getAllWebviews(_ call: CAPPluginCall) {
+        let webviews = manager.getAllWebviews()
+        call.resolve(["webviews": webviews])
+    }
+
+    @objc func getWebviewsByUrl(_ call: CAPPluginCall) {
+        guard let urlString = call.getString("url") else {
+            call.reject("Must provide url")
+            return
+        }
+
+        let exactMatch = call.getBool("exactMatch") ?? false
+        let webviews = manager.getWebviewsByUrl(urlString: urlString, exactMatch: exactMatch)
+        call.resolve(["webviews": webviews])
+    }
+
     @objc func setWebviewFrame(_ call: CAPPluginCall) {
         guard let id = call.getString("id") else {
             call.reject("Must provide webview id")

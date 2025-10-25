@@ -1,10 +1,12 @@
 import { WebPlugin } from '@capacitor/core';
 
 import type {
+  AllWebviewsResult,
   CreateWebviewOptions,
   ExecuteJavaScriptOptions,
   ExecuteJavaScriptResult,
   FocusedWebviewResult,
+  GetWebviewsByUrlOptions,
   ListWebviewsResult,
   LoadUrlOptions,
   MultiWebviewPlugin,
@@ -12,6 +14,8 @@ import type {
   SetFocusedWebviewOptions,
   SetWebviewFrameOptions,
   WebviewIdentifier,
+  WebviewInfo,
+  WebviewsByUrlResult,
 } from './definitions';
 
 export class MultiWebviewWeb extends WebPlugin implements MultiWebviewPlugin {
@@ -44,6 +48,20 @@ export class MultiWebviewWeb extends WebPlugin implements MultiWebviewPlugin {
   }
 
   async listWebviews(): Promise<ListWebviewsResult> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  async getWebviewInfo(_options: WebviewIdentifier): Promise<WebviewInfo> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  async getAllWebviews(): Promise<AllWebviewsResult> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  async getWebviewsByUrl(
+    _options: GetWebviewsByUrlOptions,
+  ): Promise<WebviewsByUrlResult> {
     throw this.unimplemented('Not implemented on web.');
   }
 

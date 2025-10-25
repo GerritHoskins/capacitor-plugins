@@ -201,6 +201,59 @@ public class MultiWebviewPlugin extends Plugin {
     }
 
     @PluginMethod
+    public void getWebviewInfo(PluginCall call) {
+        String id = call.getString("id");
+        if (id == null || id.isEmpty()) {
+            call.reject("Must provide webview id");
+            return;
+        }
+
+        try {
+            JSObject info = manager.getWebviewInfo(id);
+            call.resolve(info);
+        } catch (Exception e) {
+            call.reject("Failed to get webview info: " + e.getMessage(), e);
+        }
+    }
+
+    @PluginMethod
+    public void getAllWebviews(PluginCall call) {
+        try {
+            List<JSObject> webviewsList = manager.getAllWebviews();
+            JSArray webviews = new JSArray();
+            for (JSObject webview : webviewsList) {
+                webviews.put(webview);
+            }
+            JSObject result = new JSObject();
+            result.put("webviews", webviews);
+            call.resolve(result);
+        } catch (Exception e) {
+            call.reject("Failed to get all webviews: " + e.getMessage(), e);
+        }
+    }
+
+    @PluginMethod
+    public void getWebviewsByUrl(PluginCall call) {
+        String url = call.getString("url");
+        if (url == null || url.isEmpty()) {
+            call.reject("Must provide url");
+            return;
+        }
+
+        Boolean exactMatch = call.getBoolean("exactMatch", false);
+
+        try {
+            List<String> matchingWebviews = manager.getWebviewsByUrl(url, exactMatch);
+            JSArray webviews = new JSArray(matchingWebviews);
+            JSObject result = new JSObject();
+            result.put("webviews", webviews);
+            call.resolve(result);
+        } catch (Exception e) {
+            call.reject("Failed to get webviews by URL: " + e.getMessage(), e);
+        }
+    }
+
+    @PluginMethod
     public void setWebviewFrame(PluginCall call) {
         String id = call.getString("id");
         if (id == null || id.isEmpty()) {

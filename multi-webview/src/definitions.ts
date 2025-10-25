@@ -70,6 +70,32 @@ export interface MultiWebviewPlugin {
   listWebviews(): Promise<ListWebviewsResult>;
 
   /**
+   * Get detailed information about a specific webview.
+   *
+   * @param options Options specifying which webview to get info for
+   * @returns Promise that resolves with the webview information
+   * @since 1.0.0
+   */
+  getWebviewInfo(options: WebviewIdentifier): Promise<WebviewInfo>;
+
+  /**
+   * Get detailed information about all webviews.
+   *
+   * @returns Promise that resolves with array of webview information
+   * @since 1.0.0
+   */
+  getAllWebviews(): Promise<AllWebviewsResult>;
+
+  /**
+   * Get webviews that match a specific URL or URL pattern.
+   *
+   * @param options Options specifying the URL to search for
+   * @returns Promise that resolves with array of matching webview IDs
+   * @since 1.0.0
+   */
+  getWebviewsByUrl(options: GetWebviewsByUrlOptions): Promise<WebviewsByUrlResult>;
+
+  /**
    * Set the frame/bounds of the specified webview.
    *
    * @param options Options specifying the webview and its new frame
@@ -235,6 +261,66 @@ export interface LoadUrlOptions {
 export interface ListWebviewsResult {
   /**
    * Array of webview identifiers
+   */
+  webviews: string[];
+}
+
+/**
+ * Detailed information about a webview
+ */
+export interface WebviewInfo {
+  /**
+   * Identifier of the webview
+   */
+  id: string;
+
+  /**
+   * Current URL loaded in the webview (may be null if no URL loaded)
+   */
+  url: string | null;
+
+  /**
+   * Whether this webview is currently hidden
+   */
+  isHidden: boolean;
+
+  /**
+   * Whether this webview is currently focused
+   */
+  isFocused: boolean;
+}
+
+/**
+ * Result of getting all webviews with details
+ */
+export interface AllWebviewsResult {
+  /**
+   * Array of webview information objects
+   */
+  webviews: WebviewInfo[];
+}
+
+/**
+ * Options for getting webviews by URL
+ */
+export interface GetWebviewsByUrlOptions {
+  /**
+   * URL to search for (exact match or contains, depending on exactMatch parameter)
+   */
+  url: string;
+
+  /**
+   * Whether to use exact match (true) or contains match (false, default)
+   */
+  exactMatch?: boolean;
+}
+
+/**
+ * Result of getting webviews by URL
+ */
+export interface WebviewsByUrlResult {
+  /**
+   * Array of webview identifiers that match the URL criteria
    */
   webviews: string[];
 }

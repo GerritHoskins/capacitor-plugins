@@ -14,6 +14,7 @@ class WebviewContainer {
     let id: String
     let webView: WKWebView
     var isHidden: Bool = false
+    var currentUrl: String?
 
     init(id: String, webView: WKWebView) {
         self.id = id
@@ -180,6 +181,44 @@ class MultiWebviewManager: NSObject, WKNavigationDelegate, WKScriptMessageHandle
         return Array(webviews.keys)
     }
 
+    func getWebviewInfo(id: String) throws -> [String: Any?] {
+        guard let container = webviews[id] else {
+            throw MultiWebviewError.webviewNotFound
+        }
+
+        return [
+            "id": id,
+            "url": container.currentUrl as Any?,
+            "isHidden": container.isHidden,
+            "isFocused": focusedWebviewId == id
+        ]
+    }
+
+    func getAllWebviews() -> [[String: Any?]] {
+        return webviews.map { (id, container) in
+            return [
+                "id": id,
+                "url": container.currentUrl as Any?,
+                "isHidden": container.isHidden,
+                "isFocused": focusedWebviewId == id
+            ]
+        }
+    }
+
+    func getWebviewsByUrl(urlString: String, exactMatch: Bool) -> [String] {
+        return webviews.compactMap { (id, container) in
+            guard let currentUrl = container.currentUrl else {
+                return nil
+            }
+
+            if exactMatch {
+                return currentUrl == urlString ? id : nil
+            } else {
+                return currentUrl.contains(urlString) ? id : nil
+            }
+        }
+    }
+
     func setWebviewFrame(id: String, frame: CGRect) throws {
         guard let container = webviews[id] else {
             throw MultiWebviewError.webviewNotFound
@@ -239,6 +278,10 @@ class MultiWebviewManager: NSObject, WKNavigationDelegate, WKScriptMessageHandle
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if let id = findWebviewId(for: webView), let url = webView.url?.absoluteString {
+            // Update the current URL in the container
+            if let container = webviews[id] {
+                container.currentUrl = url
+            }
             plugin?.notifyListeners("loadFinish", data: ["id": id, "url": url])
         }
     }

@@ -80,6 +80,12 @@ public class MultiWebviewManager {
 
                 @Override
                 public void onPageFinished(WebView view, String url) {
+                    // Update current URL in container
+                    WebviewContainer container = webviews.get(id);
+                    if (container != null) {
+                        container.setCurrentUrl(url);
+                    }
+
                     JSObject data = new JSObject();
                     data.put("id", id);
                     data.put("url", url);
@@ -226,6 +232,58 @@ public class MultiWebviewManager {
         return new ArrayList<>(webviews.keySet());
     }
 
+    public JSObject getWebviewInfo(String id) throws Exception {
+        WebviewContainer container = webviews.get(id);
+        if (container == null) {
+            throw new Exception("Webview with id '" + id + "' not found");
+        }
+
+        JSObject info = new JSObject();
+        info.put("id", id);
+        info.put("url", container.getCurrentUrl());
+        info.put("isHidden", container.isHidden());
+        info.put("isFocused", id.equals(focusedWebviewId));
+        return info;
+    }
+
+    public List<JSObject> getAllWebviews() {
+        List<JSObject> result = new ArrayList<>();
+        for (Map.Entry<String, WebviewContainer> entry : webviews.entrySet()) {
+            String id = entry.getKey();
+            WebviewContainer container = entry.getValue();
+
+            JSObject info = new JSObject();
+            info.put("id", id);
+            info.put("url", container.getCurrentUrl());
+            info.put("isHidden", container.isHidden());
+            info.put("isFocused", id.equals(focusedWebviewId));
+            result.add(info);
+        }
+        return result;
+    }
+
+    public List<String> getWebviewsByUrl(String urlString, boolean exactMatch) {
+        List<String> result = new ArrayList<>();
+        for (Map.Entry<String, WebviewContainer> entry : webviews.entrySet()) {
+            String id = entry.getKey();
+            WebviewContainer container = entry.getValue();
+            String currentUrl = container.getCurrentUrl();
+
+            if (currentUrl != null) {
+                if (exactMatch) {
+                    if (currentUrl.equals(urlString)) {
+                        result.add(id);
+                    }
+                } else {
+                    if (currentUrl.contains(urlString)) {
+                        result.add(id);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     public void setWebviewFrame(String id, WebviewFrame frame) throws Exception {
         WebviewContainer container = webviews.get(id);
         if (container == null) {
@@ -299,6 +357,7 @@ public class MultiWebviewManager {
         private final String id;
         private final WebView webView;
         private boolean isHidden = false;
+        private String currentUrl = null;
 
         WebviewContainer(String id, WebView webView) {
             this.id = id;
@@ -319,6 +378,14 @@ public class MultiWebviewManager {
 
         public void setHidden(boolean hidden) {
             isHidden = hidden;
+        }
+
+        public String getCurrentUrl() {
+            return currentUrl;
+        }
+
+        public void setCurrentUrl(String currentUrl) {
+            this.currentUrl = currentUrl;
         }
     }
 }

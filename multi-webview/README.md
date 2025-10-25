@@ -21,6 +21,9 @@ npx cap sync
 * [`destroyWebview(...)`](#destroywebview)
 * [`loadUrl(...)`](#loadurl)
 * [`listWebviews()`](#listwebviews)
+* [`getWebviewInfo(...)`](#getwebviewinfo)
+* [`getAllWebviews()`](#getallwebviews)
+* [`getWebviewsByUrl(...)`](#getwebviewsbyurl)
 * [`setWebviewFrame(...)`](#setwebviewframe)
 * [`executeJavaScript(...)`](#executejavascript)
 * [`sendMessage(...)`](#sendmessage)
@@ -161,6 +164,59 @@ listWebviews() => Promise<ListWebviewsResult>
 Get a list of all webview identifiers currently managed by the plugin.
 
 **Returns:** <code>Promise&lt;<a href="#listwebviewsresult">ListWebviewsResult</a>&gt;</code>
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### getWebviewInfo(...)
+
+```typescript
+getWebviewInfo(options: WebviewIdentifier) => Promise<WebviewInfo>
+```
+
+Get detailed information about a specific webview.
+
+| Param         | Type                                                            | Description                                      |
+| ------------- | --------------------------------------------------------------- | ------------------------------------------------ |
+| **`options`** | <code><a href="#webviewidentifier">WebviewIdentifier</a></code> | Options specifying which webview to get info for |
+
+**Returns:** <code>Promise&lt;<a href="#webviewinfo">WebviewInfo</a>&gt;</code>
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### getAllWebviews()
+
+```typescript
+getAllWebviews() => Promise<AllWebviewsResult>
+```
+
+Get detailed information about all webviews.
+
+**Returns:** <code>Promise&lt;<a href="#allwebviewsresult">AllWebviewsResult</a>&gt;</code>
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### getWebviewsByUrl(...)
+
+```typescript
+getWebviewsByUrl(options: GetWebviewsByUrlOptions) => Promise<WebviewsByUrlResult>
+```
+
+Get webviews that match a specific URL or URL pattern.
+
+| Param         | Type                                                                        | Description                              |
+| ------------- | --------------------------------------------------------------------------- | ---------------------------------------- |
+| **`options`** | <code><a href="#getwebviewsbyurloptions">GetWebviewsByUrlOptions</a></code> | Options specifying the URL to search for |
+
+**Returns:** <code>Promise&lt;<a href="#webviewsbyurlresult">WebviewsByUrlResult</a>&gt;</code>
 
 **Since:** 1.0.0
 
@@ -368,6 +424,46 @@ Result of listing webviews
 | Prop           | Type                  | Description                  |
 | -------------- | --------------------- | ---------------------------- |
 | **`webviews`** | <code>string[]</code> | Array of webview identifiers |
+
+
+#### WebviewInfo
+
+Detailed information about a webview
+
+| Prop            | Type                        | Description                                                      |
+| --------------- | --------------------------- | ---------------------------------------------------------------- |
+| **`id`**        | <code>string</code>         | Identifier of the webview                                        |
+| **`url`**       | <code>string \| null</code> | Current URL loaded in the webview (may be null if no URL loaded) |
+| **`isHidden`**  | <code>boolean</code>        | Whether this webview is currently hidden                         |
+| **`isFocused`** | <code>boolean</code>        | Whether this webview is currently focused                        |
+
+
+#### AllWebviewsResult
+
+Result of getting all webviews with details
+
+| Prop           | Type                       | Description                          |
+| -------------- | -------------------------- | ------------------------------------ |
+| **`webviews`** | <code>WebviewInfo[]</code> | Array of webview information objects |
+
+
+#### WebviewsByUrlResult
+
+Result of getting webviews by URL
+
+| Prop           | Type                  | Description                                              |
+| -------------- | --------------------- | -------------------------------------------------------- |
+| **`webviews`** | <code>string[]</code> | Array of webview identifiers that match the URL criteria |
+
+
+#### GetWebviewsByUrlOptions
+
+Options for getting webviews by URL
+
+| Prop             | Type                 | Description                                                                    |
+| ---------------- | -------------------- | ------------------------------------------------------------------------------ |
+| **`url`**        | <code>string</code>  | URL to search for (exact match or contains, depending on exactMatch parameter) |
+| **`exactMatch`** | <code>boolean</code> | Whether to use exact match (true) or contains match (false, default)           |
 
 
 #### SetWebviewFrameOptions
